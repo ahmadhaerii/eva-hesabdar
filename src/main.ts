@@ -9,6 +9,7 @@ import { UpdateSourceType, updateElectronApp } from "update-electron-app";
 import { ipcContext } from "@/ipc/context";
 import { IPC_CHANNELS, inDevelopment } from "./constants";
 import { getBasePath } from "./utils/path";
+import { runMigrations } from "./database/client";
 
 function createWindow() {
   const basePath = getBasePath();
@@ -69,6 +70,8 @@ async function setupORPC() {
 }
 
 app.whenReady().then(async () => {
+  await runMigrations();
+
   try {
     createWindow();
     await installExtensions();

@@ -113,6 +113,23 @@ export class InventoryRepository extends BaseRepository {
       .where(eq(inventoryLots.id, lotId))
       .returning();
   }
+  async getProductStock(productId: number): Promise<number> {
+    const lots = await this.executor.query.inventoryLots.findMany({
+      where: and(
+        eq(inventoryLots.productId, productId),
+        gt(inventoryLots.remainingQuantity, 0),
+      ),
+    });
+
+    return lots.reduce((sum, lot) => sum + lot.remainingQuantity, 0);
+  }
+  async getLots(productId: number): Promise<InventoryLot[]> {
+    return this.executor.query.inventoryLots.findMany({
+      where: eq(inventoryLots.productId, productId),
+
+      orderBy: [asc(inventoryLots.receivedAt), asc(inventoryLots.id)],
+    });
+  }
 }
 
 export const inventoryRepository = new InventoryRepository();

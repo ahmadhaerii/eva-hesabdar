@@ -1973,3 +1973,619 @@ CURRENT_TIMESTAMP
 -- =====================================================================
 -- END OF PAGE 08
 -- =====================================================================
+-- =====================================================================
+-- PAGE 09
+-- TRIGGERS
+-- DATA INTEGRITY
+-- BUSINESS RULES
+-- =====================================================================
+
+-- =====================================================================
+-- TRIGGER
+-- Prevent editing confirmed Purchase Invoice
+-- =====================================================================
+
+CREATE TRIGGER trg_purchase_invoice_no_update
+
+BEFORE UPDATE
+ON purchase_invoices
+
+WHEN OLD.status = 'Confirmed'
+
+BEGIN
+
+SELECT RAISE
+(
+    ABORT,
+    'Confirmed purchase invoice cannot be modified.'
+);
+
+END;
+
+-- =====================================================================
+-- TRIGGER
+-- Prevent deleting confirmed Purchase Invoice
+-- =====================================================================
+
+CREATE TRIGGER trg_purchase_invoice_no_delete
+
+BEFORE DELETE
+ON purchase_invoices
+
+WHEN OLD.status = 'Confirmed'
+
+BEGIN
+
+SELECT RAISE
+(
+    ABORT,
+    'Confirmed purchase invoice cannot be deleted.'
+);
+
+END;
+
+-- =====================================================================
+-- TRIGGER
+-- Prevent editing confirmed Sales Invoice
+-- =====================================================================
+
+CREATE TRIGGER trg_sales_invoice_no_update
+
+BEFORE UPDATE
+ON sales_invoices
+
+WHEN OLD.status='Confirmed'
+
+BEGIN
+
+SELECT RAISE
+(
+    ABORT,
+    'Confirmed sales invoice cannot be modified.'
+);
+
+END;
+
+-- =====================================================================
+-- TRIGGER
+-- Prevent deleting confirmed Sales Invoice
+-- =====================================================================
+
+CREATE TRIGGER trg_sales_invoice_no_delete
+
+BEFORE DELETE
+ON sales_invoices
+
+WHEN OLD.status='Confirmed'
+
+BEGIN
+
+SELECT RAISE
+(
+    ABORT,
+    'Confirmed sales invoice cannot be deleted.'
+);
+
+END;
+
+-- =====================================================================
+-- TRIGGER
+-- Prevent negative inventory
+-- =====================================================================
+
+CREATE TRIGGER trg_inventory_remaining_positive
+
+BEFORE UPDATE
+ON inventory_lots
+
+WHEN NEW.remaining_quantity < 0
+
+BEGIN
+
+SELECT RAISE
+(
+    ABORT,
+    'Inventory cannot become negative.'
+);
+
+END;
+
+-- =====================================================================
+-- TRIGGER
+-- Prevent changing exchange rates
+-- =====================================================================
+
+CREATE TRIGGER trg_currency_rate_no_update
+
+BEFORE UPDATE
+ON currency_rates
+
+BEGIN
+
+SELECT RAISE
+(
+    ABORT,
+    'Exchange rates are immutable.'
+);
+
+END;
+
+-- =====================================================================
+-- TRIGGER
+-- Prevent deleting exchange rates
+-- =====================================================================
+
+CREATE TRIGGER trg_currency_rate_no_delete
+
+BEFORE DELETE
+ON currency_rates
+
+BEGIN
+
+SELECT RAISE
+(
+    ABORT,
+    'Exchange rates cannot be deleted.'
+);
+
+END;
+
+-- =====================================================================
+-- TRIGGER
+-- Auto update updated_at
+-- contacts
+-- =====================================================================
+
+CREATE TRIGGER trg_contacts_updated_at
+
+AFTER UPDATE
+ON contacts
+
+BEGIN
+
+UPDATE contacts
+
+SET updated_at = CURRENT_TIMESTAMP
+
+WHERE id = NEW.id;
+
+END;
+
+-- =====================================================================
+-- customer_types
+-- =====================================================================
+
+CREATE TRIGGER trg_customer_types_updated_at
+
+AFTER UPDATE
+ON customer_types
+
+BEGIN
+
+UPDATE customer_types
+
+SET updated_at = CURRENT_TIMESTAMP
+
+WHERE id = NEW.id;
+
+END;
+
+-- =====================================================================
+-- products
+-- =====================================================================
+
+CREATE TRIGGER trg_products_updated_at
+
+AFTER UPDATE
+ON products
+
+BEGIN
+
+UPDATE products
+
+SET updated_at = CURRENT_TIMESTAMP
+
+WHERE id = NEW.id;
+
+END;
+
+-- =====================================================================
+-- categories
+-- =====================================================================
+
+CREATE TRIGGER trg_categories_updated_at
+
+AFTER UPDATE
+ON categories
+
+BEGIN
+
+UPDATE categories
+
+SET updated_at = CURRENT_TIMESTAMP
+
+WHERE id = NEW.id;
+
+END;
+
+-- =====================================================================
+-- units
+-- =====================================================================
+
+CREATE TRIGGER trg_units_updated_at
+
+AFTER UPDATE
+ON units
+
+BEGIN
+
+UPDATE units
+
+SET updated_at = CURRENT_TIMESTAMP
+
+WHERE id = NEW.id;
+
+END;
+
+-- =====================================================================
+-- currencies
+-- =====================================================================
+
+CREATE TRIGGER trg_currencies_updated_at
+
+AFTER UPDATE
+ON currencies
+
+BEGIN
+
+UPDATE currencies
+
+SET updated_at = CURRENT_TIMESTAMP
+
+WHERE id = NEW.id;
+
+END;
+
+-- =====================================================================
+-- SETTINGS
+-- =====================================================================
+
+CREATE TRIGGER trg_settings_updated_at
+
+AFTER UPDATE
+ON settings
+
+BEGIN
+
+UPDATE settings
+
+SET updated_at = CURRENT_TIMESTAMP
+
+WHERE id = NEW.id;
+
+END;
+
+-- =====================================================================
+-- BUSINESS RULES
+-- ---------------------------------------------------------------------
+--
+-- 1.
+-- Purchase invoices become read-only after confirmation.
+--
+-- 2.
+-- Sales invoices become read-only after confirmation.
+--
+-- 3.
+-- Exchange rates are immutable.
+--
+-- 4.
+-- Inventory may never become negative.
+--
+-- 5.
+-- FIFO allocation is permanent.
+--
+-- 6.
+-- Sale price is always editable before confirmation.
+--
+-- 7.
+-- Historical invoices never change.
+--
+-- 8.
+-- Historical exchange rates never change.
+--
+-- 9.
+-- Inventory lots are permanent.
+--
+-- 10.
+-- Only remaining_quantity changes inside lots.
+--
+-- =====================================================================
+
+-- =====================================================================
+-- END OF PAGE 09
+-- =====================================================================
+-- =====================================================================
+-- PAGE 10
+-- FINALIZATION
+-- VERSION 1.0
+-- =====================================================================
+
+-- =====================================================================
+-- DATABASE SUMMARY
+-- =====================================================================
+--
+-- Version
+--
+-- 1.0.0
+--
+--
+-- Database
+--
+-- SQLite
+--
+--
+-- Inventory Method
+--
+-- FIFO
+--
+--
+-- Base Currency
+--
+-- IRR
+--
+--
+-- Purchase Currency
+--
+-- Unlimited
+--
+--
+-- Sales Currency
+--
+-- IRR
+--
+--
+-- Warehouse
+--
+-- Single
+--
+--
+-- Accounting
+--
+-- Not Included
+--
+--
+-- Bank
+--
+-- Not Included
+--
+--
+-- Cashbox
+--
+-- Not Included
+--
+--
+-- Barcode
+--
+-- Not Included
+--
+--
+-- Supplier Module
+--
+-- Not Included
+--
+--
+-- Unit Conversion
+--
+-- Not Included
+--
+--
+-- Brand
+--
+-- Stored inside Product Name
+--
+-- =====================================================================
+
+-- =====================================================================
+-- DATABASE OBJECTS
+-- =====================================================================
+--
+-- MASTER TABLES
+--
+-- customer_types
+-- contacts
+-- customer_profiles
+-- units
+-- categories
+-- products
+--
+--
+-- CURRENCY
+--
+-- currencies
+-- currency_rates
+--
+--
+-- PURCHASE
+--
+-- purchase_invoices
+-- purchase_invoice_items
+-- purchase_costs
+--
+--
+-- INVENTORY
+--
+-- inventory_lots
+-- inventory_transactions
+--
+--
+-- SALES
+--
+-- sales_invoices
+-- sales_invoice_items
+-- sales_inventory_allocations
+--
+--
+-- OTHER
+--
+-- currency_conversions
+-- settings
+--
+-- =====================================================================
+
+-- =====================================================================
+-- IMPLEMENTED BUSINESS RULES
+-- =====================================================================
+--
+-- ✓ FIFO Inventory
+--
+-- ✓ Snapshot Exchange Rate
+--
+-- ✓ Snapshot Purchase Cost
+--
+-- ✓ Snapshot Sale Price
+--
+-- ✓ Customer Type Profit
+--
+-- ✓ Customer Custom Profit
+--
+-- ✓ Equal Freight Distribution
+--
+-- ✓ Editable Sale Price
+--
+-- ✓ Immutable Exchange Rates
+--
+-- ✓ Immutable Confirmed Documents
+--
+-- ✓ Inventory Lots
+--
+-- ✓ Currency Conversion Tracking
+--
+-- ✓ Inventory History
+--
+-- ✓ Soft Delete For Master Data
+--
+-- ✓ One Warehouse
+--
+-- ✓ Unlimited Foreign Currencies
+--
+-- ✓ Reports Based On Historical Data
+--
+-- =====================================================================
+
+-- =====================================================================
+-- DATABASE STATISTICS
+-- =====================================================================
+--
+-- Tables
+--      18
+--
+-- Views
+--      4
+--
+-- Triggers
+--      11
+--
+-- Indexes
+--      40+
+--
+-- Foreign Keys
+--      20+
+--
+-- Constraints
+--      50+
+--
+-- =====================================================================
+
+-- =====================================================================
+-- DEVELOPMENT ROADMAP
+-- =====================================================================
+--
+-- Phase 01
+--
+-- ✓ Database Design
+--
+--
+-- Phase 02
+--
+-- Drizzle ORM
+--
+--
+-- Phase 03
+--
+-- Repository Layer
+--
+--
+-- Phase 04
+--
+-- IPC Services
+--
+--
+-- Phase 05
+--
+-- Purchase Module
+--
+--
+-- Phase 06
+--
+-- Inventory Engine
+--
+--
+-- Phase 07
+--
+-- Sales Engine
+--
+--
+-- Phase 08
+--
+-- Currency Conversion
+--
+--
+-- Phase 09
+--
+-- Reports
+--
+--
+-- Phase 10
+--
+-- UI
+--
+-- =====================================================================
+
+-- =====================================================================
+-- VERSION HISTORY
+-- =====================================================================
+--
+-- v1.0
+--
+-- Initial Database Design
+--
+--
+-- Planned v1.1
+--
+-- Performance Improvements
+--
+-- Additional Views
+--
+-- Better Reporting Indexes
+--
+-- Optimized Triggers
+--
+--
+-- Planned v1.2
+--
+-- Accounting Module
+--
+-- Bank Module
+--
+-- Cashbox Module
+--
+-- Multi Warehouse (Optional)
+--
+-- =====================================================================
+
+COMMIT;
+
+-- =====================================================================
+-- END OF FILE
+-- schema_v1.0.sql
+-- =====================================================================

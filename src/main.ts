@@ -9,7 +9,6 @@ import { UpdateSourceType, updateElectronApp } from "update-electron-app";
 import { ipcContext } from "@/ipc/context";
 import { IPC_CHANNELS, inDevelopment } from "./constants";
 import { getBasePath } from "./utils/path";
-import { runMigrations } from "./database/client";
 
 function createWindow() {
   const basePath = getBasePath();
@@ -35,7 +34,7 @@ function createWindow() {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(
-      path.join(basePath, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+      path.join(basePath, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
 }
@@ -70,8 +69,6 @@ async function setupORPC() {
 }
 
 app.whenReady().then(async () => {
-  await runMigrations();
-
   try {
     createWindow();
     await installExtensions();

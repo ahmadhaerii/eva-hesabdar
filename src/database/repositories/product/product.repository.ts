@@ -1,7 +1,4 @@
 import { and, asc, eq, isNull, like } from "drizzle-orm";
-
-import { db } from "../../client";
-
 import { categories, products, units } from "../../schema";
 
 import {
@@ -60,7 +57,13 @@ export class ProductRepository extends BaseRepository {
   }
 
   async create(data: NewProduct) {
-    return this.executor.insert(products).values(data).returning();
+    try {
+      return await this.executor.insert(products).values(data).returning();
+    } catch (error) {
+      // لاگ کردن خطا با اطلاعات کامل
+      console.error("خطا در create:", error);
+      throw error;
+    }
   }
 
   async update(id: number, data: Partial<NewProduct>) {
@@ -72,7 +75,7 @@ export class ProductRepository extends BaseRepository {
   }
 
   async delete(id: number) {
-    return db
+    return this.executor
       .update(products)
       .set({
         deletedAt: new Date().toISOString(),

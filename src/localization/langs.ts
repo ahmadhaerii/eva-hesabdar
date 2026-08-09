@@ -7,8 +7,8 @@ export default [
     prefix: "EN-US",
   },
   {
-    key: "pt-BR",
-    nativeName: "Português (Brasil)",
-    prefix: "PT-BR",
+    key: "fa",
+    nativeName: "Farsi",
+    prefix: "FA",
   },
 ] as const satisfies Language[];

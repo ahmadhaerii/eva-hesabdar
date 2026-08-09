@@ -3,24 +3,126 @@ import { initReactI18next } from "react-i18next";
 
 i18n.use(initReactI18next).init({
   fallbackLng: "en",
+
   resources: {
     en: {
       translation: {
         appName: "electron-shadcn",
         documentation: "Documentation",
         madeBy: "Made by LuanRoger",
+
         titleHomePage: "Home Page",
         titleSecondPage: "Second Page",
+
+        // Navigation
+        dashboard: "Dashboard",
+        products: "Products",
+        categories: "Categories",
+        units: "Units",
+        customers: "Customers",
+        purchases: "Purchases",
+        sales: "Sales",
+        inventory: "Inventory",
+        currencies: "Currencies",
+        settings: "Settings",
+
+        // Common
+        add: "Add",
+        edit: "Edit",
+        delete: "Delete",
+        save: "Save",
+        cancel: "Cancel",
+        search: "Search",
+        close: "Close",
+        confirm: "Confirm",
+        back: "Back",
+        actions: "Actions",
+        active: "Active",
+        inactive: "Inactive",
+        loading: "Loading...",
+        noData: "No data found",
+
+        // Categories
+        category: "Category",
+        categoryName: "Category Name",
+        addCategory: "Add Category",
+        editCategory: "Edit Category",
+        deleteCategory: "Delete Category",
+        categoryDescription: "Description",
+
+        // Products
+        product: "Product",
+        productName: "Product Name",
+        addProduct: "Add Product",
+        editProduct: "Edit Product",
+
+        // Units
+        unit: "Unit",
+        unitName: "Unit Name",
+        addUnit: "Add Unit",
+        editUnit: "Edit Unit",
       },
     },
-    "pt-BR": {
+
+    fa: {
       translation: {
-        appName: "electron-shadcn",
-        documentation: "Documentação",
-        madeBy: "Feito por LuanRoger",
-        titleHomePage: "Página Inicial",
-        titleSecondPage: "Segunda Página",
+        appName: "نرم‌افزار مدیریت",
+        documentation: "مستندات",
+        madeBy: "ساخته شده توسط احمد حائری",
+
+        titleHomePage: "خانه",
+        titleSecondPage: "صفحه دوم",
+
+        // Navigation
+        dashboard: "داشبورد",
+        products: "محصولات",
+        categories: "دسته‌بندی‌ها",
+        units: "واحدها",
+        customers: "مشتریان",
+        purchases: "خریدها",
+        sales: "فروش‌ها",
+        inventory: "انبار",
+        currencies: "ارزها",
+        settings: "تنظیمات",
+
+        // Common
+        add: "افزودن",
+        edit: "ویرایش",
+        delete: "حذف",
+        save: "ذخیره",
+        cancel: "لغو",
+        search: "جستجو",
+        close: "بستن",
+        confirm: "تأیید",
+        back: "بازگشت",
+        actions: "عملیات",
+        active: "فعال",
+        inactive: "غیرفعال",
+        loading: "در حال بارگذاری...",
+        noData: "داده‌ای یافت نشد",
+
+        // Categories
+        category: "دسته‌بندی",
+        categoryName: "نام دسته‌بندی",
+        addCategory: "افزودن دسته‌بندی",
+        editCategory: "ویرایش دسته‌بندی",
+        deleteCategory: "حذف دسته‌بندی",
+        categoryDescription: "توضیحات",
+
+        // Products
+        product: "محصول",
+        productName: "نام محصول",
+        addProduct: "افزودن محصول",
+        editProduct: "ویرایش محصول",
+
+        // Units
+        unit: "واحد",
+        unitName: "نام واحد",
+        addUnit: "افزودن واحد",
+        editUnit: "ویرایش واحد",
       },
     },
   },
 });
+
+export default i18n;

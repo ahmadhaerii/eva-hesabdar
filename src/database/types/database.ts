@@ -21,7 +21,10 @@ export type NewCategory = typeof schema.categories.$inferInsert;
 
 export type Product = typeof schema.products.$inferSelect;
 export type NewProduct = typeof schema.products.$inferInsert;
-
+export type ProductWithRelations = Product & {
+  category: Category | null;
+  unit: Unit | null;
+};
 /* ==========================================================
    CURRENCY
 ========================================================== */

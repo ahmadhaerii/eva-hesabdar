@@ -19,6 +19,7 @@
     "test:e2e": "playwright test",
     "test:all": "vitest run && playwright test",
     "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
   },
   "author": "ROG <luanroger.dev@gmail.com>",

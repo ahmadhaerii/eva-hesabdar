@@ -8,7 +8,9 @@ import { productRepository } from "../repositories/product/product.repository";
 
 export class ProductService {
   async list() {
-    return productRepository.list();
+    const list = await productRepository.list();
+    console.log(list);
+    return list;
   }
 
   async getById(id: number) {
@@ -31,9 +33,23 @@ export class ProductService {
       updatedAt: "",
       categoryId: 1,
     };
-    const data = productRepository.create(newProduct);
-    console.log("data : => ", data);
-    return data;
+    const newCategory: NewCategory = {
+      name: "تست",
+      createdAt: "",
+      isActive: true,
+      updatedAt: "",
+    };
+    const newUnit: NewUnit = {
+      symbol: "تست",
+      name: "تست",
+      createdAt: "",
+      isActive: true,
+      updatedAt: "",
+    };
+    // const data1 = await productRepository.createCategory(newCategory);
+    // const data2 = await productRepository.createUnit(newUnit);
+    // const data = await productRepository.create(newProduct);
+    return undefined;
   }
 
   async update(id: number, data: Partial<NewProduct>) {

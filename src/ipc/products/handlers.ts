@@ -2,7 +2,14 @@ import { productService } from "@/database/services/product.service";
 import { os } from "@orpc/server";
 
 export const listProducts = os.handler(async () => {
-  return productService.list();
+  try {
+    const list = await productService.list();
+    console.log("list", list);
+
+    return list;
+  } catch (error) {
+    console.error("error", error);
+  }
 });
 
 export const createDummyProduct = os.handler(async ({ input }) => {

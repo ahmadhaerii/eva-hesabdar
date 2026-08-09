@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   integer,
   real,
@@ -186,11 +187,9 @@ export const products = sqliteTable(
 
     name: text("name").notNull(),
 
-    categoryId: integer("category_id").references(() => categories.id),
+    categoryId: integer("category_id"),
 
-    unitId: integer("unit_id")
-      .notNull()
-      .references(() => units.id),
+    unitId: integer("unit_id").notNull(),
 
     description: text("description"),
 

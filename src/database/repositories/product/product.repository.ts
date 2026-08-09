@@ -7,6 +7,7 @@ import {
   NewProduct,
   NewUnit,
   Product,
+  ProductWithRelations,
   Unit,
 } from "../../types/database";
 import { BaseRepository } from "../base.repository";
@@ -16,15 +17,13 @@ export class ProductRepository extends BaseRepository {
      PRODUCTS
   ========================================================== */
 
-  async list(): Promise<Product[]> {
+  async list(): Promise<ProductWithRelations[]> {
     return this.executor.query.products.findMany({
       where: isNull(products.deletedAt),
-
       with: {
         category: true,
         unit: true,
       },
-
       orderBy: [asc(products.name)],
     });
   }

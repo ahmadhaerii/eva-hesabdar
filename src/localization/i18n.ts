@@ -37,6 +37,7 @@ i18n.use(initReactI18next).init({
         confirm: "Confirm",
         back: "Back",
         actions: "Actions",
+        status: "Status",
         active: "Active",
         inactive: "Inactive",
         loading: "Loading...",
@@ -61,6 +62,9 @@ i18n.use(initReactI18next).init({
         unitName: "Unit Name",
         addUnit: "Add Unit",
         editUnit: "Edit Unit",
+
+        // Dashboard
+        dashboardHeader: "Overview of your business system",
       },
     },
 
@@ -96,6 +100,7 @@ i18n.use(initReactI18next).init({
         confirm: "تأیید",
         back: "بازگشت",
         actions: "عملیات",
+        status: "وضعیت",
         active: "فعال",
         inactive: "غیرفعال",
         loading: "در حال بارگذاری...",
@@ -120,6 +125,9 @@ i18n.use(initReactI18next).init({
         unitName: "نام واحد",
         addUnit: "افزودن واحد",
         editUnit: "ویرایش واحد",
+
+        // Dashboard
+        dashboardHeader: "مروری بر سیستم کسب‌وکار شما",
       },
     },
   },

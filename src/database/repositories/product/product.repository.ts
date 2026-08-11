@@ -104,7 +104,25 @@ export class ProductRepository extends BaseRepository {
       orderBy: [asc(categories.name)],
     });
   }
+  async updateCategory(id: number, data: Partial<NewCategory>) {
+    return this.executor
+      .update(categories)
+      .set({
+        ...data,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(categories.id, id))
+      .returning();
+  }
 
+  async deleteCategory(id: number) {
+    return this.executor
+      .update(categories)
+      .set({
+        deletedAt: new Date().toISOString(),
+      })
+      .where(eq(categories.id, id));
+  }
   async createCategory(data: NewCategory) {
     return this.executor.insert(categories).values(data).returning();
   }

@@ -2,8 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useTransition } from "react";
 import { getAppVersion, getPlatform } from "@/actions/app";
 import { getProducts } from "@/actions/product";
+import { useTranslation } from "react-i18next";
 
 function HomePage() {
+  const { t } = useTranslation();
+
   const [appVersion, setAppVersion] = useState("...");
   const [products, setProducts] = useState<any[] | undefined>([]);
   const [platform, setPlatform] = useState("...");
@@ -24,10 +27,12 @@ function HomePage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {t("dashboard")}
+        </h1>
 
         <p className="mt-1 text-sm text-muted-foreground">
-          Overview of your business system
+          {t("dashboardHeader")}
         </p>
       </div>
 
@@ -64,15 +69,15 @@ function HomePage() {
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <DashboardCard
-            title="Products"
+            title={t("products")}
             value={products ? products.length.toString() : "0"}
           />
 
-          <DashboardCard title="Customers" value="—" />
+          <DashboardCard title={t("customers")} value="—" />
 
-          <DashboardCard title="Inventory" value="—" />
+          <DashboardCard title={t("inventory")} value="—" />
 
-          <DashboardCard title="Sales" value="—" />
+          <DashboardCard title={t("sales")} value="—" />
         </div>
       </div>
     </div>

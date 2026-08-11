@@ -15,6 +15,10 @@ const navigation = [
     to: "/products",
   },
   {
+    label: "Categories",
+    to: "/categories",
+  },
+  {
     label: "Customers",
     to: "/customers",
   },
@@ -74,7 +78,7 @@ export default function BaseLayout({
                 }}
                 className="block rounded-md px-3 py-2 text-sm font-medium transition-colors"
               >
-                {item.label}
+                {t(item.label.toLowerCase())}
               </Link>
             ))}
           </nav>

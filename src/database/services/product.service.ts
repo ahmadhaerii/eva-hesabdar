@@ -67,7 +67,20 @@ export class ProductService {
   async createCategory(data: NewCategory) {
     return productRepository.createCategory(data);
   }
+  async updateCategory(
+    id: number,
+    data: {
+      name?: string;
+      description?: string | null;
+      isActive?: boolean;
+    },
+  ) {
+    return productRepository.updateCategory(id, data);
+  }
 
+  async deleteCategory(id: number) {
+    return productRepository.deleteCategory(id);
+  }
   async listUnits() {
     return productRepository.listUnits();
   }

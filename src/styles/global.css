@@ -128,7 +128,10 @@
   html {
     @apply font-sans;
   }
-
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
   .draglayer {
     -webkit-app-region: drag;
   }

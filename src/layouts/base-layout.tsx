@@ -35,6 +35,10 @@ const navigation = [
     to: "/inventory",
   },
   {
+    label: "Units",
+    to: "/units",
+  },
+  {
     label: "Settings",
     to: "/settings",
   },

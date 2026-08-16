@@ -20,9 +20,14 @@ export async function updateCategory(
     isActive?: boolean;
   },
 ) {
-  console.log("updateCategory call");
   return ipc.client.product.updateCategory({
     id,
     ...data,
+  });
+}
+
+export async function deleteCategory(id: number) {
+  return ipc.client.product.deleteCategory({
+    id,
   });
 }

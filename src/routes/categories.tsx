@@ -15,6 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import {
   createCategory,
+  deleteCategory,
   getCategories,
   updateCategory,
 } from "@/actions/category";
@@ -32,10 +33,12 @@ function CategoriesPage() {
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
+  const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+
   const createMutation = useMutation({
     mutationFn: createCategory,
 
@@ -43,11 +46,7 @@ function CategoriesPage() {
       await queryClient.invalidateQueries({
         queryKey: ["categories"],
       });
-
-      setName("");
-      setDescription("");
-      setError("");
-      setOpen(false);
+      resetForm();
     },
 
     onError: () => {
@@ -70,18 +69,39 @@ function CategoriesPage() {
       await queryClient.invalidateQueries({
         queryKey: ["categories"],
       });
-
-      setEditingId(null);
-      setName("");
-      setDescription("");
-      setOpen(false);
+      resetForm();
     },
     onError: (error) => {
       console.error(error);
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: ({ id }: { id: number }) => deleteCategory(id),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+
+      resetForm();
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  const resetForm = () => {
+    setEditingId(null);
+    setName("");
+    setDescription("");
+    setError("");
+    setDialogDeleteOpen(false);
+    setOpen(false);
+  };
+
   return (
-    <div dir="rtl" className="space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">{t("categories")}</h1>
@@ -89,7 +109,12 @@ function CategoriesPage() {
           <p className="text-muted-foreground">{t("categoryDescription")}</p>
         </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+          open={open}
+          onOpenChange={(onOpen: boolean) =>
+            onOpen ? setOpen(onOpen) : resetForm()
+          }
+        >
           <DialogTrigger asChild>
             <Button>
               <Plus className="ml-2 h-4 w-4" />
@@ -97,7 +122,7 @@ function CategoriesPage() {
             </Button>
           </DialogTrigger>
 
-          <DialogContent dir="rtl">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>
                 {editingId ? t("editCategory") : t("addCategory")}
@@ -183,7 +208,9 @@ function CategoriesPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    resetForm();
+                  }}
                   disabled={createMutation.isPending}
                 >
                   {t("cancel")}
@@ -194,6 +221,47 @@ function CategoriesPage() {
                 </Button>
               </div>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={dialogDeleteOpen}
+          onOpenChange={(open: boolean) =>
+            open ? setDialogDeleteOpen(open) : resetForm()
+          }
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("deleteCategory")}</DialogTitle>
+            </DialogHeader>
+            <div className="flex justify-start gap-2">
+              <p>{t("deleteCategoryDescription", { name: name })}</p>
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+
+            <div className="flex justify-start gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  resetForm();
+                }}
+                disabled={createMutation.isPending}
+              >
+                {t("cancel")}
+              </Button>
+
+              <Button
+                disabled={createMutation.isPending}
+                onClick={() => {
+                  deleteMutation.mutate({
+                    id: editingId!,
+                  });
+                }}
+              >
+                {createMutation.isPending ? t("loading") : t("deleteCategory")}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
@@ -251,7 +319,9 @@ function CategoriesPage() {
                   size="icon"
                   variant="destructive"
                   onClick={() => {
-                    console.log("delete", category.id);
+                    setName(category.name);
+                    setEditingId(category.id);
+                    setDialogDeleteOpen(true);
                   }}
                 >
                   <Trash2 className="h-4 w-4" />

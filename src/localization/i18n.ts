@@ -56,12 +56,15 @@ i18n.use(initReactI18next).init({
         productName: "Product Name",
         addProduct: "Add Product",
         editProduct: "Edit Product",
+        deleteCategoryDescription:
+          "Are you sure you want to delete the category {{name}}?",
 
         // Units
         unit: "Unit",
         unitName: "Unit Name",
         addUnit: "Add Unit",
         editUnit: "Edit Unit",
+        unitDescription: "Description",
 
         // Dashboard
         dashboardHeader: "Overview of your business system",
@@ -113,6 +116,8 @@ i18n.use(initReactI18next).init({
         editCategory: "ویرایش دسته‌بندی",
         deleteCategory: "حذف دسته‌بندی",
         categoryDescription: "توضیحات",
+        deleteCategoryDescription:
+          "از حذف دسته بندی '{{name}}'  اطمینان دارید ؟",
 
         // Products
         product: "محصول",
@@ -125,6 +130,7 @@ i18n.use(initReactI18next).init({
         unitName: "نام واحد",
         addUnit: "افزودن واحد",
         editUnit: "ویرایش واحد",
+        unitDescription: "توضیحات",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

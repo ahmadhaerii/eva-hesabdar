@@ -55,25 +55,22 @@ export class ProductRepository extends BaseRepository {
     });
   }
 
-  async create(data: NewProduct) {
-    try {
-      return await this.executor.insert(products).values(data).returning();
-    } catch (error) {
-      // لاگ کردن خطا با اطلاعات کامل
-      console.error("خطا در create:", error);
-      throw error;
-    }
+  async createProduct(data: NewProduct) {
+    return await this.executor.insert(products).values(data).returning();
   }
 
-  async update(id: number, data: Partial<NewProduct>) {
+  async updateProduct(id: number, data: Partial<NewProduct>) {
     return this.executor
       .update(products)
-      .set(data)
+      .set({
+        ...data,
+        updatedAt: new Date().toISOString(),
+      })
       .where(eq(products.id, id))
       .returning();
   }
 
-  async delete(id: number) {
+  async deleteProduct(id: number) {
     return this.executor
       .update(products)
       .set({
@@ -140,6 +137,25 @@ export class ProductRepository extends BaseRepository {
 
   async createUnit(data: NewUnit) {
     return this.executor.insert(units).values(data).returning();
+  }
+  async updateUnit(id: number, data: Partial<NewCategory>) {
+    return this.executor
+      .update(units)
+      .set({
+        ...data,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(units.id, id))
+      .returning();
+  }
+
+  async deleteUnit(id: number) {
+    return this.executor
+      .update(units)
+      .set({
+        deletedAt: new Date().toISOString(),
+      })
+      .where(eq(units.id, id));
   }
 }
 

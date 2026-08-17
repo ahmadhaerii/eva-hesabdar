@@ -42,6 +42,7 @@ i18n.use(initReactI18next).init({
         inactive: "Inactive",
         loading: "Loading...",
         noData: "No data found",
+        description: "Description",
 
         // Categories
         category: "Category",
@@ -50,21 +51,30 @@ i18n.use(initReactI18next).init({
         editCategory: "Edit Category",
         deleteCategory: "Delete Category",
         categoryDescription: "Description",
+        deleteCategoryDescription:
+          "Are you sure you want to delete the category {{name}}?",
+        selectCategory: "Select Category",
 
         // Products
         product: "Product",
         productName: "Product Name",
         addProduct: "Add Product",
         editProduct: "Edit Product",
-        deleteCategoryDescription:
-          "Are you sure you want to delete the category {{name}}?",
+        productsDescription: "Manage your products",
+        deleteProduct: "Delete Product",
+        deleteProductDescription:
+          "Are you sure you want to delete the product {{name}} ?",
 
         // Units
         unit: "Unit",
         unitName: "Unit Name",
+        symbol: "Symbol",
         addUnit: "Add Unit",
         editUnit: "Edit Unit",
+        deleteUnit: "Delete Unit",
         unitDescription: "Description",
+        deleteUnitDescription: "Description",
+        selectUnit: "Select Unit",
 
         // Dashboard
         dashboardHeader: "Overview of your business system",
@@ -108,6 +118,7 @@ i18n.use(initReactI18next).init({
         inactive: "غیرفعال",
         loading: "در حال بارگذاری...",
         noData: "داده‌ای یافت نشد",
+        description: "توضیحات",
 
         // Categories
         category: "دسته‌بندی",
@@ -117,20 +128,29 @@ i18n.use(initReactI18next).init({
         deleteCategory: "حذف دسته‌بندی",
         categoryDescription: "توضیحات",
         deleteCategoryDescription:
-          "از حذف دسته بندی '{{name}}'  اطمینان دارید ؟",
+          "از حذف دسته بندی ' {{ name }} '  اطمینان دارید ؟",
+        selectCategory: "انتخاب دسته‌بندی",
 
         // Products
         product: "محصول",
         productName: "نام محصول",
         addProduct: "افزودن محصول",
         editProduct: "ویرایش محصول",
+        productsDescription: "مدیریت محصولات",
+        deleteProduct: "حذف محصول",
+        deleteProductDescription:
+          "از حذف   محصول ' {{ name }} '  اطمینان دارید ؟",
 
         // Units
         unit: "واحد",
         unitName: "نام واحد",
+        symbol: "نماد",
         addUnit: "افزودن واحد",
         editUnit: "ویرایش واحد",
+        deleteUnit: "حذف واحد",
         unitDescription: "توضیحات",
+        deleteUnitDescription: "از حذف   واحد ' {{ name }} '  اطمینان دارید ؟",
+        selectUnit: "انتخاب واحد",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

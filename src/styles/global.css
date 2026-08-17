@@ -117,7 +117,13 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 }
-
+@font-face {
+  font-family: IRANYekanXVF;
+  src: url("./IRANYekanXVF.woff") format("woff");
+}
+ * {
+    font-family: "IRANYekanXVF"
+  }
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -125,9 +131,7 @@
   body {
     @apply bg-background text-foreground overflow-hidden font-sans antialiased;
   }
-  html {
-    @apply font-sans;
-  }
+ 
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;

@@ -13,38 +13,33 @@ import {
 import { Pencil, Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import {
-  createCategory,
-  deleteCategory,
-  getCategories,
-  updateCategory,
-} from "@/actions/category";
+import { createUnit, deleteUnit, getUnits, updateUnit } from "@/actions/unit";
 
-function CategoriesPage() {
+function UnitsPage() {
   const { t } = useTranslation();
   const {
-    data: categories = [],
+    data: units = [],
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
+    queryKey: ["units"],
+    queryFn: getUnits,
   });
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
   const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false);
   const [name, setName] = useState("");
+  const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const createMutation = useMutation({
-    mutationFn: createCategory,
-
+    mutationFn: createUnit,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["categories"],
+        queryKey: ["units"],
       });
       resetForm();
     },
@@ -60,15 +55,17 @@ function CategoriesPage() {
     }: {
       id: number;
       data: {
+        symbol: string;
         name: string;
         description: string | null;
       };
-    }) => updateCategory(id, data),
+    }) => updateUnit(id, data),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["categories"],
+        queryKey: ["units"],
       });
+
       resetForm();
     },
     onError: (error) => {
@@ -77,11 +74,11 @@ function CategoriesPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) => deleteCategory(id),
+    mutationFn: ({ id }: { id: number }) => deleteUnit(id),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["categories"],
+        queryKey: ["units"],
       });
 
       resetForm();
@@ -96,36 +93,34 @@ function CategoriesPage() {
     setName("");
     setDescription("");
     setError("");
+    setSymbol("");
     setDialogDeleteOpen(false);
     setOpen(false);
   };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{t("categories")}</h1>
+          <h1 className="text-2xl font-semibold">{t("units")}</h1>
 
-          <p className="text-muted-foreground">{t("categoryDescription")}</p>
+          <p className="text-muted-foreground">{t("unitDescription")}</p>
         </div>
 
         <Dialog
           open={open}
-          onOpenChange={(onOpen: boolean) =>
-            onOpen ? setOpen(onOpen) : resetForm()
-          }
+          onOpenChange={(open: boolean) => (open ? setOpen(open) : resetForm())}
         >
           <DialogTrigger asChild>
             <Button>
               <Plus className="ml-2 h-4 w-4" />
-              {t("addCategory")}
+              {t("addUnit")}
             </Button>
           </DialogTrigger>
 
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingId ? t("editCategory") : t("addCategory")}
+                {editingId ? t("editUnit") : t("addUnit")}
               </DialogTitle>
             </DialogHeader>
 
@@ -137,10 +132,12 @@ function CategoriesPage() {
                 const result = z
                   .object({
                     name: z.string().trim().min(1, "نام دسته‌بندی الزامی است."),
+                    symbol: z.string().trim().min(1, " کد واحد الزامی است."),
                     description: z.string().trim(),
                   })
                   .safeParse({
                     name,
+                    symbol,
                     description,
                   });
 
@@ -157,6 +154,7 @@ function CategoriesPage() {
                   updateMutation.mutate({
                     id: editingId,
                     data: {
+                      symbol: result.data.symbol,
                       name: result.data.name,
                       description: result.data.description || null,
                     },
@@ -164,18 +162,19 @@ function CategoriesPage() {
                 } else {
                   createMutation.mutate({
                     name: result.data.name,
+                    symbol: result.data.symbol,
                     description: result.data.description || null,
                   });
                 }
               }}
             >
               <div className="space-y-2">
-                <label htmlFor="category-name" className="text-sm font-medium">
-                  {t("categoryName")}
+                <label htmlFor="unit-name" className="text-sm font-medium">
+                  {t("unitName")}
                 </label>
 
                 <input
-                  id="category-name"
+                  id="unit-name"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   disabled={createMutation.isPending}
@@ -185,15 +184,29 @@ function CategoriesPage() {
               </div>
 
               <div className="space-y-2">
+                <label htmlFor="unit-name" className="text-sm font-medium">
+                  {t("symbol")}
+                </label>
+
+                <input
+                  id="unit-name"
+                  value={symbol}
+                  onChange={(event) => setSymbol(event.target.value)}
+                  disabled={createMutation.isPending}
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <label
-                  htmlFor="category-description"
+                  htmlFor="unit-description"
                   className="text-sm font-medium"
                 >
-                  {t("categoryDescription")}
+                  {t("unitDescription")}
                 </label>
 
                 <textarea
-                  id="category-description"
+                  id="unit-description"
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
                   disabled={createMutation.isPending}
@@ -208,9 +221,7 @@ function CategoriesPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    resetForm();
-                  }}
+                  onClick={() => setOpen(false)}
                   disabled={createMutation.isPending}
                 >
                   {t("cancel")}
@@ -232,10 +243,10 @@ function CategoriesPage() {
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{t("deleteCategory")}</DialogTitle>
+              <DialogTitle>{t("deleteUnit")}</DialogTitle>
             </DialogHeader>
             <div className="flex justify-start gap-2">
-              <p>{t("deleteCategoryDescription", { name: name })}</p>
+              <p>{t("deleteUnitDescription", { name: name })}</p>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
 
@@ -243,9 +254,7 @@ function CategoriesPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => {
-                  resetForm();
-                }}
+                onClick={() => setDialogDeleteOpen(false)}
                 disabled={deleteMutation.isPending}
               >
                 {t("cancel")}
@@ -259,7 +268,7 @@ function CategoriesPage() {
                   });
                 }}
               >
-                {createMutation.isPending ? t("loading") : t("deleteCategory")}
+                {createMutation.isPending ? t("loading") : t("deleteUnit")}
               </Button>
             </div>
           </DialogContent>
@@ -274,41 +283,45 @@ function CategoriesPage() {
         </div>
       )}
 
-      {!isLoading && !isError && categories.length === 0 && (
+      {!isLoading && !isError && units.length === 0 && (
         <div className="rounded-lg border p-8 text-center">
           <p className="text-muted-foreground">{t("noData")}</p>
         </div>
       )}
 
-      {!isLoading && !isError && categories.length > 0 && (
+      {!isLoading && !isError && units.length > 0 && (
         <div className="rounded-lg border">
-          <div className="grid grid-cols-[1fr_2fr_auto_auto] gap-4 border-b p-4 font-medium">
-            <div>{t("categoryName")}</div>
-            <div>{t("categoryDescription")}</div>
+          <div className="grid grid-cols-[1fr_1fr_2fr_auto_auto] gap-4 border-b p-4 font-medium">
+            <div>{t("unitName")}</div>
+            <div>{t("symbol")}</div>
+            <div>{t("unitDescription")}</div>
             <div>{t("status")}</div>
             <div>{t("actions")}</div>
           </div>
 
-          {categories.map((category) => (
+          {units.map((unit) => (
             <div
-              key={category.id}
-              className="grid grid-cols-[1fr_2fr_auto_auto] gap-4 border-b p-4 last:border-b-0"
+              key={unit.id}
+              className="grid grid-cols-[1fr_1fr_2fr_auto_auto] gap-4 border-b p-4 last:border-b-0"
             >
-              <div>{category.name}</div>
+              <div>{unit.name}</div>
+
+              <div>{unit.symbol}</div>
 
               <div className="text-muted-foreground">
-                {category.description || "—"}
+                {unit.description || "—"}
               </div>
 
-              <div>{category.isActive ? t("active") : t("inactive")}</div>
+              <div>{unit.isActive ? t("active") : t("inactive")}</div>
               <div className="flex gap-2">
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={() => {
-                    setEditingId(category.id);
-                    setName(category.name);
-                    setDescription(category.description ?? "");
+                    setEditingId(unit.id);
+                    setSymbol(unit.symbol);
+                    setName(unit.name);
+                    setDescription(unit.description ?? "");
                     setOpen(true);
                   }}
                 >
@@ -319,8 +332,9 @@ function CategoriesPage() {
                   size="icon"
                   variant="destructive"
                   onClick={() => {
-                    setName(category.name);
-                    setEditingId(category.id);
+                    setName(unit.name);
+                    setSymbol(unit.symbol);
+                    setEditingId(unit.id);
                     setDialogDeleteOpen(true);
                   }}
                 >
@@ -335,6 +349,6 @@ function CategoriesPage() {
   );
 }
 
-export const Route = createFileRoute("/categories")({
-  component: CategoriesPage,
+export const Route = createFileRoute("/units")({
+  component: UnitsPage,
 });

@@ -1,58 +1,12 @@
 import { relations } from "drizzle-orm";
 
-import {
-  categories,
-  contacts,
-  customerProfiles,
-  customerTypes,
-  products,
-  units,
-} from "../schema/master";
+import { categories, customerTypes, products, units } from "../schema/master";
 
 import { purchaseInvoiceItems, purchaseInvoices } from "../schema/purchase";
 
 import { inventoryLots, inventoryTransactions } from "../schema/inventory";
 
 import { salesInvoiceItems, salesInvoices } from "../schema/sales";
-
-/* ==========================================================
-   CUSTOMER TYPES
-========================================================== */
-
-export const customerTypeRelations = relations(customerTypes, ({ many }) => ({
-  customers: many(customerProfiles),
-}));
-
-/* ==========================================================
-   CONTACTS
-========================================================== */
-
-export const contactRelations = relations(contacts, ({ one, many }) => ({
-  profile: one(customerProfiles),
-
-  purchaseInvoices: many(purchaseInvoices),
-
-  salesInvoices: many(salesInvoices),
-}));
-
-/* ==========================================================
-   CUSTOMER PROFILE
-========================================================== */
-
-export const customerProfileRelations = relations(
-  customerProfiles,
-  ({ one }) => ({
-    contact: one(contacts, {
-      fields: [customerProfiles.contactId],
-      references: [contacts.id],
-    }),
-
-    customerType: one(customerTypes, {
-      fields: [customerProfiles.customerTypeId],
-      references: [customerTypes.id],
-    }),
-  }),
-);
 
 /* ==========================================================
    CATEGORIES

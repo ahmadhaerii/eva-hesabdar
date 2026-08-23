@@ -6,7 +6,7 @@ import {
   salesInventoryAllocations,
 } from "../schema/sales";
 
-import { contacts, products } from "../schema/master";
+import { products } from "../schema/master";
 
 import { currencies, currencyRates } from "../schema/currency";
 
@@ -19,11 +19,6 @@ import { inventoryLots } from "../schema/inventory";
 export const salesInvoiceRelations = relations(
   salesInvoices,
   ({ one, many }) => ({
-    contact: one(contacts, {
-      fields: [salesInvoices.contactId],
-      references: [contacts.id],
-    }),
-
     currencyRate: one(currencyRates, {
       fields: [salesInvoices.currencyRateId],
       references: [currencyRates.id],

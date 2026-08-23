@@ -6,7 +6,7 @@ import {
   purchaseCosts,
 } from "../schema/purchase";
 
-import { contacts, products } from "../schema/master";
+import { products } from "../schema/master";
 
 import { currencies, currencyRates } from "../schema/currency";
 
@@ -19,11 +19,6 @@ import { inventoryLots } from "../schema/inventory";
 export const purchaseInvoiceRelations = relations(
   purchaseInvoices,
   ({ one, many }) => ({
-    contact: one(contacts, {
-      fields: [purchaseInvoices.contactId],
-      references: [contacts.id],
-    }),
-
     currency: one(currencies, {
       fields: [purchaseInvoices.currencyId],
       references: [currencies.id],

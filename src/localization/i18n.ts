@@ -76,6 +76,27 @@ i18n.use(initReactI18next).init({
         deleteUnitDescription: "Description",
         selectUnit: "Select Unit",
 
+        // CustomerTypes
+        manageCustomerType: "Manage customer type",
+        addCustomerType: "Add Customer type",
+        editCustomerType: "Edit Customer type",
+        deleteCustomerType: "Delete Customer type",
+        customerTypeDescription: "Description",
+        customerTypeName: "Name",
+        customerTypeProfitPercent: "Profit Percent",
+        deleteCustomerTypesDescription:
+          "Are you sure you want to delete the customer types {{name}} ?",
+
+        // Customers
+        addCustomer: "Add Customer",
+        editCustomer: "Edit Customer",
+        deleteCustomer: "Delete Customer",
+        customerDescription: "Description",
+        customerName: "Name",
+        customerProfitPercent: "Profit Percent",
+        deleteCustomerDescription:
+          "Are you sure you want to delete the customer  {{name}} ?",
+
         // Dashboard
         dashboardHeader: "Overview of your business system",
       },
@@ -151,6 +172,27 @@ i18n.use(initReactI18next).init({
         unitDescription: "توضیحات",
         deleteUnitDescription: "از حذف   واحد ' {{ name }} '  اطمینان دارید ؟",
         selectUnit: "انتخاب واحد",
+
+        // customerTypes
+        manageCustomerType: "مدیریت انواع مشتری",
+        addCustomerType: "افزودن نوع مشتری",
+        editCustomerType: "ویرایش نوع مشتری",
+        deleteCustomerType: "حذف نوع مشتری",
+        customerTypeDescription: "توضیحات",
+        customerTypeName: "نام نوع مشتری",
+        customerTypeProfitPercent: "درصد سود",
+        deleteCustomerTypesDescription:
+          "از حذف   نوع مشتری  ' {{ name }} '  اطمینان دارید ؟",
+
+        // Customers
+        addCustomer: "افزودن مشتری",
+        editCustomer: "ویرایش مشتری",
+        deleteCustomer: "حذف مشتری",
+        customerDescription: "توضیحات",
+        customerName: "نام",
+        customerProfitPercent: "درصد سود",
+        deleteCustomerDescription:
+          "از حذف مشتری  ' {{ name }} '  اطمینان دارید ؟",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

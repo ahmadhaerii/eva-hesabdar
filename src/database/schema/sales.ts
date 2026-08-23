@@ -7,7 +7,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
-import { contacts, products } from "./master";
+import { products } from "./master";
 import { currencies, currencyRates } from "./currency";
 import { inventoryLots } from "./inventory";
 
@@ -21,10 +21,6 @@ export const salesInvoices = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     invoiceNumber: text("invoice_number").notNull(),
-
-    contactId: integer("contact_id")
-      .notNull()
-      .references(() => contacts.id),
 
     currencyRateId: integer("currency_rate_id")
       .notNull()
@@ -49,8 +45,6 @@ export const salesInvoices = sqliteTable(
     invoiceUnique: uniqueIndex("uq_sales_invoice_number").on(
       table.invoiceNumber,
     ),
-
-    contactIndex: index("idx_sales_contact").on(table.contactId),
 
     dateIndex: index("idx_sales_date").on(table.invoiceDate),
 

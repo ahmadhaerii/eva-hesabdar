@@ -39,10 +39,10 @@ export const customerTypes = sqliteTable(
 );
 
 /* ==========================================================
-   CONTACTS
+   CUSTOMERS
 ========================================================== */
 
-export const contacts = sqliteTable(
+export const customers = sqliteTable(
   "contacts",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
@@ -53,7 +53,11 @@ export const contacts = sqliteTable(
 
     nationalId: text("national_id"),
 
-    economicCode: text("economic_code"),
+    customerTypeId: integer("customer_type_id")
+      .notNull()
+      .references(() => customerTypes.id),
+
+    customProfitPercent: real("custom_profit_percent"),
 
     phone: text("phone"),
 
@@ -77,45 +81,9 @@ export const contacts = sqliteTable(
   },
   (table) => ({
     codeUnique: uniqueIndex("uq_contacts_code").on(table.code),
-
     nameIndex: index("idx_contacts_name").on(table.displayName),
-
     mobileIndex: index("idx_contacts_mobile").on(table.mobile),
-
     activeIndex: index("idx_contacts_active").on(table.isActive),
-  }),
-);
-
-/* ==========================================================
-   CUSTOMER PROFILE
-========================================================== */
-
-export const customerProfiles = sqliteTable(
-  "customer_profiles",
-  {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-
-    contactId: integer("contact_id")
-      .notNull()
-      .references(() => contacts.id),
-
-    customerTypeId: integer("customer_type_id")
-      .notNull()
-      .references(() => customerTypes.id),
-
-    customProfitPercent: real("custom_profit_percent"),
-
-    creditLimit: real("credit_limit").default(0),
-
-    notes: text("notes"),
-
-    createdAt: text("created_at").notNull(),
-
-    updatedAt: text("updated_at"),
-  },
-  (table) => ({
-    contactUnique: uniqueIndex("uq_customer_profile").on(table.contactId),
-
     typeIndex: index("idx_customer_profile_type").on(table.customerTypeId),
   }),
 );

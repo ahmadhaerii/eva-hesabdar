@@ -7,58 +7,28 @@ import { customers, customerTypes } from "../../schema";
 import {
   Customer,
   CustomerType,
+  CustomerWithRelations,
   NewCustomer,
   NewCustomerType,
 } from "../../types/database";
 import { BaseRepository } from "../base.repository";
 
 export class CustomerRepository extends BaseRepository {
-  /* ==========================================================
-     CONTACTS
-  ========================================================== */
-
-  async list(): Promise<Customer[]> {
+  async listCustomers(): Promise<CustomerWithRelations[]> {
     return this.executor.query.customers.findMany({
       where: isNull(customers.deletedAt),
-
       with: {
         customerType: true,
       },
-
       orderBy: [asc(customers.displayName)],
     });
   }
 
-  async getById(id: number): Promise<Customer | undefined> {
-    return this.executor.query.customers.findFirst({
-      where: and(eq(customers.id, id), isNull(customers.deletedAt)),
-
-      with: {
-        customerType: true,
-      },
-    });
-  }
-
-  async search(keyword: string): Promise<Customer[]> {
-    return this.executor.query.customers.findMany({
-      where: and(
-        like(customers.displayName, `%${keyword}%`),
-        isNull(customers.deletedAt),
-      ),
-
-      with: {
-        customerType: true,
-      },
-
-      orderBy: [asc(customers.displayName)],
-    });
-  }
-
-  async create(data: NewCustomer) {
+  async createCustomer(data: NewCustomer) {
     return this.executor.insert(customers).values(data).returning();
   }
 
-  async update(id: number, data: Partial<NewCustomer>) {
+  async updateCustomer(id: number, data: Partial<NewCustomer>) {
     return this.executor
       .update(customers)
       .set({
@@ -69,25 +39,13 @@ export class CustomerRepository extends BaseRepository {
       .returning();
   }
 
-  async delete(id: number) {
+  async deleteCustomer(id: number) {
     return db
       .update(customers)
       .set({
         deletedAt: new Date().toISOString(),
       })
       .where(eq(customers.id, id));
-  }
-
-  async exists(id: number): Promise<boolean> {
-    const result = await this.executor.query.customers.findFirst({
-      columns: {
-        id: true,
-      },
-
-      where: and(eq(customers.id, id), isNull(customers.deletedAt)),
-    });
-
-    return result !== undefined;
   }
 
   /* ==========================================================

@@ -3,23 +3,29 @@ import { useEffect, useState, useTransition } from "react";
 import { getAppVersion, getPlatform } from "@/actions/app";
 import { getProducts } from "@/actions/product";
 import { useTranslation } from "react-i18next";
+import { getCustomers } from "@/actions/customer";
 
 function HomePage() {
   const { t } = useTranslation();
 
   const [appVersion, setAppVersion] = useState("...");
   const [products, setProducts] = useState<any[] | undefined>([]);
+  const [customers, setCustomers] = useState<any[] | undefined>([]);
   const [platform, setPlatform] = useState("...");
   const [, startTransition] = useTransition();
   useEffect(() => {
     startTransition(() => {
-      Promise.all([getProducts(), getAppVersion(), getPlatform()]).then(
-        ([products, version, currentPlatform]) => {
-          setProducts(products);
-          setAppVersion(version);
-          setPlatform(currentPlatform);
-        },
-      );
+      Promise.all([
+        getProducts(),
+        getCustomers(),
+        getAppVersion(),
+        getPlatform(),
+      ]).then(([products, customers, version, currentPlatform]) => {
+        setCustomers(customers);
+        setProducts(products);
+        setAppVersion(version);
+        setPlatform(currentPlatform);
+      });
     });
   }, []);
 
@@ -73,7 +79,10 @@ function HomePage() {
             value={products ? products.length.toString() : "0"}
           />
 
-          <DashboardCard title={t("customers")} value="—" />
+          <DashboardCard
+            title={t("customers")}
+            value={customers ? customers.length.toString() : "0"}
+          />
 
           <DashboardCard title={t("inventory")} value="—" />
 

@@ -6,7 +6,7 @@ export async function getCustomers(): Promise<
   return ipc.client.customer.listCustomers();
 }
 export async function createCustomer(data: {
-  customerTypeId?: number;
+  customerTypeId: number;
   customProfitPercent?: number | null;
   displayName: string;
   code: string;
@@ -24,10 +24,10 @@ export async function createCustomer(data: {
 export async function updateCustomer(
   id: number,
   data: {
-    customerTypeId?: number;
+    customerTypeId: number;
     customProfitPercent?: number | null;
-    displayName?: string;
-    code?: string;
+    displayName: string;
+    code: string;
     nationalId?: string | null;
     phone?: string | null;
     mobile?: string | null;
@@ -70,7 +70,7 @@ export async function updateCustomerType(
   id: number,
   data: {
     name?: string;
-    profitPercent?: number;
+    profitPercent: number;
     description?: string | null;
     isActive?: boolean;
   },

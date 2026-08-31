@@ -7,8 +7,10 @@ import * as schema from "../schema";
 export type CustomerType = typeof schema.customerTypes.$inferSelect;
 export type NewCustomerType = typeof schema.customerTypes.$inferInsert;
 export type Customer = typeof schema.customers.$inferSelect;
-export type NewCustomer = typeof schema.customers.$inferSelect;
-
+export type NewCustomer = typeof schema.customers.$inferInsert;
+export type CustomerWithRelations = Customer & {
+  customerType: CustomerType | null;
+};
 export type Unit = typeof schema.units.$inferSelect;
 export type NewUnit = typeof schema.units.$inferInsert;
 

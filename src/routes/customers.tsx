@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil, Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
+import { number, z } from "zod";
+
 import {
-  createCategory,
-  deleteCategory,
-  getCategories,
-  updateCategory,
-} from "@/actions/category";
-import { getCustomers } from "@/actions/customer";
+  createCustomer,
+  deleteCustomer,
+  getCustomers,
+  getCustomerTypes,
+  updateCustomer,
+} from "@/actions/customer";
 import CustomerType from "@/features/customers/customerType";
 
 function CustomersPage() {
@@ -33,29 +34,50 @@ function CustomersPage() {
     queryKey: ["customers"],
     queryFn: getCustomers,
   });
+  const {
+    data: customerTypes = [],
+    isLoading: isLoadingCustomerTypes,
+    isError: isErrorCustomerTypes,
+  } = useQuery({
+    queryKey: ["customerTypes"],
+    queryFn: getCustomerTypes,
+  });
 
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
   const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false);
   const [dialogCustomerTypeOpen, setDialogCustomerTypeOpen] = useState(false);
-  const [name, setName] = useState("");
+
+  const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
+  const [code, setCode] = useState("");
+  const [nationalId, setNationalId] = useState("");
+  const [customerTypeId, setCustomerTypeId] = useState<number | null>(null);
+  const [customProfitPercent, setCustomProfitPercent] = useState<number | null>(
+    0,
+  );
+  const [phone, setPhone] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const createMutation = useMutation({
-    mutationFn: createCategory,
+    mutationFn: createCustomer,
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["categories"],
+        queryKey: ["customers"],
       });
       resetForm();
     },
 
     onError: () => {
-      setError("ایجاد دسته‌بندی با خطا مواجه شد.");
+      setError("ایجاد مشتری با خطا مواجه شد.");
     },
   });
   const updateMutation = useMutation({
@@ -65,14 +87,24 @@ function CustomersPage() {
     }: {
       id: number;
       data: {
-        name: string;
+        displayName: string;
         description: string | null;
+        code: string;
+        nationalId: string | null;
+        customerTypeId: number;
+        customProfitPercent: number | null;
+        phone: string | null;
+        mobile: string | null;
+        email: string | null;
+        address: string | null;
+        postalCode: string | null;
+        isActive?: boolean;
       };
-    }) => updateCategory(id, data),
+    }) => updateCustomer(id, data),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["categories"],
+        queryKey: ["customers"],
       });
       resetForm();
     },
@@ -82,11 +114,11 @@ function CustomersPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) => deleteCategory(id),
+    mutationFn: ({ id }: { id: number }) => deleteCustomer(id),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["categories"],
+        queryKey: ["customers"],
       });
 
       resetForm();
@@ -98,8 +130,18 @@ function CustomersPage() {
 
   const resetForm = () => {
     setEditingId(null);
-    setName("");
+    setDisplayName("");
     setDescription("");
+    setCode("");
+    setNationalId("");
+    setCustomerTypeId(null);
+    setCustomProfitPercent(0);
+    setPhone("");
+    setMobile("");
+    setEmail("");
+    setAddress("");
+    setPostalCode("");
+
     setError("");
     setDialogDeleteOpen(false);
     setOpen(false);
@@ -110,9 +152,9 @@ function CustomersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{t("categories")}</h1>
+          <h1 className="text-2xl font-semibold">{t("customers")}</h1>
 
-          <p className="text-muted-foreground">{t("categoryDescription")}</p>
+          <p className="text-muted-foreground">{t("customerDescription")}</p>
         </div>
         <div>
           <Dialog
@@ -128,10 +170,10 @@ function CustomersPage() {
               </Button>
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
-                  {editingId ? t("editCategory") : t("addCategory")}
+                  {editingId ? t("editCustomer") : t("addCustomer")}
                 </DialogTitle>
               </DialogHeader>
 
@@ -139,18 +181,44 @@ function CustomersPage() {
                 className="space-y-4"
                 onSubmit={(event) => {
                   event.preventDefault();
-
                   const result = z
                     .object({
-                      name: z
+                      displayName: z
                         .string()
                         .trim()
-                        .min(1, "نام دسته‌بندی الزامی است."),
+                        .min(1, "نام مشتری الزامی است ."),
                       description: z.string().trim(),
+                      customProfitPercent: z.number(),
+                      nationalId: z.string().trim(),
+                      phone: z.string().trim(),
+                      mobile: z.string().trim(),
+                      email: z.string().trim(),
+                      address: z.string().trim(),
+                      postalCode: z.string().trim(),
+                      code: z.string().trim().min(1, "کد مشتری الزامی است."),
+                      customerTypeId: z
+                        .number()
+                        .nullable() // ← اجازه دادن به null
+                        .optional() // ← اختیاری کردن
+                        .refine(
+                          (val) => val !== null && val !== undefined && val > 0,
+                          {
+                            message: "نوع مشتری الزامی است.",
+                          },
+                        ),
                     })
                     .safeParse({
-                      name,
+                      displayName,
                       description,
+                      customProfitPercent,
+                      nationalId,
+                      phone,
+                      mobile,
+                      email,
+                      address,
+                      postalCode,
+                      code,
+                      customerTypeId,
                     });
 
                   if (!result.success) {
@@ -161,61 +229,261 @@ function CustomersPage() {
                   }
 
                   setError("");
-
+                  if (
+                    result.data.customerTypeId === undefined ||
+                    result.data.customerTypeId === null
+                  )
+                    return;
                   if (editingId) {
                     updateMutation.mutate({
                       id: editingId,
                       data: {
-                        name: result.data.name,
+                        displayName: result.data.displayName,
                         description: result.data.description || null,
+                        customProfitPercent:
+                          result.data.customProfitPercent || null,
+                        nationalId: result.data.nationalId || null,
+                        phone: result.data.phone || null,
+                        mobile: result.data.mobile || null,
+                        email: result.data.email || null,
+                        address: result.data.address || null,
+                        postalCode: result.data.postalCode || null,
+                        code: result.data.code,
+                        customerTypeId: result.data.customerTypeId,
                       },
                     });
                   } else {
                     createMutation.mutate({
-                      name: result.data.name,
+                      displayName: result.data.displayName,
                       description: result.data.description || null,
+                      customProfitPercent:
+                        result.data.customProfitPercent || null,
+                      nationalId: result.data.nationalId || null,
+                      phone: result.data.phone || null,
+                      mobile: result.data.mobile || null,
+                      email: result.data.email || null,
+                      address: result.data.address || null,
+                      postalCode: result.data.postalCode || null,
+                      code: result.data.code,
+                      customerTypeId: result.data.customerTypeId,
                     });
                   }
                 }}
               >
-                <div className="space-y-2">
-                  <label
-                    htmlFor="category-name"
-                    className="text-sm font-medium"
-                  >
-                    {t("categoryName")}
-                  </label>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-displayName"
+                      className="text-sm font-medium"
+                    >
+                      {t("customerName")}
+                    </label>
 
-                  <input
-                    id="category-name"
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                    disabled={createMutation.isPending}
-                    className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    autoFocus
-                  />
+                    <input
+                      id="customer-displayName"
+                      value={displayName}
+                      onChange={(event) => setDisplayName(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-code"
+                      className="text-sm font-medium"
+                    >
+                      {t("customerCode")}
+                    </label>
+
+                    <input
+                      id="customer-code"
+                      value={code}
+                      onChange={(event) => setCode(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-nationalId"
+                      className="text-sm font-medium"
+                    >
+                      {t("customerNationalId")}
+                    </label>
+
+                    <input
+                      id="customer-nationalId"
+                      value={nationalId}
+                      onChange={(event) => setNationalId(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-type"
+                      className="text-sm font-medium"
+                    >
+                      {t("selectCustomerType")}
+                    </label>
+
+                    <select
+                      id="customer-type"
+                      value={customerTypeId?.toString() ?? ""}
+                      onChange={(event) =>
+                        setCustomerTypeId(+event.target.value)
+                      }
+                      disabled={
+                        createMutation.isPending || isLoadingCustomerTypes
+                      }
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="">
+                        {isLoadingCustomerTypes
+                          ? t("loading")
+                          : t("selectCustomerType")}
+                      </option>
+
+                      {customerTypes.map((customerType) => (
+                        <option key={customerType.id} value={customerType.id}>
+                          {customerType.name} ({customerType.profitPercent}{" "}
+                          {t("percent")})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-customProfitPercent"
+                      className="text-sm font-medium"
+                    >
+                      {t("customProfitPercent")}
+                    </label>
+
+                    <input
+                      id="customer-customProfitPercent"
+                      value={customProfitPercent?.toString()}
+                      onChange={(event) =>
+                        setCustomProfitPercent(+event.target.value)
+                      }
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-phone"
+                      className="text-sm font-medium"
+                    >
+                      {t("phone")}
+                    </label>
+
+                    <input
+                      id="customer-phone"
+                      value={phone}
+                      onChange={(event) => setPhone(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-mobile"
+                      className="text-sm font-medium"
+                    >
+                      {t("mobile")}
+                    </label>
+
+                    <input
+                      id="customer-mobile"
+                      value={mobile}
+                      onChange={(event) => setMobile(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-email"
+                      className="text-sm font-medium"
+                    >
+                      {t("email")}
+                    </label>
+
+                    <input
+                      id="customer-email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="space-y-2 sm:col-span-2">
+                    <label
+                      htmlFor="customer-address"
+                      className="text-sm font-medium"
+                    >
+                      {t("address")}
+                    </label>
+
+                    <input
+                      id="customer-address"
+                      value={address}
+                      onChange={(event) => setAddress(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="customer-postalCode"
+                      className="text-sm font-medium"
+                    >
+                      {t("postalCode")}
+                    </label>
+
+                    <input
+                      id="customer-postalCode"
+                      value={postalCode}
+                      onChange={(event) => setPostalCode(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="space-y-2 sm:col-span-2">
+                    <label
+                      htmlFor="customer-description"
+                      className="text-sm font-medium"
+                    >
+                      {t("customerDescription")}
+                    </label>
+
+                    <textarea
+                      id="customer-description"
+                      value={description}
+                      onChange={(event) => setDescription(event.target.value)}
+                      disabled={createMutation.isPending}
+                      rows={3}
+                      className="w-full resize-none rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label
-                    htmlFor="category-description"
-                    className="text-sm font-medium"
-                  >
-                    {t("categoryDescription")}
-                  </label>
-
-                  <textarea
-                    id="category-description"
-                    value={description}
-                    onChange={(event) => setDescription(event.target.value)}
-                    disabled={createMutation.isPending}
-                    rows={3}
-                    className="w-full resize-none rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
-
+                {/* Error */}
                 {error && <p className="text-sm text-destructive">{error}</p>}
 
+                {/* Actions */}
                 <div className="flex justify-start gap-2">
                   <Button
                     type="button"
@@ -266,10 +534,10 @@ function CustomersPage() {
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{t("deleteCategory")}</DialogTitle>
+              <DialogTitle>{t("deleteCustomer")}</DialogTitle>
             </DialogHeader>
             <div className="flex justify-start gap-2">
-              <p>{t("deleteCategoryDescription", { name: name })}</p>
+              <p>{t("deleteCustomerDescription", { name: displayName })}</p>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
 
@@ -293,7 +561,7 @@ function CustomersPage() {
                   });
                 }}
               >
-                {createMutation.isPending ? t("loading") : t("deleteCategory")}
+                {createMutation.isPending ? t("loading") : t("deleteCustomer")}
               </Button>
             </div>
           </DialogContent>
@@ -316,33 +584,51 @@ function CustomersPage() {
 
       {!isLoading && !isError && customers.length > 0 && (
         <div className="rounded-lg border">
-          <div className="grid grid-cols-[1fr_2fr_auto_auto] gap-4 border-b p-4 font-medium">
-            <div>{t("categoryName")}</div>
-            <div>{t("categoryDescription")}</div>
+          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto_auto] gap-4 border-b p-4 font-medium">
+            <div>{t("customerName")}</div>
+            <div>{t("CustomerType")}</div>
+            <div>{t("customerProfitPercent")}</div>
+            <div>{t("customerDescription")}</div>
             <div>{t("status")}</div>
             <div>{t("actions")}</div>
           </div>
 
-          {customers.map((category) => (
+          {customers.map((customer) => (
             <div
-              key={category.id}
-              className="grid grid-cols-[1fr_2fr_auto_auto] gap-4 border-b p-4 last:border-b-0"
+              key={customer.id}
+              className="grid grid-cols-[1fr_1fr_1fr_1fr_auto_auto] gap-4 border-b p-4 last:border-b-0"
             >
-              <div>{category.name}</div>
-
-              <div className="text-muted-foreground">
-                {category.description || "—"}
+              <div>{customer.displayName}</div>
+              <div>{customer.customerType?.name}</div>
+              <div>
+                {customer.customProfitPercent
+                  ? customer.customProfitPercent
+                  : customer.customerType?.profitPercent}
               </div>
 
-              <div>{category.isActive ? t("active") : t("inactive")}</div>
+              <div className="text-muted-foreground">
+                {customer.description || "—"}
+              </div>
+
+              <div>{customer.isActive ? t("active") : t("inactive")}</div>
               <div className="flex gap-2">
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={() => {
-                    setEditingId(category.id);
-                    setName(category.name);
-                    setDescription(category.description ?? "");
+                    setEditingId(customer.id);
+                    setDisplayName(customer.displayName);
+                    setDescription(customer.description ?? "");
+                    setCode(customer.code ?? "");
+                    setCustomerTypeId(customer.customerTypeId ?? "");
+                    setNationalId(customer.nationalId ?? "");
+                    setCustomProfitPercent(customer.customProfitPercent ?? 0);
+                    setPhone(customer.phone ?? "");
+                    setMobile(customer.mobile ?? "");
+                    setEmail(customer.email ?? "");
+                    setAddress(customer.address ?? "");
+                    setPostalCode(customer.postalCode ?? "");
+                    setDescription(customer.description ?? "");
                     setOpen(true);
                   }}
                 >
@@ -353,8 +639,8 @@ function CustomersPage() {
                   size="icon"
                   variant="destructive"
                   onClick={() => {
-                    setName(category.name);
-                    setEditingId(category.id);
+                    setDisplayName(customer.displayName);
+                    setEditingId(customer.id);
                     setDialogDeleteOpen(true);
                   }}
                 >

@@ -1,12 +1,11 @@
 import { customerService } from "@/database/services/customer.service";
-import { productService } from "@/database/services/product.service";
 import { os } from "@orpc/server";
 import { z } from "zod";
 
 // customer
 export const listCustomers = os.handler(async () => {
   try {
-    const list = await productService.list();
+    const list = await customerService.listCustomers();
     return list;
   } catch (error) {
     console.error("error", error);
@@ -14,18 +13,32 @@ export const listCustomers = os.handler(async () => {
 });
 
 const createCustomerInput = z.object({
-  name: z.string().min(1),
-  categoryId: z.number(),
-  unitId: z.number(),
+  displayName: z.string().min(1),
   description: z.string().nullable().optional(),
+  customProfitPercent: z.number().nullable().optional(),
+  nationalId: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  mobile: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
+  postalCode: z.string().nullable().optional(),
+  code: z.string().min(1),
+  customerTypeId: z.number().min(1),
   isActive: z.boolean().optional(),
 });
 const updateCustomerInput = z.object({
   id: z.number(),
-  name: z.string().min(1).optional(),
-  categoryId: z.number(),
-  unitId: z.number(),
+  displayName: z.string().min(1),
   description: z.string().nullable().optional(),
+  customProfitPercent: z.number().nullable().optional(),
+  nationalId: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  mobile: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
+  postalCode: z.string().nullable().optional(),
+  code: z.string().min(1),
+  customerTypeId: z.number().min(1),
   isActive: z.boolean().optional(),
 });
 
@@ -38,7 +51,7 @@ export const createCustomer = os
   .handler(async ({ input }) => {
     console.log("aaaa");
 
-    return productService.createProduct({
+    return customerService.createCustomer({
       ...input,
       createdAt: new Date().toISOString(),
       updatedAt: null,
@@ -50,13 +63,13 @@ export const updateCustomer = os
   .input(updateCustomerInput)
   .handler(async ({ input }) => {
     const { id, ...data } = input;
-    return customerService.updateProduct(id, data);
+    return customerService.updateCustomer(id, data);
   });
 
 export const deleteCustomer = os
   .input(deleteCustomerInput)
   .handler(async ({ input }) => {
-    return productService.deleteProduct(input.id);
+    return customerService.deleteCustomer(input.id);
   });
 
 // customerType

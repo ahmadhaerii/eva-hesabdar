@@ -17,6 +17,7 @@ import { Route as PurchasesRouteImport } from './routes/purchases'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as CustomersRouteImport } from './routes/customers'
+import { Route as CurrencyRatesRouteImport } from './routes/currencyRates'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -60,6 +61,11 @@ const CustomersRoute = CustomersRouteImport.update({
   path: '/customers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CurrencyRatesRoute = CurrencyRatesRouteImport.update({
+  id: '/currencyRates',
+  path: '/currencyRates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -74,6 +80,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
+  '/currencyRates': typeof CurrencyRatesRoute
   '/customers': typeof CustomersRoute
   '/inventory': typeof InventoryRoute
   '/products': typeof ProductsRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
+  '/currencyRates': typeof CurrencyRatesRoute
   '/customers': typeof CustomersRoute
   '/inventory': typeof InventoryRoute
   '/products': typeof ProductsRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
+  '/currencyRates': typeof CurrencyRatesRoute
   '/customers': typeof CustomersRoute
   '/inventory': typeof InventoryRoute
   '/products': typeof ProductsRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/categories'
+    | '/currencyRates'
     | '/customers'
     | '/inventory'
     | '/products'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/categories'
+    | '/currencyRates'
     | '/customers'
     | '/inventory'
     | '/products'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/categories'
+    | '/currencyRates'
     | '/customers'
     | '/inventory'
     | '/products'
@@ -150,6 +162,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CategoriesRoute: typeof CategoriesRoute
+  CurrencyRatesRoute: typeof CurrencyRatesRoute
   CustomersRoute: typeof CustomersRoute
   InventoryRoute: typeof InventoryRoute
   ProductsRoute: typeof ProductsRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/currencyRates': {
+      id: '/currencyRates'
+      path: '/currencyRates'
+      fullPath: '/currencyRates'
+      preLoaderRoute: typeof CurrencyRatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categories': {
       id: '/categories'
       path: '/categories'
@@ -238,6 +258,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CategoriesRoute: CategoriesRoute,
+  CurrencyRatesRoute: CurrencyRatesRoute,
   CustomersRoute: CustomersRoute,
   InventoryRoute: InventoryRoute,
   ProductsRoute: ProductsRoute,

@@ -33,7 +33,6 @@ export const customerTypes = sqliteTable(
   },
   (table) => ({
     nameUnique: uniqueIndex("uq_customer_types_name").on(table.name),
-
     activeIndex: index("idx_customer_types_active").on(table.isActive),
   }),
 );
@@ -43,7 +42,7 @@ export const customerTypes = sqliteTable(
 ========================================================== */
 
 export const customers = sqliteTable(
-  "contacts",
+  "customers",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
 
@@ -80,11 +79,11 @@ export const customers = sqliteTable(
     deletedAt: text("deleted_at"),
   },
   (table) => ({
-    codeUnique: uniqueIndex("uq_contacts_code").on(table.code),
-    nameIndex: index("idx_contacts_name").on(table.displayName),
-    mobileIndex: index("idx_contacts_mobile").on(table.mobile),
-    activeIndex: index("idx_contacts_active").on(table.isActive),
-    typeIndex: index("idx_customer_profile_type").on(table.customerTypeId),
+    codeUnique: uniqueIndex("uq_customers_code").on(table.code),
+    nameIndex: index("idx_customers_name").on(table.displayName),
+    mobileIndex: index("idx_customers_mobile").on(table.mobile),
+    activeIndex: index("idx_customers_active").on(table.isActive),
+    typeIndex: index("idx_customer_type").on(table.customerTypeId),
   }),
 );
 

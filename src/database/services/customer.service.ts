@@ -1,37 +1,21 @@
-import {
-  NewCategory,
-  NewCustomerType,
-  NewProduct,
-  NewUnit,
-} from "../../database/types/database";
+import { NewCustomer, NewCustomerType } from "../../database/types/database";
 import { customerRepository } from "../repositories/customer/customer.repository";
 
-import { productRepository } from "../repositories/product/product.repository";
-
 export class CustomerService {
-  async list() {
-    const list = await customerRepository.list();
+  async listCustomers() {
+    const list = await customerRepository.listCustomers();
     return list;
   }
-
-  // async getById(id: number) {
-  //   return productRepository.getById(id);
-  // }
-
-  // async search(keyword: string) {
-  //   return productRepository.search(keyword);
-  // }
-
-  async createProduct(data: NewProduct) {
-    return productRepository.createProduct(data);
+  async createCustomer(data: NewCustomer) {
+    return customerRepository.createCustomer(data);
   }
 
-  async updateProduct(id: number, data: Partial<NewProduct>) {
-    return customerRepository.update(id, data);
+  async updateCustomer(id: number, data: Partial<NewCustomer>) {
+    return customerRepository.updateCustomer(id, data);
   }
 
-  async deleteProduct(id: number) {
-    return productRepository.deleteProduct(id);
+  async deleteCustomer(id: number) {
+    return customerRepository.deleteCustomer(id);
   }
 
   // customerType
@@ -57,31 +41,6 @@ export class CustomerService {
 
   async deleteCustomerType(id: number) {
     return customerRepository.deleteCustomerType(id);
-  }
-  /////////////////////////////////////////////////////////// remove un used
-
-  // units
-  async listUnits() {
-    return productRepository.listUnits();
-  }
-
-  async createUnit(data: NewUnit) {
-    return productRepository.createUnit(data);
-  }
-  async updateUnit(
-    id: number,
-    data: {
-      name?: string;
-      symbol?: string;
-      description?: string | null;
-      isActive?: boolean;
-    },
-  ) {
-    return productRepository.updateUnit(id, data);
-  }
-
-  async deleteUnit(id: number) {
-    return productRepository.deleteUnit(id);
   }
 }
 

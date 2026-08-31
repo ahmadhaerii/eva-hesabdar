@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import { email } from "zod";
 
 i18n.use(initReactI18next).init({
   fallbackLng: "en",
@@ -27,6 +28,7 @@ i18n.use(initReactI18next).init({
         settings: "Settings",
 
         // Common
+        percent: "Percent",
         add: "Add",
         edit: "Edit",
         delete: "Delete",
@@ -43,6 +45,11 @@ i18n.use(initReactI18next).init({
         loading: "Loading...",
         noData: "No data found",
         description: "Description",
+        mobile: "Mobile",
+        email: "Email",
+        phone: "Phone",
+        address: "Address",
+        postalCode: "PostalCode",
 
         // Categories
         category: "Category",
@@ -94,6 +101,11 @@ i18n.use(initReactI18next).init({
         customerDescription: "Description",
         customerName: "Name",
         customerProfitPercent: "Profit Percent",
+        selectCustomerType: " Select Customer type",
+        customerCode: "Customer Code   ",
+        customerNationalId: "National Id",
+        customProfitPercent: "Profit Percent",
+
         deleteCustomerDescription:
           "Are you sure you want to delete the customer  {{name}} ?",
 
@@ -124,6 +136,7 @@ i18n.use(initReactI18next).init({
         settings: "تنظیمات",
 
         // Common
+        percent: "درصد",
         add: "افزودن",
         edit: "ویرایش",
         delete: "حذف",
@@ -140,6 +153,11 @@ i18n.use(initReactI18next).init({
         loading: "در حال بارگذاری...",
         noData: "داده‌ای یافت نشد",
         description: "توضیحات",
+        mobile: "موبایل",
+        email: "ایمیل",
+        phone: "تلفن",
+        address: "آدرس",
+        postalCode: "کد پستی",
 
         // Categories
         category: "دسته‌بندی",
@@ -191,8 +209,19 @@ i18n.use(initReactI18next).init({
         customerDescription: "توضیحات",
         customerName: "نام",
         customerProfitPercent: "درصد سود",
+        selectCustomerType: "انتخاب نوع مشتری",
+        customerCode: "کد مشتری",
+        customerNationalId: "کد ملی",
+        customProfitPercent: "درصد سود",
         deleteCustomerDescription:
           "از حذف مشتری  ' {{ name }} '  اطمینان دارید ؟",
+
+        // currencies
+        manageCurrency: "مدیریت انواع ارز",
+        addCurrency: "افزودن نرخ ارز",
+        editCurrency: "ویرایش نرخ ارز",
+        deleteCurrency: "حذف نرخ ارز",
+        currencyDescription: "توضیحات",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

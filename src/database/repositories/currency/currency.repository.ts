@@ -6,6 +6,7 @@ import { currencies, currencyRates } from "../../schema";
 import {
   Currency,
   CurrencyRate,
+  CurrencyRateWithRelations,
   NewCurrency,
   NewCurrencyRate,
 } from "../../types/database";
@@ -16,7 +17,7 @@ export class CurrencyRepository extends BaseRepository {
      CURRENCIES
   ========================================================== */
 
-  async list(): Promise<Currency[]> {
+  async listCurrencies(): Promise<Currency[]> {
     return this.executor.query.currencies.findMany({
       where: isNull(currencies.deletedAt),
       orderBy: [asc(currencies.name)],
@@ -41,11 +42,11 @@ export class CurrencyRepository extends BaseRepository {
       where: and(eq(currencies.isBase, true), isNull(currencies.deletedAt)),
     });
   }
-  async create(data: NewCurrency) {
+  async createCurrency(data: NewCurrency) {
     return this.executor.insert(currencies).values(data).returning();
   }
 
-  async update(id: number, data: Partial<NewCurrency>) {
+  async updateCurrency(id: number, data: Partial<NewCurrency>) {
     return db
       .update(currencies)
       .set(data)
@@ -53,7 +54,7 @@ export class CurrencyRepository extends BaseRepository {
       .returning();
   }
 
-  async delete(id: number) {
+  async deleteCurrency(id: number) {
     return db
       .update(currencies)
       .set({
@@ -66,7 +67,7 @@ export class CurrencyRepository extends BaseRepository {
      CURRENCY RATES
   ========================================================== */
 
-  async createRate(data: NewCurrencyRate) {
+  async createCurrencyRate(data: NewCurrencyRate) {
     return this.executor.insert(currencyRates).values(data).returning();
   }
 
@@ -76,22 +77,22 @@ export class CurrencyRepository extends BaseRepository {
     });
   }
 
-  async getLatestRate(currencyId: number): Promise<CurrencyRate | undefined> {
+  async getLatestCurrencyRate(
+    currencyId: number,
+  ): Promise<CurrencyRate | undefined> {
     return this.executor.query.currencyRates.findFirst({
       where: eq(currencyRates.currencyId, currencyId),
       orderBy: [desc(currencyRates.createdAt)],
     });
   }
 
-  async listRates(currencyId: number): Promise<CurrencyRate[]> {
+  async listCurrencyRates(): Promise<CurrencyRateWithRelations[]> {
     return this.executor.query.currencyRates.findMany({
-      where: eq(currencyRates.currencyId, currencyId),
+      with: {
+        currency: true,
+      },
       orderBy: [desc(currencyRates.createdAt)],
     });
-  }
-
-  async deleteRate(id: number) {
-    return this.executor.delete(currencyRates).where(eq(currencyRates.id, id));
   }
 }
 

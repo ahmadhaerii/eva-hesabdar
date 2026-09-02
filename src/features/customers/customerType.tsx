@@ -296,9 +296,7 @@ export default function CustomerType() {
       {isLoading && <div className="text-muted-foreground">{t("loading")}</div>}
 
       {isError && (
-        <div className="text-destructive">
-          دریافت دسته‌بندی‌ها با خطا مواجه شد.
-        </div>
+        <div className="text-destructive">دریافت داده ها با خطا مواجه شد.</div>
       )}
 
       {!isLoading && !isError && customerTypes.length === 0 && (

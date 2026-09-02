@@ -39,6 +39,10 @@ const navigation = [
     to: "/units",
   },
   {
+    label: "Currencies",
+    to: "/currencyRates",
+  },
+  {
     label: "Settings",
     to: "/settings",
   },

@@ -20,8 +20,6 @@ export const currencies = sqliteTable(
 
     name: text("name").notNull(),
 
-    symbol: text("symbol"),
-
     isBase: integer("is_base", { mode: "boolean" }).notNull().default(false),
 
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
@@ -58,16 +56,12 @@ export const currencyRates = sqliteTable(
 
     rate: real("rate").notNull(),
 
-    effectiveAt: text("effective_at").notNull(),
-
     description: text("description"),
 
     createdAt: text("created_at").notNull(),
   },
   (table) => ({
     currencyIndex: index("idx_currency_rates_currency").on(table.currencyId),
-
-    effectiveIndex: index("idx_currency_rates_effective").on(table.effectiveAt),
 
     lookupIndex: index("idx_currency_rates_lookup").on(
       table.currencyId,

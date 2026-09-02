@@ -32,6 +32,9 @@ export type NewCurrency = typeof schema.currencies.$inferInsert;
 
 export type CurrencyRate = typeof schema.currencyRates.$inferSelect;
 export type NewCurrencyRate = typeof schema.currencyRates.$inferInsert;
+export type CurrencyRateWithRelations = CurrencyRate & {
+  currency: Currency | null;
+};
 
 /* ==========================================================
    PURCHASE

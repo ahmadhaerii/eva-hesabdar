@@ -4,6 +4,7 @@ import { customer } from "./customers";
 import { shell } from "./shell";
 import { theme } from "./theme";
 import { window } from "./window";
+import { currency } from "./currencies";
 
 export const router = {
   app,
@@ -12,4 +13,5 @@ export const router = {
   window,
   product,
   customer,
+  currency,
 };

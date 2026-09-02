@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -10,36 +10,44 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2 } from "lucide-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
-import { createUnit, deleteUnit, getUnits, updateUnit } from "@/actions/unit";
+import z from "zod";
+import {
+  createCurrency,
+  deleteCurrency,
+  getCurrencies,
+  updateCurrency,
+} from "@/actions/currency";
 
-function UnitsPage() {
+export default function Currencies() {
   const { t } = useTranslation();
+
   const {
-    data: units = [],
+    data: currencies = [],
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["units"],
-    queryFn: getUnits,
+    queryKey: ["currencies"],
+    queryFn: getCurrencies,
   });
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
   const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false);
+
   const [name, setName] = useState("");
-  const [symbol, setSymbol] = useState("");
-  const [description, setDescription] = useState("");
+  const [code, setCode] = useState("");
+  const [isBase, setIsBase] = useState(false);
+  const [isActive, setIsActive] = useState(true);
+
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const createMutation = useMutation({
-    mutationFn: createUnit,
+    mutationFn: createCurrency,
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["units"],
+        queryKey: ["currencies"],
       });
       resetForm();
     },
@@ -55,17 +63,17 @@ function UnitsPage() {
     }: {
       id: number;
       data: {
-        symbol: string;
         name: string;
-        description: string | null;
+        code: string;
+        isBase: boolean;
+        isActive: boolean;
       };
-    }) => updateUnit(id, data),
+    }) => updateCurrency(id, data),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["units"],
+        queryKey: ["currencies"],
       });
-
       resetForm();
     },
     onError: (error) => {
@@ -74,11 +82,11 @@ function UnitsPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) => deleteUnit(id),
+    mutationFn: ({ id }: { id: number }) => deleteCurrency(id),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["units"],
+        queryKey: ["currencies"],
       });
 
       resetForm();
@@ -91,36 +99,37 @@ function UnitsPage() {
   const resetForm = () => {
     setEditingId(null);
     setName("");
-    setDescription("");
+    setCode("");
+    setIsActive(true);
+    setIsBase(false);
     setError("");
-    setSymbol("");
     setDialogDeleteOpen(false);
     setOpen(false);
   };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{t("units")}</h1>
-
-          <p className="text-muted-foreground">{t("unitDescription")}</p>
+          <p className="text-muted-foreground">{t("currencyDescription")}</p>
         </div>
-
         <Dialog
           open={open}
-          onOpenChange={(open: boolean) => (open ? setOpen(open) : resetForm())}
+          onOpenChange={(onOpen: boolean) =>
+            onOpen ? setOpen(onOpen) : resetForm()
+          }
         >
           <DialogTrigger asChild>
             <Button>
               <Plus className="ml-2 h-4 w-4" />
-              {t("addUnit")}
+              {t("addCurrency")}
             </Button>
           </DialogTrigger>
 
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingId ? t("editUnit") : t("addUnit")}
+                {editingId ? t("editCurrency") : t("addCurrency")}
               </DialogTitle>
             </DialogHeader>
 
@@ -131,14 +140,16 @@ function UnitsPage() {
 
                 const result = z
                   .object({
-                    name: z.string().trim().min(1, "نام دسته‌بندی الزامی است."),
-                    symbol: z.string().trim().min(1, " کد واحد الزامی است."),
-                    description: z.string().trim(),
+                    name: z.string().trim().min(1, "نام الزامی است."),
+                    code: z.string().trim().min(1, "کد الزامی است."),
+                    isActive: z.boolean(),
+                    isBase: z.boolean(),
                   })
                   .safeParse({
                     name,
-                    symbol,
-                    description,
+                    code,
+                    isActive,
+                    isBase,
                   });
 
                 if (!result.success) {
@@ -154,27 +165,29 @@ function UnitsPage() {
                   updateMutation.mutate({
                     id: editingId,
                     data: {
-                      symbol: result.data.symbol,
                       name: result.data.name,
-                      description: result.data.description || null,
+                      code: result.data.code,
+                      isBase: result.data.isBase,
+                      isActive: result.data.isActive,
                     },
                   });
                 } else {
                   createMutation.mutate({
                     name: result.data.name,
-                    symbol: result.data.symbol,
-                    description: result.data.description || null,
+                    code: result.data.code,
+                    isBase: result.data.isBase,
+                    isActive: result.data.isActive,
                   });
                 }
               }}
             >
               <div className="space-y-2">
-                <label htmlFor="unit-name" className="text-sm font-medium">
-                  {t("unitName")}
+                <label htmlFor="currency-name" className="text-sm font-medium">
+                  {t("currencyName")}
                 </label>
 
                 <input
-                  id="unit-name"
+                  id="currency-name"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   disabled={createMutation.isPending}
@@ -182,37 +195,45 @@ function UnitsPage() {
                   autoFocus
                 />
               </div>
-
               <div className="space-y-2">
-                <label htmlFor="unit-name" className="text-sm font-medium">
-                  {t("symbol")}
+                <label htmlFor="currency-code" className="text-sm font-medium">
+                  {t("currencyCode")}
                 </label>
 
                 <input
-                  id="unit-name"
-                  value={symbol}
-                  onChange={(event) => setSymbol(event.target.value)}
+                  id="currency-code"
+                  value={code}
+                  onChange={(event) => setCode(event.target.value)}
                   disabled={createMutation.isPending}
                   className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  autoFocus
                 />
               </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="unit-description"
-                  className="text-sm font-medium"
-                >
-                  {t("unitDescription")}
-                </label>
-
-                <textarea
-                  id="unit-description"
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
+              <div className="flex items-center gap-2">
+                <input
+                  id="product-active"
+                  type="checkbox"
+                  checked={isActive}
+                  onChange={(event) => setIsActive(event.target.checked)}
                   disabled={createMutation.isPending}
-                  rows={3}
-                  className="w-full resize-none rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
+
+                <label htmlFor="product-active" className="text-sm font-medium">
+                  {t("active")}
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  id="product-active"
+                  type="checkbox"
+                  checked={isBase}
+                  onChange={(event) => setIsBase(event.target.checked)}
+                  disabled={createMutation.isPending}
+                />
+
+                <label htmlFor="product-active" className="text-sm font-medium">
+                  {t("isBase")}
+                </label>
               </div>
 
               {error && <p className="text-sm text-destructive">{error}</p>}
@@ -221,7 +242,9 @@ function UnitsPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    resetForm();
+                  }}
                   disabled={createMutation.isPending}
                 >
                   {t("cancel")}
@@ -243,10 +266,10 @@ function UnitsPage() {
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{t("deleteUnit")}</DialogTitle>
+              <DialogTitle>{t("deleteCurrency")}</DialogTitle>
             </DialogHeader>
             <div className="flex justify-start gap-2">
-              <p>{t("deleteUnitDescription", { name: name })}</p>
+              <p>{t("deleteCurrencyDescription", { name: name })}</p>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
 
@@ -254,7 +277,9 @@ function UnitsPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setDialogDeleteOpen(false)}
+                onClick={() => {
+                  resetForm();
+                }}
                 disabled={deleteMutation.isPending}
               >
                 {t("cancel")}
@@ -268,58 +293,54 @@ function UnitsPage() {
                   });
                 }}
               >
-                {createMutation.isPending ? t("loading") : t("deleteUnit")}
+                {createMutation.isPending ? t("loading") : t("deleteCurrency")}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
-
       {isLoading && <div className="text-muted-foreground">{t("loading")}</div>}
 
       {isError && (
         <div className="text-destructive">دریافت داده ها با خطا مواجه شد.</div>
       )}
 
-      {!isLoading && !isError && units.length === 0 && (
+      {!isLoading && !isError && currencies.length === 0 && (
         <div className="rounded-lg border p-8 text-center">
           <p className="text-muted-foreground">{t("noData")}</p>
         </div>
       )}
 
-      {!isLoading && !isError && units.length > 0 && (
+      {!isLoading && !isError && currencies.length > 0 && (
         <div className="rounded-lg border">
           <div className="grid grid-cols-[1fr_1fr_2fr_auto_auto] gap-4 border-b p-4 font-medium">
-            <div>{t("unitName")}</div>
-            <div>{t("symbol")}</div>
-            <div>{t("unitDescription")}</div>
+            <div>{t("currencyName")}</div>
+            <div>{t("currencyCode")}</div>
+            <div>{t("isBase")}</div>
             <div>{t("status")}</div>
             <div>{t("actions")}</div>
           </div>
 
-          {units.map((unit) => (
+          {currencies.map((currency) => (
             <div
-              key={unit.id}
+              key={currency.id}
               className="grid grid-cols-[1fr_1fr_2fr_auto_auto] gap-4 border-b p-4 last:border-b-0"
             >
-              <div>{unit.name}</div>
+              <div>{currency.name}</div>
+              <div>{currency.code}</div>
+              <div>{currency.isBase ? t("active") : t("inactive")}</div>
+              <div>{currency.isActive ? t("active") : t("inactive")}</div>
 
-              <div>{unit.symbol}</div>
-
-              <div className="text-muted-foreground">
-                {unit.description || "—"}
-              </div>
-
-              <div>{unit.isActive ? t("active") : t("inactive")}</div>
               <div className="flex gap-2">
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={() => {
-                    setEditingId(unit.id);
-                    setSymbol(unit.symbol);
-                    setName(unit.name);
-                    setDescription(unit.description ?? "");
+                    setEditingId(currency.id);
+                    setCode(currency.code);
+                    setName(currency.name);
+                    setIsBase(currency.isBase);
+                    setIsActive(currency.isActive);
                     setOpen(true);
                   }}
                 >
@@ -330,9 +351,8 @@ function UnitsPage() {
                   size="icon"
                   variant="destructive"
                   onClick={() => {
-                    setName(unit.name);
-                    setSymbol(unit.symbol);
-                    setEditingId(unit.id);
+                    setName(currency.name);
+                    setEditingId(currency.id);
                     setDialogDeleteOpen(true);
                   }}
                 >
@@ -346,7 +366,3 @@ function UnitsPage() {
     </div>
   );
 }
-
-export const Route = createFileRoute("/units")({
-  component: UnitsPage,
-});

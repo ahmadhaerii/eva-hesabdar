@@ -158,6 +158,7 @@ i18n.use(initReactI18next).init({
         phone: "تلفن",
         address: "آدرس",
         postalCode: "کد پستی",
+        date: "تاریخ",
 
         // Categories
         category: "دسته‌بندی",
@@ -217,11 +218,26 @@ i18n.use(initReactI18next).init({
           "از حذف مشتری  ' {{ name }} '  اطمینان دارید ؟",
 
         // currencies
+        currency: "ارز",
         manageCurrency: "مدیریت انواع ارز",
-        addCurrency: "افزودن نرخ ارز",
-        editCurrency: "ویرایش نرخ ارز",
-        deleteCurrency: "حذف نرخ ارز",
+        addCurrency: "افزودن ارز",
+        editCurrency: "ویرایش ارز",
+        deleteCurrency: "حذف ارز",
+        deleteCurrencyDescription:
+          "از حذف ارز  ' {{ name }} '  اطمینان دارید ؟",
         currencyDescription: "توضیحات",
+        isBase: "ارز پیشفرض",
+        currencyName: "نام ارز",
+        currencyCode: "کد ارز",
+
+        // currencyRate
+        selectCurrency: "انتخاب ارز",
+        currencyRate: "نرخ ارز",
+        addCurrencyRate: "افزودن نرخ ارز",
+        deleteCurrencyRate: "حذف نرخ ارز",
+        editCurrencyRate: "ویرایش نرخ ارز",
+        deleteCurrencyRateDescription:
+          "از حذف نرخ ارز  ' {{ name }} '  اطمینان دارید ؟",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

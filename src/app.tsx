@@ -8,16 +8,23 @@ import { syncWithLocalTheme } from "./actions/theme";
 import { router } from "./utils/routes";
 
 import "./localization/i18n";
+import { useCurrencyStore } from "./stores/currencyStore";
 
 const queryClient = new QueryClient();
 
 export default function App() {
   const { i18n } = useTranslation();
+  const fetchCurrencies = useCurrencyStore((state) => state.fetchCurrency);
 
   useEffect(() => {
     syncWithLocalTheme();
     updateAppLanguage(i18n);
   }, [i18n]);
+
+  useEffect(() => {
+    fetchCurrencies();
+    console.log("fetchCurrencies");
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

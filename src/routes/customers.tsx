@@ -626,7 +626,6 @@ function CustomersPage() {
                     setEmail(customer.email ?? "");
                     setAddress(customer.address ?? "");
                     setPostalCode(customer.postalCode ?? "");
-                    setDescription(customer.description ?? "");
                     setOpen(true);
                   }}
                 >

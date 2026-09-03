@@ -29,8 +29,6 @@ export const purchaseInvoices = sqliteTable(
       .notNull()
       .references(() => currencyRates.id),
 
-    currencyRate: real("currency_rate").notNull(),
-
     invoiceDate: text("invoice_date").notNull(),
 
     description: text("description"),
@@ -76,13 +74,13 @@ export const purchaseInvoiceItems = sqliteTable(
 
     quantity: real("quantity").notNull(),
 
-    unitCost: real("unit_cost").notNull(),
+    remainingQuantity: real("remaining_quantity").notNull(),
 
-    allocatedCost: real("allocated_cost").notNull().default(0),
+    unitPrice: real("unit_price").notNull(),
 
-    finalUnitCost: real("final_unit_cost").notNull(),
+    freightShare: real("freight_share").notNull().default(0),
 
-    lineTotal: real("line_total").notNull(),
+    totalPrice: real("total_price").notNull(),
 
     description: text("description"),
   },
@@ -95,30 +93,30 @@ export const purchaseInvoiceItems = sqliteTable(
   }),
 );
 
-/* ==========================================================
-   PURCHASE COSTS
-========================================================== */
+// /* ==========================================================
+//    PURCHASE COSTS
+// ========================================================== */
 
-export const purchaseCosts = sqliteTable(
-  "purchase_costs",
-  {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+// export const purchaseCosts = sqliteTable(
+//   "purchase_costs",
+//   {
+//     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    purchaseInvoiceId: integer("purchase_invoice_id")
-      .notNull()
-      .references(() => purchaseInvoices.id),
+//     purchaseInvoiceId: integer("purchase_invoice_id")
+//       .notNull()
+//       .references(() => purchaseInvoices.id),
 
-    title: text("title").notNull(),
+//     title: text("title").notNull(),
 
-    amount: real("amount").notNull(),
+//     amount: real("amount").notNull(),
 
-    description: text("description"),
+//     description: text("description"),
 
-    createdAt: text("created_at").notNull(),
-  },
-  (table) => ({
-    invoiceIndex: index("idx_purchase_cost_invoice").on(
-      table.purchaseInvoiceId,
-    ),
-  }),
-);
+//     createdAt: text("created_at").notNull(),
+//   },
+//   (table) => ({
+//     invoiceIndex: index("idx_purchase_cost_invoice").on(
+//       table.purchaseInvoiceId,
+//     ),
+//   }),
+// );

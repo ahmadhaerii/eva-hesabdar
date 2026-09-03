@@ -29,6 +29,10 @@ const deleteCurrencyInput = z.object({
   id: z.number(),
 });
 
+const currencyInput = z.object({
+  id: z.number(),
+});
+
 export const createCurrency = os
   .input(createCurrencyInput)
   .handler(async ({ input }) => {
@@ -65,6 +69,11 @@ const createCurrencyRateInput = z.object({
 export const listCurrencyRate = os.handler(async (input) => {
   return currencyService.listCurrencyRates();
 });
+export const getRatesByCurrency = os
+  .input(currencyInput)
+  .handler(async ({ input }) => {
+    return currencyService.getRatesByCurrency(input);
+  });
 
 export const createCurrencyRate = os
   .input(createCurrencyRateInput)

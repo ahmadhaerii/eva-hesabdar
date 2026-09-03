@@ -23,6 +23,9 @@ export class CurrencyService {
   async listCurrencyRates() {
     return currencyRepository.listCurrencyRates();
   }
+  async getRatesByCurrency(data: { id: number }) {
+    return currencyRepository.getRatesByCurrency(data.id);
+  }
 
   async createCurrencyRate(data: NewCurrencyRate) {
     return currencyRepository.createCurrencyRate(data);

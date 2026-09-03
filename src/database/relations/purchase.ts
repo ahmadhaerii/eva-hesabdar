@@ -1,16 +1,10 @@
 import { relations } from "drizzle-orm";
 
-import {
-  purchaseInvoices,
-  purchaseInvoiceItems,
-  purchaseCosts,
-} from "../schema/purchase";
+import { purchaseInvoices, purchaseInvoiceItems } from "../schema/purchase";
 
 import { products } from "../schema/master";
 
 import { currencies, currencyRates } from "../schema/currency";
-
-import { inventoryLots } from "../schema/inventory";
 
 /* ==========================================================
    PURCHASE INVOICES
@@ -30,8 +24,6 @@ export const purchaseInvoiceRelations = relations(
     }),
 
     items: many(purchaseInvoiceItems),
-
-    costs: many(purchaseCosts),
   }),
 );
 
@@ -52,17 +44,17 @@ export const purchaseInvoiceItemRelations = relations(
       references: [products.id],
     }),
 
-    inventoryLots: many(inventoryLots),
+    // inventoryLots: many(inventoryLots),
   }),
 );
 
-/* ==========================================================
-   PURCHASE COSTS
-========================================================== */
+// /* ==========================================================
+//    PURCHASE COSTS
+// ========================================================== */
 
-export const purchaseCostRelations = relations(purchaseCosts, ({ one }) => ({
-  invoice: one(purchaseInvoices, {
-    fields: [purchaseCosts.purchaseInvoiceId],
-    references: [purchaseInvoices.id],
-  }),
-}));
+// export const purchaseCostRelations = relations(purchaseCosts, ({ one }) => ({
+//   invoice: one(purchaseInvoices, {
+//     fields: [purchaseCosts.purchaseInvoiceId],
+//     references: [purchaseInvoices.id],
+//   }),
+// }));

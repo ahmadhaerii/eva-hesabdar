@@ -38,6 +38,9 @@ export class ProductService {
   async listCategories() {
     return productRepository.listCategories();
   }
+  async listCategoriesWithProducts() {
+    return productRepository.listCategoriesWithProducts();
+  }
 
   async createCategory(data: NewCategory) {
     return productRepository.createCategory(data);

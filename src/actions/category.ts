@@ -5,6 +5,11 @@ export async function getCategories(): Promise<
 > {
   return ipc.client.product.listCategories();
 }
+export async function getCategoriesWithProducts(): Promise<
+  Awaited<ReturnType<typeof ipc.client.product.listCategoriesWithProducts>>
+> {
+  return ipc.client.product.listCategoriesWithProducts();
+}
 export async function createCategory(data: {
   name: string;
   description?: string | null;

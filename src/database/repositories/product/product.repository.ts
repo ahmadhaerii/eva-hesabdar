@@ -3,6 +3,7 @@ import { categories, products, units } from "../../schema";
 
 import {
   Category,
+  CategoryWithRelations,
   NewCategory,
   NewProduct,
   NewUnit,
@@ -101,6 +102,17 @@ export class ProductRepository extends BaseRepository {
       orderBy: [asc(categories.name)],
     });
   }
+
+  async listCategoriesWithProducts(): Promise<CategoryWithRelations[]> {
+    return this.executor.query.categories.findMany({
+      where: isNull(categories.deletedAt),
+      with: {
+        products: true,
+      },
+      orderBy: [asc(categories.name)],
+    });
+  }
+
   async updateCategory(id: number, data: Partial<NewCategory>) {
     return this.executor
       .update(categories)

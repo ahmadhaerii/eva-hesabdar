@@ -16,6 +16,9 @@ export type NewUnit = typeof schema.units.$inferInsert;
 
 export type Category = typeof schema.categories.$inferSelect;
 export type NewCategory = typeof schema.categories.$inferInsert;
+export type CategoryWithRelations = Category & {
+  products: Product[];
+};
 
 export type Product = typeof schema.products.$inferSelect;
 export type NewProduct = typeof schema.products.$inferInsert;
@@ -41,18 +44,26 @@ export type CurrencyRateWithRelations = CurrencyRate & {
 ========================================================== */
 
 export type PurchaseInvoice = typeof schema.purchaseInvoices.$inferSelect;
+export type PurchaseInvoiceWithRelations = PurchaseInvoice & {
+  currency: Currency | null;
+  currencyRate: CurrencyRate | null;
+  items: PurchaseInvoiceItem[];
+};
 
 export type NewPurchaseInvoice = typeof schema.purchaseInvoices.$inferInsert;
 
 export type PurchaseInvoiceItem =
   typeof schema.purchaseInvoiceItems.$inferSelect;
 
+export type PurchaseInvoiceItemWithRelations = PurchaseInvoiceItem & {
+  product: Product;
+};
 export type NewPurchaseInvoiceItem =
   typeof schema.purchaseInvoiceItems.$inferInsert;
 
-export type PurchaseCost = typeof schema.purchaseCosts.$inferSelect;
+// export type PurchaseCost = typeof schema.purchaseCosts.$inferSelect;
 
-export type NewPurchaseCost = typeof schema.purchaseCosts.$inferInsert;
+// export type NewPurchaseCost = typeof schema.purchaseCosts.$inferInsert;
 
 /* ==========================================================
    INVENTORY

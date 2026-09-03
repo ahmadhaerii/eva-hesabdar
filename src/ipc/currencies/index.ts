@@ -1,6 +1,7 @@
 import {
   listCurrencies,
   listCurrencyRate,
+  getRatesByCurrency,
   createCurrency,
   createCurrencyRate,
   deleteCurrency,
@@ -10,6 +11,7 @@ import {
 export const currency = {
   listCurrencies,
   listCurrencyRate,
+  getRatesByCurrency,
   createCurrency,
   createCurrencyRate,
   deleteCurrency,

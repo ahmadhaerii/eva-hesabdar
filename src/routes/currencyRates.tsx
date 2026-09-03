@@ -21,9 +21,11 @@ import {
   getCurrencyRates,
 } from "@/actions/currency";
 import { toPersianDateTime } from "@/utils/dateUtils";
+import { useCurrencyStore } from "@/stores/currencyStore";
 
 function CurrenciesPage() {
   const { t } = useTranslation();
+  const defaultCurrency = useCurrencyStore((state) => state.defaultCurrency);
   const {
     data: currencyRates = [],
     isLoading,
@@ -269,7 +271,10 @@ function CurrenciesPage() {
               className="grid grid-cols-[1fr_1fr_2fr] gap-4 border-b p-4 last:border-b-0"
             >
               <div>{currencyRate.currency?.name}</div>
-              <div>{currencyRate.rate}</div>
+              <div>
+                {currencyRate.rate.toLocaleString("en-US")}{" "}
+                {defaultCurrency?.name}
+              </div>
               <div>{toPersianDateTime(currencyRate.createdAt)}</div>
             </div>
           ))}

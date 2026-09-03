@@ -159,6 +159,7 @@ i18n.use(initReactI18next).init({
         address: "آدرس",
         postalCode: "کد پستی",
         date: "تاریخ",
+        quantity: "تعداد",
 
         // Categories
         category: "دسته‌بندی",
@@ -173,6 +174,7 @@ i18n.use(initReactI18next).init({
 
         // Products
         product: "محصول",
+        selectProduct: "انتخاب محصول",
         productName: "نام محصول",
         addProduct: "افزودن محصول",
         editProduct: "ویرایش محصول",
@@ -218,6 +220,7 @@ i18n.use(initReactI18next).init({
           "از حذف مشتری  ' {{ name }} '  اطمینان دارید ؟",
 
         // currencies
+        selectCurrency: "انتخاب ارز",
         currency: "ارز",
         manageCurrency: "مدیریت انواع ارز",
         addCurrency: "افزودن ارز",
@@ -231,7 +234,7 @@ i18n.use(initReactI18next).init({
         currencyCode: "کد ارز",
 
         // currencyRate
-        selectCurrency: "انتخاب ارز",
+        selectCurrencyRate: "انتخاب نرخ ارز",
         currencyRate: "نرخ ارز",
         addCurrencyRate: "افزودن نرخ ارز",
         deleteCurrencyRate: "حذف نرخ ارز",
@@ -239,6 +242,27 @@ i18n.use(initReactI18next).init({
         deleteCurrencyRateDescription:
           "از حذف نرخ ارز  ' {{ name }} '  اطمینان دارید ؟",
 
+        // purchases
+        purchaseDescription: "توضیحات",
+        addPurchaseInvoice: "افزودن فاکتور خرید",
+        editPurchaseInvoice: "ویرایش فاکتور خرید",
+        deletePurchaseInvoice: "حذف فاکتور خرید",
+        purchaseInvoiceNumber: "شماره فاکتور",
+        purchaseInvoiceDate: "تاریخ شمسی",
+        deletePurchaseInvoiceDescription:
+          "از حذف   فاکتور خرید ' {{ name }} '  اطمینان دارید ؟",
+        // purchaseItems
+        purchaseItems: "اقلام خرید",
+        purchaseItemDescription: "توضیحات",
+        addPurchaseItem: "افزودن آیتم خرید",
+        editPurchaseItem: "ویرایش آیتم خرید",
+        deletePurchaseItem: "حذف آیتم خرید",
+        unitPrice: "قیمت واحد",
+        freightShare: "حمل و نقل",
+        totalPrice: "قیمت خرید",
+        remainingQuantity: "باقی مانده",
+        deletePurchaseItemsDescription:
+          "از حذف   محصول ' {{ name }} '  اطمینان دارید ؟",
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",
       },

@@ -77,6 +77,13 @@ export class CurrencyRepository extends BaseRepository {
     });
   }
 
+  async getRatesByCurrency(currencyId: number): Promise<CurrencyRate[]> {
+    return this.executor.query.currencyRates.findMany({
+      where: eq(currencyRates.currencyId, currencyId),
+      orderBy: [desc(currencyRates.createdAt)],
+    });
+  }
+
   async getLatestCurrencyRate(
     currencyId: number,
   ): Promise<CurrencyRate | undefined> {

@@ -79,6 +79,9 @@ const deleteCategoryInput = z.object({
 export const listCategories = os.handler(async () => {
   return productService.listCategories();
 });
+export const listCategoriesWithProducts = os.handler(async () => {
+  return productService.listCategoriesWithProducts();
+});
 
 export const createCategory = os
   .input(createCategoryInput)

@@ -584,7 +584,7 @@ function CustomersPage() {
         <div className="rounded-lg border">
           <div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto_auto] gap-4 border-b p-4 font-medium">
             <div>{t("customerName")}</div>
-            <div>{t("CustomerType")}</div>
+            <div>{t("customerType")}</div>
             <div>{t("customerProfitPercent")}</div>
             <div>{t("customerDescription")}</div>
             <div>{t("status")}</div>

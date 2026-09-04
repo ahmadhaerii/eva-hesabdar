@@ -151,7 +151,6 @@ function PurchasesPage() {
     let value = e.target.value.replace(/\D/g, ""); // فقط عدد
     if (value.length > 8) value = value.slice(0, 8);
 
-    // اضافه کردن خط تیره خودکار
     if (value.length >= 5) {
       value = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
     } else if (value.length >= 4) {
@@ -228,15 +227,11 @@ function PurchasesPage() {
                           "تاریخ به درستی وارد نشده است",
                         ),
                       description: z.string().nullable().optional(),
-                      status: z
-                        .enum(["Draft", "Confirmed", "Cancelled"])
-                        .optional(),
                     })
                     .safeParse({
                       invoiceNumber,
                       invoiceDate,
                       description,
-                      status,
                       currencyId,
                       currencyRateId,
                     });
@@ -263,7 +258,7 @@ function PurchasesPage() {
                         invoiceNumber: result.data.invoiceNumber,
                         invoiceDate: result.data.invoiceDate,
                         description: result.data.description || null,
-                        status: result.data.status,
+                        status: "Confirmed",
                         currencyId: result.data.currencyId,
                         currencyRateId: result.data.currencyRateId,
                       },
@@ -273,7 +268,7 @@ function PurchasesPage() {
                       invoiceNumber: result.data.invoiceNumber,
                       invoiceDate: result.data.invoiceDate,
                       description: result.data.description || null,
-                      status: result.data.status,
+                      status: "Confirmed",
                       currencyId: result.data.currencyId,
                       currencyRateId: result.data.currencyRateId,
                     });
@@ -428,7 +423,7 @@ function PurchasesPage() {
               onOpen ? setDialogPurchaseItemsOpen(onOpen) : resetForm()
             }
           >
-            <DialogContent className="sm:max-w-4/6">
+            <DialogContent className="sm:max-w-4/6 max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{t("purchaseItems")}</DialogTitle>
               </DialogHeader>

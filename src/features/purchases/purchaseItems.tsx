@@ -88,6 +88,10 @@ export default function PurchaseItems({
     totalPurchaseInvoicePriceDescription,
     setTotalPurchaseInvoicePriceDescription,
   ] = useState("");
+  const [
+    totalPurchaseInvoiceFreightShareDescription,
+    setTotalPurchaseInvoiceFreightShareDescription,
+  ] = useState("");
 
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -168,7 +172,7 @@ export default function PurchaseItems({
   useEffect(() => {
     if (unitPrice !== null && freightShare !== null && quantity !== null) {
       setHelperDescription(
-        `قیمت خرید هر واحد این محصول : ${unitPrice + freightShare / quantity} ${purchaseInvoice.currency?.name} میباشد`,
+        `قیمت خرید هر واحد این محصول : ${unitPrice + (unitPrice * freightShare) / 100} ${purchaseInvoice.currency?.name} میباشد`,
       );
     } else {
       setHelperDescription("قیمت فروش محاسبه نشده است");
@@ -180,14 +184,27 @@ export default function PurchaseItems({
       setTotalPurchaseInvoicePriceDescription(
         ` جمع کل خرید های این فاکتور : ${purchaseInvoiceItems
           .reduce((sum, item) => {
-            const freight = item.freightShare || 0;
-            const subtotal = (item.quantity || 0) * (item.unitPrice || 0);
-            return sum + freight + subtotal;
+            const subtotal = (item.quantity || 0) * (item.totalPrice || 0);
+            return sum + subtotal;
+          }, 0)
+          .toLocaleString("en-US")} ${purchaseInvoice.currency?.name} میباشد`,
+      );
+
+      setTotalPurchaseInvoiceFreightShareDescription(
+        ` جمع کل حمل و نقل های این فاکتور : ${purchaseInvoiceItems
+          .reduce((sum, item) => {
+            const subtotal =
+              (((item.unitPrice || 0) * (item.freightShare || 0)) / 100) *
+              (item.quantity || 0);
+            return sum + subtotal;
           }, 0)
           .toLocaleString("en-US")} ${purchaseInvoice.currency?.name} میباشد`,
       );
     } else {
       setTotalPurchaseInvoicePriceDescription("    محاسبه نشده است");
+      setTotalPurchaseInvoiceFreightShareDescription(
+        "  حمل و نقل  محاسبه نشده است ",
+      );
     }
   }, [purchaseInvoiceItems]);
 
@@ -228,7 +245,10 @@ export default function PurchaseItems({
                   .object({
                     productId: z.number().min(1),
                     quantity: z.number().min(1),
-                    freightShare: z.number().min(1),
+                    freightShare: z
+                      .number()
+                      .min(1)
+                      .max(100, "حمل و نقل باید بین 1 تا 100 باشد"),
                     unitPrice: z.number().min(1),
                     description: z.string().nullable().optional(),
                   })
@@ -246,14 +266,12 @@ export default function PurchaseItems({
                   );
                   return;
                 }
-
-                setTotalPrice(
+                const totalPrice =
                   result.data.unitPrice +
-                    result.data.freightShare / result.data.quantity,
-                );
+                  (result.data.unitPrice * result.data.freightShare) / 100;
+                setTotalPrice(totalPrice);
                 if (!totalPrice) {
                   setError("مجموع اشتباه است");
-
                   return;
                 }
                 setError("");
@@ -291,7 +309,6 @@ export default function PurchaseItems({
                 onValueChange={setProductId}
                 items={categoriesWithProducts}
                 label={t("selectProduct")}
-                placeholder={t("placeholder")}
               />
               <div className="space-y-2">
                 <label
@@ -468,9 +485,7 @@ export default function PurchaseItems({
                 {purchaseInvoiceItem.remainingQuantity.toLocaleString("en-US")}
               </div>
               <div>{purchaseInvoiceItem.unitPrice.toLocaleString("en-US")}</div>
-              <div>
-                {purchaseInvoiceItem.freightShare.toLocaleString("en-US")}
-              </div>
+              <div>{purchaseInvoiceItem.freightShare} %</div>
               <div>
                 {purchaseInvoiceItem.totalPrice.toLocaleString("en-US")}
               </div>
@@ -517,6 +532,11 @@ export default function PurchaseItems({
       {totalPurchaseInvoicePriceDescription && (
         <p className="bg-helper-mix py-1 px-2.5 rounded-xl text-sm text-helper">
           {totalPurchaseInvoicePriceDescription}
+        </p>
+      )}
+      {totalPurchaseInvoiceFreightShareDescription && (
+        <p className="bg-alert-mix py-1 px-2.5 rounded-xl text-sm text-alert">
+          {totalPurchaseInvoiceFreightShareDescription}
         </p>
       )}
     </div>

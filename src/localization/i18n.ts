@@ -195,6 +195,7 @@ i18n.use(initReactI18next).init({
         selectUnit: "انتخاب واحد",
 
         // customerTypes
+        customerType: "نوع مشتری",
         manageCustomerType: "مدیریت انواع مشتری",
         addCustomerType: "افزودن نوع مشتری",
         editCustomerType: "ویرایش نوع مشتری",
@@ -258,7 +259,7 @@ i18n.use(initReactI18next).init({
         editPurchaseItem: "ویرایش آیتم خرید",
         deletePurchaseItem: "حذف آیتم خرید",
         unitPrice: "قیمت واحد",
-        freightShare: "حمل و نقل",
+        freightShare: "حمل و نقل (%)",
         totalPrice: "قیمت خرید",
         remainingQuantity: "باقی مانده",
         deletePurchaseItemsDescription:

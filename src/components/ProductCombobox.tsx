@@ -20,7 +20,6 @@ type ProductComboboxProps = {
   value?: number | null;
   onValueChange?: (value: number | null) => void;
   items: CategoryWithProducts[];
-  placeholder?: string;
   label?: string;
   disabled?: boolean;
 };
@@ -29,7 +28,6 @@ export function ProductCombobox({
   value,
   onValueChange,
   items,
-  placeholder = "انتخاب محصول...",
   label = "انتخاب محصول",
   disabled = false,
 }: ProductComboboxProps) {
@@ -118,7 +116,6 @@ export function ProductCombobox({
           ref={inputRef}
           value={open ? search : (selectedProduct?.name ?? "")}
           disabled={disabled}
-          placeholder={placeholder}
           onMouseDown={(event) => {
             if (!open) {
               event.preventDefault();

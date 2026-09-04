@@ -62,6 +62,7 @@ function PurchasesPage() {
     queryKey: ["currencies"],
     queryFn: getCurrencies,
   });
+
   const {
     data: currencyRates = [],
     isLoading: isLoadingCurrencyRates,
@@ -128,7 +129,7 @@ function PurchasesPage() {
     },
   });
 
-  const resetForm = () => {
+  const resetForm = async () => {
     setEditingId(null);
     setInvoiceNumber("");
     setInvoiceDate("");
@@ -141,6 +142,9 @@ function PurchasesPage() {
     setDialogDeleteOpen(false);
     setOpen(false);
     setDialogPurchaseItemsOpen(false);
+    await queryClient.invalidateQueries({
+      queryKey: ["purchaseInvoices"],
+    });
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {

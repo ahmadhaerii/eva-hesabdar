@@ -160,6 +160,7 @@ i18n.use(initReactI18next).init({
         postalCode: "کد پستی",
         date: "تاریخ",
         quantity: "تعداد",
+        total: "مجموع",
 
         // Categories
         category: "دسته‌بندی",
@@ -182,6 +183,7 @@ i18n.use(initReactI18next).init({
         deleteProduct: "حذف محصول",
         deleteProductDescription:
           "از حذف   محصول ' {{ name }} '  اطمینان دارید ؟",
+        productInventory: "موجودی محصول",
 
         // Units
         unit: "واحد",
@@ -219,6 +221,8 @@ i18n.use(initReactI18next).init({
         customProfitPercent: "درصد سود",
         deleteCustomerDescription:
           "از حذف مشتری  ' {{ name }} '  اطمینان دارید ؟",
+        customer: "مشتری",
+        selectCustomer: "انتخاب مشتری",
 
         // currencies
         selectCurrency: "انتخاب ارز",
@@ -264,6 +268,13 @@ i18n.use(initReactI18next).init({
         remainingQuantity: "باقی مانده",
         deletePurchaseItemsDescription:
           "از حذف   محصول ' {{ name }} '  اطمینان دارید ؟",
+
+        //sales
+        saleDescription: "توضیحات",
+        saleInvoiceDescription: "توضیحات",
+        addSaleInvoice: "افزودن فاکتور فروش",
+        addSaleItem: "افزودن آیتم فروش",
+
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",
       },

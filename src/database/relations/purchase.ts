@@ -5,6 +5,7 @@ import { purchaseInvoices, purchaseInvoiceItems } from "../schema/purchase";
 import { products } from "../schema/master";
 
 import { currencies, currencyRates } from "../schema/currency";
+import { salesInventoryAllocations } from "../schema";
 
 /* ==========================================================
    PURCHASE INVOICES
@@ -23,7 +24,7 @@ export const purchaseInvoiceRelations = relations(
       references: [currencyRates.id],
     }),
 
-    items: many(purchaseInvoiceItems),
+    purchaseInvoiceItems: many(purchaseInvoiceItems),
   }),
 );
 
@@ -34,7 +35,7 @@ export const purchaseInvoiceRelations = relations(
 export const purchaseInvoiceItemRelations = relations(
   purchaseInvoiceItems,
   ({ one, many }) => ({
-    invoice: one(purchaseInvoices, {
+    purchaseInvoice: one(purchaseInvoices, {
       fields: [purchaseInvoiceItems.purchaseInvoiceId],
       references: [purchaseInvoices.id],
     }),
@@ -43,6 +44,7 @@ export const purchaseInvoiceItemRelations = relations(
       fields: [purchaseInvoiceItems.productId],
       references: [products.id],
     }),
+    allocations: many(salesInventoryAllocations),
 
     // inventoryLots: many(inventoryLots),
   }),

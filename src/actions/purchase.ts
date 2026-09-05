@@ -49,6 +49,16 @@ export async function getPurchaseInvoiceItems(
   return ipc.client.purchase.listPurchaseInvoiceItems(id);
 }
 
+export async function getPurchaseInvoiceItemsForProduct(
+  id: number,
+): Promise<
+  Awaited<
+    ReturnType<typeof ipc.client.purchase.listPurchaseInvoiceItemsForProduct>
+  >
+> {
+  return ipc.client.purchase.listPurchaseInvoiceItemsForProduct(id);
+}
+
 export async function addPurchaseInvoiceItem(data: {
   purchaseInvoiceId: number;
   productId: number;

@@ -39,6 +39,19 @@ export async function getCurrencyRates(): Promise<
 > {
   return ipc.client.currency.listCurrencyRate();
 }
+export async function getLatestCurrencyRate(
+  id: number,
+): Promise<
+  Awaited<ReturnType<typeof ipc.client.currency.getLatestCurrencyRate>>
+> {
+  return ipc.client.currency.getLatestCurrencyRate(id);
+}
+
+export async function listCurrenciesWithLastRate(): Promise<
+  Awaited<ReturnType<typeof ipc.client.currency.listCurrenciesWithLastRate>>
+> {
+  return ipc.client.currency.listCurrenciesWithLastRate();
+}
 
 export async function getRatesByCurrency(data: {
   id: number;

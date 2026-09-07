@@ -161,6 +161,7 @@ i18n.use(initReactI18next).init({
         date: "تاریخ",
         quantity: "تعداد",
         total: "مجموع",
+        select: "انتخاب",
 
         // Categories
         category: "دسته‌بندی",
@@ -274,6 +275,7 @@ i18n.use(initReactI18next).init({
         saleInvoiceDescription: "توضیحات",
         addSaleInvoice: "افزودن فاکتور فروش",
         addSaleItem: "افزودن آیتم فروش",
+        createSaleInvoice: "افزودن فاکتور فروش",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

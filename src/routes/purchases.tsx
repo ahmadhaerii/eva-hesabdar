@@ -18,11 +18,10 @@ import {
   deletePurchaseInvoice,
   getPurchaseInvoices,
   updatePurchaseInvoice,
-} from "@/actions/purchases";
+} from "@/actions/purchase";
 import { getCurrencies, getRatesByCurrency } from "@/actions/currency";
 import { PurchaseInvoiceWithRelations } from "@/database/types/database";
 import PurchaseItems from "@/features/purchases/purchaseItems";
-import { useCurrencyStore } from "@/stores/currencyStore";
 
 function PurchasesPage() {
   const { t } = useTranslation();
@@ -512,7 +511,7 @@ function PurchasesPage() {
               <div>
                 {purchaseInvoice.currencyRate?.rate.toLocaleString("en-US")}
               </div>
-              <div>{purchaseInvoice.items.length}</div>
+              <div>{purchaseInvoice.purchaseInvoiceItems.length}</div>
               <div>{purchaseInvoice.invoiceDate}</div>
               <div className="text-muted-foreground">
                 {purchaseInvoice.description || "—"}

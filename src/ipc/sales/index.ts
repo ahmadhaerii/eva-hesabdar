@@ -1,8 +1,7 @@
 import {
-  listPurchaseInvoices,
+  listSaleInvoices,
+  createSaleInvoice,
   listPurchaseInvoiceItems,
-  listPurchaseInvoiceItemsForProduct,
-  createPurchaseInvoice,
   addPurchaseInvoiceItem,
   deletePurchaseInvoice,
   deletePurchaseInvoiceItem,
@@ -10,11 +9,10 @@ import {
   updatePurchaseInvoiceItem,
 } from "./handlers";
 
-export const purchase = {
-  listPurchaseInvoices,
+export const sale = {
+  listSaleInvoices,
+  createSaleInvoice,
   listPurchaseInvoiceItems,
-  listPurchaseInvoiceItemsForProduct,
-  createPurchaseInvoice,
   addPurchaseInvoiceItem,
   deletePurchaseInvoice,
   deletePurchaseInvoiceItem,

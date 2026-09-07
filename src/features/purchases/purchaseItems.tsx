@@ -1,16 +1,4 @@
 import {
-  Combobox,
-  ComboboxCollection,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxGroup,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxLabel,
-  ComboboxList,
-  ComboboxSeparator,
-} from "@/components/ui/combobox";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -24,20 +12,15 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import z from "zod";
-import {
-  CategoryWithRelations,
-  Product,
-  PurchaseInvoiceWithRelations,
-} from "@/database/types/database";
+import { PurchaseInvoiceWithRelations } from "@/database/types/database";
 import {
   addPurchaseInvoiceItem,
   deletePurchaseInvoiceItem,
   getPurchaseInvoiceItems,
   updatePurchaseInvoiceItem,
-} from "@/actions/purchases";
-import { getProducts } from "@/actions/product";
-import { getCategories, getCategoriesWithProducts } from "@/actions/category";
+} from "@/actions/purchase";
 import { ProductCombobox } from "@/components/ProductCombobox";
+import { getCategoriesWithProducts } from "@/actions/category";
 interface purchaseInvoiceWithRelations {
   purchaseInvoice: PurchaseInvoiceWithRelations;
 }
@@ -306,7 +289,7 @@ export default function PurchaseItems({
             >
               <ProductCombobox
                 value={productId}
-                onValueChange={setProductId}
+                onValueChange={(productId, product) => setProductId(productId)}
                 items={categoriesWithProducts}
                 label={t("selectProduct")}
               />

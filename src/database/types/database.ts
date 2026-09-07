@@ -47,7 +47,7 @@ export type PurchaseInvoice = typeof schema.purchaseInvoices.$inferSelect;
 export type PurchaseInvoiceWithRelations = PurchaseInvoice & {
   currency: Currency | null;
   currencyRate: CurrencyRate | null;
-  items: PurchaseInvoiceItem[];
+  purchaseInvoiceItems: PurchaseInvoiceItem[];
 };
 
 export type NewPurchaseInvoice = typeof schema.purchaseInvoices.$inferInsert;
@@ -57,6 +57,7 @@ export type PurchaseInvoiceItem =
 
 export type PurchaseInvoiceItemWithRelations = PurchaseInvoiceItem & {
   product: Product;
+  purchaseInvoice: PurchaseInvoice;
 };
 export type NewPurchaseInvoiceItem =
   typeof schema.purchaseInvoiceItems.$inferInsert;
@@ -84,12 +85,21 @@ export type NewInventoryTransaction =
 ========================================================== */
 
 export type SalesInvoice = typeof schema.salesInvoices.$inferSelect;
+export type SalesInvoiceWithRelations =
+  typeof schema.salesInvoices.$inferSelect & {
+    currencyRate: CurrencyRate;
+    customer: Customer;
+    saleInvoiceItems: SalesInvoiceItem[];
+  };
 
 export type NewSalesInvoice = typeof schema.salesInvoices.$inferInsert;
 
 export type SalesInvoiceItem = typeof schema.salesInvoiceItems.$inferSelect;
 
-export type NewSalesInvoiceItem = typeof schema.salesInvoiceItems.$inferInsert;
+export type NewSalesInvoiceItem =
+  typeof schema.salesInvoiceItems.$inferInsert & {
+    selectedRowOfPurchaseInvoiceItems: number[];
+  };
 
 export type SalesInventoryAllocation =
   typeof schema.salesInventoryAllocations.$inferSelect;

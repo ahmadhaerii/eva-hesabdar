@@ -1,4 +1,4 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, gt, min, sql } from "drizzle-orm";
 
 import { db } from "../../client";
 
@@ -24,32 +24,12 @@ export class PurchaseRepository extends BaseRepository {
       with: {
         currency: true,
         currencyRate: true,
-        items: true,
+        purchaseInvoiceItems: true,
       },
 
       orderBy: [desc(purchaseInvoices.invoiceDate)],
     });
   }
-
-  // async getById(id: number): Promise<PurchaseInvoice | undefined> {
-  //   return this.executor.query.purchaseInvoices.findFirst({
-  //     where: eq(purchaseInvoices.id, id),
-
-  //     with: {
-  //       contact: true,
-  //       currency: true,
-  //       currencyRate: true,
-
-  //       items: {
-  //         with: {
-  //           product: true,
-  //         },
-  //       },
-
-  //       costs: true,
-  //     },
-  //   });
-  // }
 
   async createPurchaseInvoice(data: NewPurchaseInvoice) {
     return this.executor.insert(purchaseInvoices).values(data).returning();
@@ -78,13 +58,52 @@ export class PurchaseRepository extends BaseRepository {
   ): Promise<PurchaseInvoiceItemWithRelations[]> {
     return this.executor.query.purchaseInvoiceItems.findMany({
       where: eq(purchaseInvoiceItems.purchaseInvoiceId, invoiceId),
-
       with: {
         product: true,
+        purchaseInvoice: true,
       },
-
       orderBy: [asc(purchaseInvoiceItems.id)],
     });
+  }
+  async getPurchaseInvoiceItemById(
+    id: number,
+  ): Promise<PurchaseInvoiceItem | undefined> {
+    return this.executor.query.purchaseInvoiceItems.findFirst({
+      where: eq(purchaseInvoiceItems.id, id),
+    });
+  }
+
+  async listPurchaseInvoiceItemsForProduct(productId: number): Promise<any[]> {
+    try {
+      return this.executor
+        .select({
+          id: purchaseInvoiceItems.id,
+          description: purchaseInvoiceItems.description,
+          purchaseInvoiceId: purchaseInvoiceItems.purchaseInvoiceId,
+          productId: purchaseInvoiceItems.productId,
+          quantity: purchaseInvoiceItems.quantity,
+          remainingQuantity: purchaseInvoiceItems.remainingQuantity,
+          unitPrice: purchaseInvoiceItems.unitPrice,
+          freightShare: purchaseInvoiceItems.freightShare,
+          totalPrice: purchaseInvoiceItems.totalPrice,
+          invoiceNumber: purchaseInvoices.invoiceNumber,
+        })
+        .from(purchaseInvoiceItems)
+        .innerJoin(
+          purchaseInvoices,
+          eq(purchaseInvoiceItems.purchaseInvoiceId, purchaseInvoices.id),
+        )
+        .where(
+          and(
+            eq(purchaseInvoiceItems.productId, productId),
+            gt(purchaseInvoiceItems.remainingQuantity, 0),
+          ),
+        )
+        .orderBy(purchaseInvoices.invoiceDate);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   async addPurchaseInvoiceItem(data: NewPurchaseInvoiceItem) {
@@ -106,6 +125,16 @@ export class PurchaseRepository extends BaseRepository {
     return db
       .delete(purchaseInvoiceItems)
       .where(eq(purchaseInvoiceItems.id, id));
+  }
+
+  async updateRemainingQuantity(id: number, remainingQuantity: number) {
+    return db
+      .update(purchaseInvoiceItems)
+      .set({
+        remainingQuantity,
+      })
+      .where(eq(purchaseInvoiceItems.id, id))
+      .returning();
   }
 
   // /* ==========================================================

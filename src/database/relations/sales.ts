@@ -6,11 +6,12 @@ import {
   salesInventoryAllocations,
 } from "../schema/sales";
 
-import { products } from "../schema/master";
+import { customers, products } from "../schema/master";
 
 import { currencies, currencyRates } from "../schema/currency";
 
 import { inventoryLots } from "../schema/inventory";
+import { purchaseInvoiceItems } from "../schema";
 
 /* ==========================================================
    SALES INVOICES
@@ -23,8 +24,12 @@ export const salesInvoiceRelations = relations(
       fields: [salesInvoices.currencyRateId],
       references: [currencyRates.id],
     }),
+    customer: one(customers, {
+      fields: [salesInvoices.customerId],
+      references: [customers.id],
+    }),
 
-    items: many(salesInvoiceItems),
+    saleInvoiceItems: many(salesInvoiceItems),
   }),
 );
 
@@ -45,11 +50,6 @@ export const salesInvoiceItemRelations = relations(
       references: [products.id],
     }),
 
-    purchaseCurrency: one(currencies, {
-      fields: [salesInvoiceItems.purchaseCurrencyId],
-      references: [currencies.id],
-    }),
-
     allocations: many(salesInventoryAllocations),
   }),
 );
@@ -66,9 +66,9 @@ export const salesInventoryAllocationRelations = relations(
       references: [salesInvoiceItems.id],
     }),
 
-    inventoryLot: one(inventoryLots, {
-      fields: [salesInventoryAllocations.inventoryLotId],
-      references: [inventoryLots.id],
+    purchaseInvoiceItem: one(purchaseInvoiceItems, {
+      fields: [salesInventoryAllocations.purchaseInvoiceItemId],
+      references: [purchaseInvoiceItems.id],
     }),
   }),
 );

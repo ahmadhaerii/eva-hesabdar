@@ -10,6 +10,14 @@ export const listCurrencies = os.handler(async () => {
     console.error("error", error);
   }
 });
+export const listCurrenciesWithLastRate = os.handler(async () => {
+  try {
+    const list = await currencyService.listCurrenciesWithLastRate();
+    return list;
+  } catch (error) {
+    console.error("error", error);
+  }
+});
 
 const createCurrencyInput = z.object({
   code: z.string().min(1),
@@ -32,6 +40,7 @@ const deleteCurrencyInput = z.object({
 const currencyInput = z.object({
   id: z.number(),
 });
+const idInput = z.number();
 
 export const createCurrency = os
   .input(createCurrencyInput)
@@ -73,6 +82,11 @@ export const getRatesByCurrency = os
   .input(currencyInput)
   .handler(async ({ input }) => {
     return currencyService.getRatesByCurrency(input);
+  });
+export const getLatestCurrencyRate = os
+  .input(idInput)
+  .handler(async ({ input }) => {
+    return currencyService.getLatestCurrencyRate(input);
   });
 
 export const createCurrencyRate = os

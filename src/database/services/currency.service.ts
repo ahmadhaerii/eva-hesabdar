@@ -27,6 +27,13 @@ export class CurrencyService {
     return currencyRepository.getRatesByCurrency(data.id);
   }
 
+  async getLatestCurrencyRate(id: number) {
+    return currencyRepository.getLatestCurrencyRate(id);
+  }
+  async listCurrenciesWithLastRate() {
+    return currencyRepository.listCurrenciesWithLastRate();
+  }
+
   async createCurrencyRate(data: NewCurrencyRate) {
     return currencyRepository.createCurrencyRate(data);
   }

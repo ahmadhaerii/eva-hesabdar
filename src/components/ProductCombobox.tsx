@@ -4,22 +4,12 @@ import * as React from "react";
 import { ChevronDownIcon, CheckIcon } from "lucide-react";
 
 import { cn } from "@/utils/tailwind";
-
-type Product = {
-  id: number;
-  name: string;
-};
-
-type CategoryWithProducts = {
-  id: number;
-  name: string;
-  products: Product[];
-};
+import { CategoryWithRelations, Product } from "@/database/types/database";
 
 type ProductComboboxProps = {
   value?: number | null;
-  onValueChange?: (value: number | null) => void;
-  items: CategoryWithProducts[];
+  onValueChange?: (productId: number | null, product: Product) => void;
+  items: CategoryWithRelations[];
   label?: string;
   disabled?: boolean;
 };
@@ -91,7 +81,7 @@ export function ProductCombobox({
   }
 
   function handleSelect(product: Product) {
-    onValueChange?.(product.id);
+    onValueChange?.(product.id, product);
     setSearch("");
     setOpen(false);
   }

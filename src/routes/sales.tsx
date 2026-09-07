@@ -18,11 +18,12 @@ import {
   deletePurchaseInvoice,
   getPurchaseInvoices,
   updatePurchaseInvoice,
-} from "@/actions/purchases";
+} from "@/actions/purchase";
 import { getCurrencies, getRatesByCurrency } from "@/actions/currency";
 import { PurchaseInvoiceWithRelations } from "@/database/types/database";
 import PurchaseItems from "@/features/purchases/purchaseItems";
 import { useCurrencyStore } from "@/stores/currencyStore";
+import SaleInvoice from "@/features/sales/saleInvoice";
 
 function SalesPage() {
   const { t } = useTranslation();
@@ -35,7 +36,7 @@ function SalesPage() {
   const [selectedPurchaseInvoice, setSelectedPurchaseInvoice] =
     useState<PurchaseInvoiceWithRelations | null>(null);
   const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false);
-  const [dialogPurchaseItemsOpen, setDialogPurchaseItemsOpen] = useState(false);
+  const [dialogSaleInvoiceOpen, setDialogSaleInvoiceOpen] = useState(false);
 
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [invoiceDate, setInvoiceDate] = useState("");
@@ -139,9 +140,9 @@ function SalesPage() {
     setStatus("");
 
     setError("");
+    setDialogSaleInvoiceOpen(false);
     setDialogDeleteOpen(false);
     setOpen(false);
-    setDialogPurchaseItemsOpen(false);
     await queryClient.invalidateQueries({
       queryKey: ["purchaseInvoices"],
     });
@@ -165,274 +166,31 @@ function SalesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{t("purchases")}</h1>
+          <h1 className="text-2xl font-semibold">{t("sales")}</h1>
 
-          <p className="text-muted-foreground">{t("purchaseDescription")}</p>
+          <p className="text-muted-foreground">{t("saleDescription")}</p>
         </div>
         <div>
           <Dialog
-            open={open}
+            open={dialogSaleInvoiceOpen}
             onOpenChange={(onOpen: boolean) =>
-              onOpen ? setOpen(onOpen) : resetForm()
+              onOpen ? setDialogSaleInvoiceOpen(onOpen) : resetForm()
             }
           >
             <DialogTrigger asChild>
               <Button>
                 <Plus className="ml-2 h-4 w-4" />
-                {t("addPurchaseInvoice")}
+                {t("addSaleInvoice")}
               </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
               <DialogHeader>
                 <DialogTitle>
-                  {editingId
-                    ? t("editPurchaseInvoice")
-                    : t("addPurchaseInvoice")}
+                  {editingId ? t("editSaleInvoice") : t("addSaleInvoice")}
                 </DialogTitle>
               </DialogHeader>
-
-              <form
-                className="space-y-4"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  const result = z
-                    .object({
-                      invoiceNumber: z
-                        .string()
-                        .min(1, "شماره رسید را وارد کنید"),
-                      currencyId: z
-                        .number()
-                        .nullable()
-                        .optional()
-                        .refine(
-                          (val) => val !== null && val !== undefined && val > 0,
-                          {
-                            message: " ارز الزامی است.",
-                          },
-                        ),
-                      currencyRateId: z
-                        .number()
-                        .nullable()
-                        .optional()
-                        .refine(
-                          (val) => val !== null && val !== undefined && val > 0,
-                          {
-                            message: " نرخ ارز الزامی است.",
-                          },
-                        ),
-                      invoiceDate: z
-                        .string()
-                        .regex(
-                          /^1[34]\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
-                          "تاریخ به درستی وارد نشده است",
-                        ),
-                      description: z.string().nullable().optional(),
-                      status: z
-                        .enum(["Draft", "Confirmed", "Cancelled"])
-                        .optional(),
-                    })
-                    .safeParse({
-                      invoiceNumber,
-                      invoiceDate,
-                      description,
-                      status,
-                      currencyId,
-                      currencyRateId,
-                    });
-
-                  if (!result.success) {
-                    setError(
-                      result.error.issues[0]?.message ?? "اطلاعات نامعتبر است.",
-                    );
-                    return;
-                  }
-
-                  setError("");
-                  if (
-                    result.data.currencyId === undefined ||
-                    result.data.currencyId === null ||
-                    result.data.currencyRateId === undefined ||
-                    result.data.currencyRateId === null
-                  )
-                    return;
-                  if (editingId) {
-                    updateMutation.mutate({
-                      id: editingId,
-                      data: {
-                        invoiceNumber: result.data.invoiceNumber,
-                        invoiceDate: result.data.invoiceDate,
-                        description: result.data.description || null,
-                        status: result.data.status,
-                        currencyId: result.data.currencyId,
-                        currencyRateId: result.data.currencyRateId,
-                      },
-                    });
-                  } else {
-                    createMutation.mutate({
-                      invoiceNumber: result.data.invoiceNumber,
-                      invoiceDate: result.data.invoiceDate,
-                      description: result.data.description || null,
-                      status: result.data.status,
-                      currencyId: result.data.currencyId,
-                      currencyRateId: result.data.currencyRateId,
-                    });
-                  }
-                }}
-              >
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="purchase-invoiceNumber"
-                      className="text-sm font-medium"
-                    >
-                      {t("purchaseInvoiceNumber")}
-                    </label>
-
-                    <input
-                      id="purchase-invoiceNumber"
-                      value={invoiceNumber}
-                      onChange={(event) => setInvoiceNumber(event.target.value)}
-                      disabled={createMutation.isPending}
-                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                      autoFocus
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="purchase-currency"
-                      className="text-sm font-medium"
-                    >
-                      {t("selectCurrency")}
-                    </label>
-
-                    <select
-                      id="purchase-currency"
-                      value={currencyId?.toString() ?? ""}
-                      onChange={(event) => setCurrencyId(+event.target.value)}
-                      disabled={createMutation.isPending || isLoadingCurrencies}
-                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      <option value="">
-                        {isLoadingCurrencies
-                          ? t("loading")
-                          : t("selectCurrency")}
-                      </option>
-
-                      {currencies.map((currency) => (
-                        <option key={currency.id} value={currency.id}>
-                          {currency.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="purchase-currencyRate"
-                      className="text-sm font-medium"
-                    >
-                      {t("selectCurrencyRate")}
-                    </label>
-
-                    <select
-                      id="purchase-currencyRate"
-                      value={currencyRateId?.toString() ?? ""}
-                      onChange={(event) =>
-                        setCurrencyRateId(+event.target.value)
-                      }
-                      disabled={
-                        createMutation.isPending || isLoadingCurrencyRates
-                      }
-                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      <option value="">
-                        {isLoadingCurrencyRates
-                          ? t("loading")
-                          : t("selectCurrencyRate")}
-                      </option>
-
-                      {currencyRates.map((currencyRate) => (
-                        <option key={currencyRate.id} value={currencyRate.id}>
-                          {currencyRate.rate}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="purchase-invoiceDate"
-                      className="text-sm font-medium"
-                    >
-                      {t("purchaseInvoiceDate")}
-                    </label>
-
-                    <input
-                      id="purchase-invoiceDate"
-                      value={invoiceDate}
-                      placeholder="1405-01-01"
-                      onChange={handleDateChange}
-                      disabled={createMutation.isPending}
-                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-
-                  <div className="space-y-2 sm:col-span-2">
-                    <label
-                      htmlFor="purchase-description"
-                      className="text-sm font-medium"
-                    >
-                      {t("purchaseDescription")}
-                    </label>
-
-                    <textarea
-                      id="purchase-description"
-                      value={description}
-                      onChange={(event) => setDescription(event.target.value)}
-                      disabled={createMutation.isPending}
-                      rows={3}
-                      className="w-full resize-none rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                </div>
-
-                {/* Error */}
-                {error && <p className="text-sm text-destructive">{error}</p>}
-
-                {/* Actions */}
-                <div className="flex justify-start gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      resetForm();
-                    }}
-                    disabled={createMutation.isPending}
-                  >
-                    {t("cancel")}
-                  </Button>
-
-                  <Button type="submit" disabled={createMutation.isPending}>
-                    {createMutation.isPending ? t("loading") : t("save")}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog
-            open={dialogPurchaseItemsOpen}
-            onOpenChange={(onOpen: boolean) =>
-              onOpen ? setDialogPurchaseItemsOpen(onOpen) : resetForm()
-            }
-          >
-            <DialogContent className="sm:max-w-4/6">
-              <DialogHeader>
-                <DialogTitle>{t("purchaseItems")}</DialogTitle>
-              </DialogHeader>
-              <PurchaseItems purchaseInvoice={selectedPurchaseInvoice!} />
+              <SaleInvoice />
             </DialogContent>
           </Dialog>
         </div>
@@ -517,24 +275,13 @@ function SalesPage() {
               <div>
                 {purchaseInvoice.currencyRate?.rate.toLocaleString("en-US")}
               </div>
-              <div>{purchaseInvoice.items.length}</div>
+              <div>{purchaseInvoice.purchaseInvoiceItems.length}</div>
               <div>{purchaseInvoice.invoiceDate}</div>
               <div className="text-muted-foreground">
                 {purchaseInvoice.description || "—"}
               </div>
 
               <div className="flex gap-2">
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedPurchaseInvoice(purchaseInvoice);
-                    setDialogPurchaseItemsOpen(true);
-                  }}
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                </Button>
-
                 <Button
                   size="icon"
                   variant="outline"

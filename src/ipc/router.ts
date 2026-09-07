@@ -6,6 +6,7 @@ import { theme } from "./theme";
 import { window } from "./window";
 import { currency } from "./currencies";
 import { purchase } from "./purchases";
+import { sale } from "./sales";
 
 export const router = {
   app,
@@ -16,4 +17,5 @@ export const router = {
   customer,
   currency,
   purchase,
+  sale,
 };

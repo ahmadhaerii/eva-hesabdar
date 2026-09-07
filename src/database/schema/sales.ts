@@ -7,9 +7,9 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
-import { products } from "./master";
-import { currencies, currencyRates } from "./currency";
-import { inventoryLots } from "./inventory";
+import { customers, products } from "./master";
+import { currencyRates } from "./currency";
+import { purchaseInvoiceItems } from "./purchase";
 
 /* ==========================================================
    SALES INVOICES
@@ -22,11 +22,13 @@ export const salesInvoices = sqliteTable(
 
     invoiceNumber: text("invoice_number").notNull(),
 
+    customerId: integer("customer_id")
+      .notNull()
+      .references(() => customers.id),
+
     currencyRateId: integer("currency_rate_id")
       .notNull()
       .references(() => currencyRates.id),
-
-    currencyRate: real("currency_rate").notNull(),
 
     invoiceDate: text("invoice_date").notNull(),
 
@@ -71,19 +73,18 @@ export const salesInvoiceItems = sqliteTable(
 
     quantity: real("quantity").notNull(),
 
-    // FIFO Snapshot
-    fifoUnitCost: real("fifo_unit_cost").notNull(),
+    //  fifoUnitCost: real("fifo_unit_cost").notNull(),
 
-    purchaseCurrencyId: integer("purchase_currency_id")
-      .notNull()
-      .references(() => currencies.id),
+    // purchaseCurrencyId: integer("purchase_currency_id")
+    //   .notNull()
+    //   .references(() => currencies.id),
 
-    purchaseCurrencyRate: real("purchase_currency_rate").notNull(),
+    // purchaseCurrencyRate: real("purchase_currency_rate").notNull(),
 
     // Sale Snapshot
-    saleExchangeRate: real("sale_exchange_rate").notNull(),
+    // saleExchangeRate: real("sale_exchange_rate").notNull(),
 
-    customerProfitPercent: real("customer_profit_percent").notNull(),
+    // customerProfitPercent: real("customer_profit_percent").notNull(),
 
     suggestedUnitPrice: real("suggested_unit_price").notNull(),
 
@@ -114,21 +115,19 @@ export const salesInventoryAllocations = sqliteTable(
       .notNull()
       .references(() => salesInvoiceItems.id),
 
-    inventoryLotId: integer("inventory_lot_id")
+    purchaseInvoiceItemId: integer("purchase_invoice_item_id")
       .notNull()
-      .references(() => inventoryLots.id),
+      .references(() => purchaseInvoiceItems.id),
 
     quantity: real("quantity").notNull(),
-
-    fifoUnitCost: real("fifo_unit_cost").notNull(),
-
-    fifoTotalCost: real("fifo_total_cost").notNull(),
 
     createdAt: text("created_at").notNull(),
   },
   (table) => ({
     itemIndex: index("idx_sales_alloc_item").on(table.salesInvoiceItemId),
 
-    lotIndex: index("idx_sales_alloc_lot").on(table.inventoryLotId),
+    lotIndex: index("idx_sales_alloc_purchase_invoice_item").on(
+      table.purchaseInvoiceItemId,
+    ),
   }),
 );

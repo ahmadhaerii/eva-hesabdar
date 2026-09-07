@@ -31,6 +31,11 @@ export class PurchaseService {
     const list = await purchaseRepository.listPurchaseInvoiceItems(invoiceId);
     return list;
   }
+  async listPurchaseInvoiceItemsForProduct(productId: number) {
+    const list =
+      await purchaseRepository.listPurchaseInvoiceItemsForProduct(productId);
+    return list;
+  }
 
   async addPurchaseInvoiceItem(data: NewPurchaseInvoiceItem) {
     return purchaseRepository.addPurchaseInvoiceItem(data);

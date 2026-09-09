@@ -162,6 +162,8 @@ i18n.use(initReactI18next).init({
         quantity: "تعداد",
         total: "مجموع",
         select: "انتخاب",
+        invoiceNumber: "شماره فاکتور",
+        items: "اقلام",
 
         // Categories
         category: "دسته‌بندی",
@@ -276,6 +278,16 @@ i18n.use(initReactI18next).init({
         addSaleInvoice: "افزودن فاکتور فروش",
         addSaleItem: "افزودن آیتم فروش",
         createSaleInvoice: "افزودن فاکتور فروش",
+        amountReceived: "مبلغ دریافتی",
+
+        validationReceivedAmountLessThanInvoice:
+          "برای این نوع مشتری ، مبلغ دریافتی نمیتواند کمتر از مبلغ فاکتور باشد",
+
+        validationSalesInvoiceItems: "حداقل باید یک آیتم در سبد خرید باشد",
+        validationInvoiceDate: "تاریخ شمسی را وارد نمایید",
+        validationTotalPrice: "جمع کل فاکتور نمیتواند صفر باشد",
+        validationAmountReceived: "مبلغ دریافتی را وارد نمایید",
+        validationSuccess: "اطلاعات با موفقیت ذخیره شد",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

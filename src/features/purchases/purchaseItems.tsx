@@ -28,8 +28,6 @@ export default function PurchaseItems({
   purchaseInvoice,
 }: purchaseInvoiceWithRelations) {
   const { t } = useTranslation();
-  console.log("purchaseInvoiceWithRelations => ", purchaseInvoice);
-
   const {
     data: purchaseInvoiceItems = [],
     isLoading,

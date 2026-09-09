@@ -18,12 +18,17 @@ import {
   SalesInvoiceWithRelations,
 } from "../../types/database";
 import { BaseRepository } from "../base.repository";
+import { currency } from "@/ipc/currencies";
 
 export class SalesRepository extends BaseRepository {
   async listSaleInvoices(): Promise<SalesInvoiceWithRelations[]> {
     return this.executor.query.salesInvoices.findMany({
       with: {
-        currencyRate: true,
+        currencyRate: {
+          with: {
+            currency: true,
+          },
+        },
         customer: true,
         saleInvoiceItems: true,
       },

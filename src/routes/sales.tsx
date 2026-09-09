@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Plus, UserCog } from "lucide-react";
+import { Eye, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, ShoppingCart } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { number, z } from "zod";
 import {
@@ -24,6 +23,7 @@ import { PurchaseInvoiceWithRelations } from "@/database/types/database";
 import PurchaseItems from "@/features/purchases/purchaseItems";
 import { useCurrencyStore } from "@/stores/currencyStore";
 import SaleInvoice from "@/features/sales/saleInvoice";
+import { getSaleInvoices } from "@/actions/sale";
 
 function SalesPage() {
   const { t } = useTranslation();
@@ -47,12 +47,12 @@ function SalesPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const {
-    data: purchaseInvoices = [],
+    data: saleInvoices = [],
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["purchaseInvoices"],
-    queryFn: getPurchaseInvoices,
+    queryKey: ["saleInvoices"],
+    queryFn: getSaleInvoices,
   });
 
   const {
@@ -190,7 +190,15 @@ function SalesPage() {
                   {editingId ? t("editSaleInvoice") : t("addSaleInvoice")}
                 </DialogTitle>
               </DialogHeader>
-              <SaleInvoice />
+              <SaleInvoice
+                saleInvoiceEditingId={editingId}
+                onClose={() => {
+                  setDialogSaleInvoiceOpen(false);
+                  queryClient.invalidateQueries({
+                    queryKey: ["saleInvoices"],
+                  });
+                }}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -247,38 +255,41 @@ function SalesPage() {
         <div className="text-destructive">دریافت داده ها با خطا مواجه شد.</div>
       )}
 
-      {!isLoading && !isError && purchaseInvoices.length === 0 && (
+      {!isLoading && !isError && saleInvoices.length === 0 && (
         <div className="rounded-lg border p-8 text-center">
           <p className="text-muted-foreground">{t("noData")}</p>
         </div>
       )}
 
-      {!isLoading && !isError && purchaseInvoices.length > 0 && (
+      {!isLoading && !isError && saleInvoices.length > 0 && (
         <div className="rounded-lg border">
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 font-medium">
-            <div>{t("purchaseInvoiceNumber")}</div>
+          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 font-medium">
+            <div>{t("invoiceNumber")}</div>
             <div>{t("currency")}</div>
             <div>{t("currencyRate")}</div>
-            <div>{t("purchaseItems")}</div>
+            <div>{t("items")}</div>
+            <div>{t("totalPrice")}</div>
             <div>{t("purchaseInvoiceDate")}</div>
-            <div>{t("purchaseDescription")}</div>
+            <div>{t("description")}</div>
             <div>{t("actions")}</div>
           </div>
 
-          {purchaseInvoices.map((purchaseInvoice) => (
+          {saleInvoices.map((saleInvoice) => (
             <div
-              key={purchaseInvoice.id}
-              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 last:border-b-0"
+              key={saleInvoice.id}
+              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 last:border-b-0"
             >
-              <div>{purchaseInvoice.invoiceNumber}</div>
-              <div>{purchaseInvoice.currency?.name}</div>
+              <div>{saleInvoice.id}</div>
+              <div>{saleInvoice.currencyRate?.currency?.name}</div>
               <div>
-                {purchaseInvoice.currencyRate?.rate.toLocaleString("en-US")}
+                {saleInvoice.currencyRate?.rate.toLocaleString("en-US")}
               </div>
-              <div>{purchaseInvoice.purchaseInvoiceItems.length}</div>
-              <div>{purchaseInvoice.invoiceDate}</div>
+              <div>{saleInvoice.saleInvoiceItems.length}</div>
+              <div>{saleInvoice.totalPrice.toLocaleString()}</div>
+
+              <div>{saleInvoice.invoiceDate}</div>
               <div className="text-muted-foreground">
-                {purchaseInvoice.description || "—"}
+                {saleInvoice.description || "—"}
               </div>
 
               <div className="flex gap-2">
@@ -286,29 +297,11 @@ function SalesPage() {
                   size="icon"
                   variant="outline"
                   onClick={() => {
-                    setEditingId(purchaseInvoice.id);
-                    setInvoiceNumber(purchaseInvoice.invoiceNumber ?? "");
-                    setCurrencyId(purchaseInvoice.currencyId ?? "");
-                    setCurrencyRateId(purchaseInvoice.currencyRateId ?? "");
-                    setInvoiceDate(purchaseInvoice.invoiceDate ?? "");
-                    setDescription(purchaseInvoice.description ?? "");
-                    setStatus(purchaseInvoice.status ?? "");
-                    setOpen(true);
+                    setEditingId(saleInvoice.id);
+                    setDialogSaleInvoiceOpen(true);
                   }}
                 >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={() => {
-                    setEditingId(purchaseInvoice.id);
-                    setInvoiceNumber(purchaseInvoice.invoiceNumber ?? "");
-                    setDialogDeleteOpen(true);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
+                  <Eye className="h-4 w-4" />
                 </Button>
               </div>
             </div>

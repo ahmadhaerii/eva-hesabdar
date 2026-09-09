@@ -9,7 +9,6 @@ export async function createCustomer(data: {
   customerTypeId: number;
   customProfitPercent?: number | null;
   displayName: string;
-  code: string;
   nationalId?: string | null;
   phone?: string | null;
   mobile?: string | null;
@@ -18,6 +17,7 @@ export async function createCustomer(data: {
   postalCode?: string | null;
   description?: string | null;
   isActive?: boolean;
+  isAnonymous?: boolean;
 }): Promise<Awaited<ReturnType<typeof ipc.client.customer.createCustomer>>> {
   return ipc.client.customer.createCustomer(data);
 }
@@ -27,7 +27,6 @@ export async function updateCustomer(
     customerTypeId: number;
     customProfitPercent?: number | null;
     displayName: string;
-    code: string;
     nationalId?: string | null;
     phone?: string | null;
     mobile?: string | null;
@@ -36,6 +35,7 @@ export async function updateCustomer(
     postalCode?: string | null;
     description?: string | null;
     isActive?: boolean;
+    isAnonymous?: boolean;
   },
 ) {
   return ipc.client.customer.updateCustomer({

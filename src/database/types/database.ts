@@ -87,7 +87,7 @@ export type NewInventoryTransaction =
 export type SalesInvoice = typeof schema.salesInvoices.$inferSelect;
 export type SalesInvoiceWithRelations =
   typeof schema.salesInvoices.$inferSelect & {
-    currencyRate: CurrencyRate;
+    currencyRate: CurrencyRateWithRelations;
     customer: Customer;
     saleInvoiceItems: SalesInvoiceItem[];
   };

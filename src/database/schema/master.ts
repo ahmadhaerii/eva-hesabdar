@@ -46,8 +46,6 @@ export const customers = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    code: text("code").notNull(),
-
     displayName: text("display_name").notNull(),
 
     nationalId: text("national_id"),
@@ -72,6 +70,10 @@ export const customers = sqliteTable(
 
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
 
+    isAnonymous: integer("is_anonymous", { mode: "boolean" })
+      .notNull()
+      .default(false),
+
     createdAt: text("created_at").notNull(),
 
     updatedAt: text("updated_at"),
@@ -79,7 +81,6 @@ export const customers = sqliteTable(
     deletedAt: text("deleted_at"),
   },
   (table) => ({
-    codeUnique: uniqueIndex("uq_customers_code").on(table.code),
     nameIndex: index("idx_customers_name").on(table.displayName),
     mobileIndex: index("idx_customers_mobile").on(table.mobile),
     activeIndex: index("idx_customers_active").on(table.isActive),

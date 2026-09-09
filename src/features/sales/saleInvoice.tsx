@@ -10,9 +10,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckIcon, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 import z from "zod";
 import {
+  CustomerWithRelations,
   Product,
   PurchaseInvoiceWithRelations,
 } from "@/database/types/database";
@@ -44,7 +46,15 @@ interface InvoiceItem {
   lineTotal: number;
   createdAt: string;
 }
-export default function SaleInvoice() {
+interface SaleInvoiceProps {
+  onClose: () => void;
+  saleInvoiceEditingId: number | null;
+}
+
+export default function SaleInvoice({
+  onClose,
+  saleInvoiceEditingId = null,
+}: SaleInvoiceProps) {
   const { t } = useTranslation();
 
   const [customerId, setCustomerId] = useState<number | null>(1);
@@ -71,8 +81,17 @@ export default function SaleInvoice() {
     useState<number>(0);
   const [suggestedUnitPrice, setSuggestedUnitPrice] = useState(0);
   const [saleUnitPrice, setSaleUnitPrice] = useState<number | null>(null);
-  const [lineTotal, setLineTotal] = useState<number | null>(null);
+  const [totalPrice, setTotalPrice] = useState<number | null>(null);
+  const [amountReceived, setAmountReceived] = useState<number | null>(null);
   const [helperDescription, setHelperDescription] = useState("");
+  const [saleInvoiceError, setSaleInvoiceError] = useState("");
+  const [selectedCustomer, setSelectedCustomer] =
+    useState<CustomerWithRelations | null>(null);
+
+  const [
+    totalSaleInvoicePriceDescription,
+    setTotalSaleInvoicePriceDescription,
+  ] = useState("");
 
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -87,6 +106,7 @@ export default function SaleInvoice() {
       const data = await getCustomers();
       if (data) {
         setCustomerId(data[data.length - 1].id);
+        setSelectedCustomer(data[data.length - 1]);
       }
       return data;
     },
@@ -131,34 +151,6 @@ export default function SaleInvoice() {
     enabled: !!productId,
   });
 
-  // //salesInvoices
-  // invoiceNumber;
-  // currencyRateId;
-  // invoiceDate;
-  // description;
-  // status Confirmed;
-  // // salesInvoiceItems
-  // salesInvoiceId
-  // productId
-  // quantity
-  // suggestedUnitPrice
-  // saleUnitPrice
-  // lineTotal
-  // description
-  // // salesInventoryAllocations
-  // salesInvoiceItemId
-  // purchaseInvoiceItemId
-  // quantity
-
-  // const [
-  //   totalPurchaseInvoicePriceDescription,
-  //   setTotalPurchaseInvoicePriceDescription,
-  // ] = useState("");
-  // const [
-  //   totalPurchaseInvoiceFreightShareDescription,
-  //   setTotalPurchaseInvoiceFreightShareDescription,
-  // ] = useState("");
-
   const onCreateSaleInvoice = () => {
     const data = {
       invoice: {
@@ -166,21 +158,40 @@ export default function SaleInvoice() {
         currencyRateId: currencyRateId!,
         invoiceNumber: new Date().toISOString(),
         invoiceDate: invoiceDate,
+        totalPrice: totalPrice!,
         createdAt: new Date().toISOString(),
       },
       items: salesInvoiceItems,
     };
+    setSaleInvoiceError("");
+    const regex = /^1[34]\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+    if (salesInvoiceItems.length <= 0) {
+      setSaleInvoiceError(t("validationSalesInvoiceItems"));
+    } else if (!regex.test(invoiceDate)) {
+      setSaleInvoiceError(t("validationInvoiceDate"));
+    } else if (totalPrice === null) {
+      setSaleInvoiceError(t("validationTotalPrice"));
+    } else if (amountReceived === null) {
+      setSaleInvoiceError(t("validationAmountReceived"));
+    } else if (
+      totalPrice &&
+      amountReceived &&
+      selectedCustomer?.isAnonymous &&
+      totalPrice > amountReceived
+    ) {
+      setSaleInvoiceError(t("validationReceivedAmountLessThanInvoice"));
+    } else {
+      createMutation.mutate(data);
+    }
     console.log(data);
-    createMutation.mutate(data);
   };
 
   const createMutation = useMutation({
     mutationFn: createSaleInvoice,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["purchaseInvoiceItems"],
-      });
+      toast.success(t("validationSuccess"), { position: "bottom-center" });
       resetForm();
+      onClose();
     },
 
     onError: (error) => {
@@ -269,6 +280,28 @@ export default function SaleInvoice() {
   }, [quantity, productId, saleUnitPrice]);
 
   useEffect(() => {
+    if (salesInvoiceItems.length > 0) {
+      const total = salesInvoiceItems.reduce(
+        (sum, salesInvoiceItem) => sum + salesInvoiceItem.lineTotal,
+        0,
+      );
+      setTotalPrice(total);
+      setTotalSaleInvoicePriceDescription(
+        `قیمت فروش کل  : ${total.toLocaleString("en-US")} ${defaultCurrency?.name}  ، معادل  ${WordifyFa(total)} ${defaultCurrency?.name}   میباشد`,
+      );
+    } else {
+      setTotalSaleInvoicePriceDescription("قیمت فروش محاسبه نشده است");
+    }
+  }, [salesInvoiceItems]);
+
+  const onSelectedCustomer = (customerId: number) => {
+    const customer = customers.find((customer) => customer.id === customerId);
+    if (customer) {
+      setSelectedCustomer(customer);
+    }
+  };
+
+  useEffect(() => {
     if (productId !== null && quantity !== null) {
       const selectedRows = [];
       let remainingQuantity = quantity;
@@ -291,15 +324,20 @@ export default function SaleInvoice() {
       (currencyWithLastRate) =>
         currencyWithLastRate.latestRateId == currencyRateId,
     );
-    const customer = customers.find((customer) => customer.id == customerId);
-    const profitPercent = customer?.customProfitPercent
-      ? customer?.customProfitPercent
-      : customer?.customerType?.profitPercent;
+    const profitPercent = selectedCustomer?.customProfitPercent
+      ? selectedCustomer?.customProfitPercent
+      : selectedCustomer?.customerType?.profitPercent;
     const totalPrice =
       purchaseInvoiceItemsForProduct[purchaseInvoiceItemsForProduct.length - 1]
         ?.totalPrice;
+    console.log(selectedCustomer);
+    console.log(currency);
+    console.log(totalPrice);
+    console.log(profitPercent);
+    console.log(currency?.latestRate);
+    console.log(productId);
     if (
-      customer &&
+      selectedCustomer &&
       currency &&
       totalPrice &&
       profitPercent &&
@@ -393,7 +431,10 @@ export default function SaleInvoice() {
             id="saleInvoice-customer"
             value={customerId?.toString() ?? ""}
             defaultValue={customerId?.toString() ?? ""}
-            onChange={(event) => setCustomerId(+event.target.value)}
+            onChange={(event) => {
+              setCustomerId(+event.target.value);
+              onSelectedCustomer(+event.target.value);
+            }}
             disabled={createMutation.isPending || isLoadingCustomers}
             className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
           >
@@ -443,7 +484,8 @@ export default function SaleInvoice() {
                 </span>
                 <span>
                   {currency.name} ={" "}
-                  {currency.latestRate?.toLocaleString("en-US")} ریال
+                  {currency.latestRate?.toLocaleString("en-US")}{" "}
+                  {defaultCurrency?.name}
                 </span>
               </p>
             </div>
@@ -462,10 +504,12 @@ export default function SaleInvoice() {
           }
         >
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="ml-2 h-4 w-4" />
-              {t("addSaleItem")}
-            </Button>
+            {!!!saleInvoiceEditingId && (
+              <Button>
+                <Plus className="ml-2 h-4 w-4" />
+                {t("addSaleItem")}
+              </Button>
+            )}
           </DialogTrigger>
 
           <DialogContent className=" sm:max-w-2xl">
@@ -566,14 +610,14 @@ export default function SaleInvoice() {
                   />
                   <div className="space-y-2">
                     <label
-                      htmlFor="customer-type-name"
+                      htmlFor="saleInvoice-type-name"
                       className="text-sm font-medium"
                     >
                       {t("quantity")}
                     </label>
 
                     <input
-                      id="customer-type-name"
+                      id="saleInvoice-type-name"
                       value={quantity?.toString()}
                       onChange={(event) => setQuantity(+event.target.value)}
                       disabled={createMutation.isPending}
@@ -644,13 +688,13 @@ export default function SaleInvoice() {
                 </div>
                 <div className="space-y-2">
                   <label
-                    htmlFor="customer-type-profit-percent"
+                    htmlFor="saleInvoice-type-profit-percent"
                     className="text-sm font-medium"
                   >
                     {t("unitPrice")}
                   </label>
                   <input
-                    id="customer-type-profit-percent"
+                    id="saleInvoice-type-profit-percent"
                     value={saleUnitPrice?.toLocaleString()}
                     onChange={(event) =>
                       setSaleUnitPrice(+event.target.value.replaceAll(",", ""))
@@ -759,35 +803,64 @@ export default function SaleInvoice() {
         </div>
       )}
 
-      {/* {totalPurchaseInvoicePriceDescription && (
+      {totalSaleInvoicePriceDescription && (
         <p className="bg-helper-mix py-1 px-2.5 rounded-xl text-sm text-helper">
-          {totalPurchaseInvoicePriceDescription}
+          {totalSaleInvoicePriceDescription}
         </p>
       )}
-      {totalPurchaseInvoiceFreightShareDescription && (
-        <p className="bg-alert-mix py-1 px-2.5 rounded-xl text-sm text-alert">
-          {totalPurchaseInvoiceFreightShareDescription}
-        </p>
-      )} */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="space-y-2">
+          <label
+            htmlFor="saleInvoice-amount_received"
+            className="text-sm font-medium"
+          >
+            {t("amountReceived")}
+          </label>
 
+          <input
+            id="saleInvoice-amount_received"
+            value={saleUnitPrice?.toLocaleString()}
+            onChange={(event) =>
+              setSaleUnitPrice(+event.target.value.replaceAll(",", ""))
+            }
+            disabled={createMutation.isPending}
+            className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            autoFocus
+          />
+          {totalPrice &&
+            amountReceived &&
+            selectedCustomer?.isAnonymous &&
+            totalPrice > amountReceived && (
+              <p className="text-xs text-destructive">
+                {t("validationReceivedAmountLessThanInvoice")}
+              </p>
+            )}
+        </div>
+      </div>
+      {saleInvoiceError && (
+        <p className="bg-destructive-mix py-1 px-2.5 rounded-xl text-sm text-destructive">
+          {saleInvoiceError}
+        </p>
+      )}
       <div className="flex justify-start gap-2">
         <Button
           type="button"
           variant="outline"
           onClick={() => {
             resetForm();
+            onClose();
           }}
-          disabled={deleteMutation.isPending}
         >
           {t("cancel")}
         </Button>
-
-        <Button
-          disabled={createMutation.isPending}
-          onClick={() => onCreateSaleInvoice()}
-        >
-          {createMutation.isPending ? t("loading") : t("createSaleInvoice")}
-        </Button>
+        {!!!saleInvoiceEditingId && (
+          <Button
+            disabled={createMutation.isPending}
+            onClick={() => onCreateSaleInvoice()}
+          >
+            {createMutation.isPending ? t("loading") : t("createSaleInvoice")}
+          </Button>
+        )}
       </div>
     </div>
   );

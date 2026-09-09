@@ -22,9 +22,9 @@ const createCustomerInput = z.object({
   email: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
   postalCode: z.string().nullable().optional(),
-  code: z.string().min(1),
   customerTypeId: z.number().min(1),
   isActive: z.boolean().optional(),
+  isAnonymous: z.boolean().optional(),
 });
 const updateCustomerInput = z.object({
   id: z.number(),
@@ -37,9 +37,9 @@ const updateCustomerInput = z.object({
   email: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
   postalCode: z.string().nullable().optional(),
-  code: z.string().min(1),
   customerTypeId: z.number().min(1),
   isActive: z.boolean().optional(),
+  isAnonymous: z.boolean().optional(),
 });
 
 const deleteCustomerInput = z.object({

@@ -51,8 +51,8 @@ function CustomersPage() {
 
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
-  const [code, setCode] = useState("");
   const [nationalId, setNationalId] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(true);
   const [customerTypeId, setCustomerTypeId] = useState<number | null>(null);
   const [customProfitPercent, setCustomProfitPercent] = useState<number | null>(
     0,
@@ -89,7 +89,6 @@ function CustomersPage() {
       data: {
         displayName: string;
         description: string | null;
-        code: string;
         nationalId: string | null;
         customerTypeId: number;
         customProfitPercent: number | null;
@@ -99,6 +98,7 @@ function CustomersPage() {
         address: string | null;
         postalCode: string | null;
         isActive?: boolean;
+        isAnonymous?: boolean;
       };
     }) => updateCustomer(id, data),
 
@@ -132,7 +132,6 @@ function CustomersPage() {
     setEditingId(null);
     setDisplayName("");
     setDescription("");
-    setCode("");
     setNationalId("");
     setCustomerTypeId(null);
     setCustomProfitPercent(0);
@@ -141,6 +140,7 @@ function CustomersPage() {
     setEmail("");
     setAddress("");
     setPostalCode("");
+    setIsAnonymous(false);
 
     setError("");
     setDialogDeleteOpen(false);
@@ -195,7 +195,7 @@ function CustomersPage() {
                       email: z.string().trim(),
                       address: z.string().trim(),
                       postalCode: z.string().trim(),
-                      code: z.string().trim().min(1, "کد مشتری الزامی است."),
+                      isAnonymous: z.boolean(),
                       customerTypeId: z
                         .number()
                         .nullable() // ← اجازه دادن به null
@@ -217,8 +217,8 @@ function CustomersPage() {
                       email,
                       address,
                       postalCode,
-                      code,
                       customerTypeId,
+                      isAnonymous,
                     });
 
                   if (!result.success) {
@@ -248,8 +248,8 @@ function CustomersPage() {
                         email: result.data.email || null,
                         address: result.data.address || null,
                         postalCode: result.data.postalCode || null,
-                        code: result.data.code,
                         customerTypeId: result.data.customerTypeId,
+                        isAnonymous: result.data.isAnonymous,
                       },
                     });
                   } else {
@@ -264,8 +264,8 @@ function CustomersPage() {
                       email: result.data.email || null,
                       address: result.data.address || null,
                       postalCode: result.data.postalCode || null,
-                      code: result.data.code,
                       customerTypeId: result.data.customerTypeId,
+                      isAnonymous: result.data.isAnonymous,
                     });
                   }
                 }}
@@ -286,23 +286,6 @@ function CustomersPage() {
                       disabled={createMutation.isPending}
                       className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                       autoFocus
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="customer-code"
-                      className="text-sm font-medium"
-                    >
-                      {t("customerCode")}
-                    </label>
-
-                    <input
-                      id="customer-code"
-                      value={code}
-                      onChange={(event) => setCode(event.target.value)}
-                      disabled={createMutation.isPending}
-                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                     />
                   </div>
 
@@ -427,23 +410,6 @@ function CustomersPage() {
                     />
                   </div>
 
-                  <div className="space-y-2 sm:col-span-2">
-                    <label
-                      htmlFor="customer-address"
-                      className="text-sm font-medium"
-                    >
-                      {t("address")}
-                    </label>
-
-                    <input
-                      id="customer-address"
-                      value={address}
-                      onChange={(event) => setAddress(event.target.value)}
-                      disabled={createMutation.isPending}
-                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-
                   <div className="space-y-2">
                     <label
                       htmlFor="customer-postalCode"
@@ -456,6 +422,22 @@ function CustomersPage() {
                       id="customer-postalCode"
                       value={postalCode}
                       onChange={(event) => setPostalCode(event.target.value)}
+                      disabled={createMutation.isPending}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <label
+                      htmlFor="customer-address"
+                      className="text-sm font-medium"
+                    >
+                      {t("address")}
+                    </label>
+
+                    <input
+                      id="customer-address"
+                      value={address}
+                      onChange={(event) => setAddress(event.target.value)}
                       disabled={createMutation.isPending}
                       className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                     />
@@ -477,6 +459,23 @@ function CustomersPage() {
                       rows={3}
                       className="w-full resize-none rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                     />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="product-active"
+                      type="checkbox"
+                      checked={isAnonymous}
+                      onChange={(event) => setIsAnonymous(event.target.checked)}
+                      disabled={createMutation.isPending}
+                    />
+
+                    <label
+                      htmlFor="product-active"
+                      className="text-sm font-medium"
+                    >
+                      {t("active")}
+                    </label>
                   </div>
                 </div>
 
@@ -617,7 +616,6 @@ function CustomersPage() {
                     setEditingId(customer.id);
                     setDisplayName(customer.displayName);
                     setDescription(customer.description ?? "");
-                    setCode(customer.code ?? "");
                     setCustomerTypeId(customer.customerTypeId ?? "");
                     setNationalId(customer.nationalId ?? "");
                     setCustomProfitPercent(customer.customProfitPercent ?? 0);
@@ -626,6 +624,7 @@ function CustomersPage() {
                     setEmail(customer.email ?? "");
                     setAddress(customer.address ?? "");
                     setPostalCode(customer.postalCode ?? "");
+                    setIsAnonymous(customer.isAnonymous);
                     setOpen(true);
                   }}
                 >

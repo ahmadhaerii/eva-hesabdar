@@ -41,6 +41,28 @@ export const customerTypes = sqliteTable(
    CUSTOMERS
 ========================================================== */
 
+export const customerPayments = sqliteTable(
+  "customer_payments",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    customerId: integer("customer_id")
+      .notNull()
+      .references(() => customers.id),
+    amount: real("amount").notNull(),
+    paymentDate: text("payment_date").notNull(),
+    paymentMethod: text("payment_method").notNull(),
+    referenceNumber: text("reference_number"),
+    description: text("description"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at"),
+    deletedAt: text("deleted_at"),
+  },
+  (table) => ({
+    customerIndex: index("idx_customers_name").on(table.customerId),
+    paymentDateIndex: index("idx_customers_name").on(table.paymentDate),
+  }),
+);
+
 export const customers = sqliteTable(
   "customers",
   {

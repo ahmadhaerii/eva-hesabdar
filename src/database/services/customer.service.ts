@@ -1,4 +1,8 @@
-import { NewCustomer, NewCustomerType } from "../../database/types/database";
+import {
+  NewCustomer,
+  NewCustomerPayment,
+  NewCustomerType,
+} from "../../database/types/database";
 import { customerRepository } from "../repositories/customer/customer.repository";
 
 export class CustomerService {
@@ -24,7 +28,7 @@ export class CustomerService {
     return customerRepository.listCustomerType();
   }
 
-  async createCustomerTypes(data: NewCustomerType) {
+  async createCustomerType(data: NewCustomerType) {
     return customerRepository.createCustomerType(data);
   }
   async updateCustomerType(
@@ -41,6 +45,31 @@ export class CustomerService {
 
   async deleteCustomerType(id: number) {
     return customerRepository.deleteCustomerType(id);
+  }
+
+  // customerPayment
+
+  async listCustomerPayments() {
+    return customerRepository.listCustomerPayments();
+  }
+
+  async createCustomerPayment(data: NewCustomerPayment) {
+    return customerRepository.createCustomerPayment(data);
+  }
+  async updateCustomerPayment(
+    id: number,
+    data: {
+      name?: string;
+      profitPercent: number;
+      description?: string | null;
+      isActive?: boolean;
+    },
+  ) {
+    return customerRepository.updateCustomerPayment(id, data);
+  }
+
+  async deleteCustomerPayment(id: number) {
+    return customerRepository.deleteCustomerPayment(id);
   }
 }
 

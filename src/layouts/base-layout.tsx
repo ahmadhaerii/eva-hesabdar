@@ -23,6 +23,10 @@ const navigation = [
     to: "/customers",
   },
   {
+    label: "Payments",
+    to: "/payments",
+  },
+  {
     label: "Purchases",
     to: "/purchases",
   },

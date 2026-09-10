@@ -816,17 +816,17 @@ export default function SaleInvoice({
           >
             {t("amountReceived")}
           </label>
-
           <input
             id="saleInvoice-amount_received"
-            value={saleUnitPrice?.toLocaleString()}
+            value={amountReceived?.toLocaleString()}
             onChange={(event) =>
-              setSaleUnitPrice(+event.target.value.replaceAll(",", ""))
+              setAmountReceived(+event.target.value.replaceAll(",", ""))
             }
             disabled={createMutation.isPending}
             className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
             autoFocus
           />
+          {amountReceived && WordifyFa(amountReceived)} {defaultCurrency?.name}
           {totalPrice &&
             amountReceived &&
             selectedCustomer?.isAnonymous &&

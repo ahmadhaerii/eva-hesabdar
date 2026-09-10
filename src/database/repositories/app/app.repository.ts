@@ -7,9 +7,35 @@ import { BaseRepository } from "../base.repository";
 
 import moment from "moment-jalaali";
 
+export interface DashboardData {
+  allTimeSales: number;
+  bestSellingProduct: string; // '{"productId":3,"productName":"تست","totalSoldQuantity":112.0}';
+  currentYearSales: number;
+  customersCount: number;
+  productsCount: number;
+  purchaseInvoicesCount: number;
+  salesInvoicesCount: number;
+  totalInventoryValue: number;
+  totalRemainingQuantity: number;
+}
+export interface Last12MonthsSales {
+  months: {
+    year: number;
+    month: number;
+    monthName: string;
+    totalSales: number;
+    invoiceCount: number;
+    formattedMonth: string;
+  }[];
+  totalSales: number;
+  totalInvoices: number;
+  averageMonthlySales: number;
+}
 export class AppRepository extends BaseRepository {
-  async getDashboardData(): Promise<any> {
-    const result = await this.executor.get(sql`
+  async getDashboardData(): Promise<DashboardData> {
+    const currentJYear = moment().jYear();
+
+    const result: DashboardData = await this.executor.get(sql`
     SELECT 
     (SELECT COUNT(*) FROM products) AS productsCount,
     (SELECT COUNT(*) FROM customers) AS customersCount,
@@ -20,8 +46,12 @@ export class AppRepository extends BaseRepository {
         SELECT COALESCE(SUM(pii2.remaining_quantity * pii2.total_price * cr2.rate), 0)
         FROM purchase_invoice_items pii2
         INNER JOIN purchase_invoices pi2 ON pii2.purchase_invoice_id = pi2.id
-        INNER JOIN currency_rates cr2 ON pi2.currency_rate_id = cr2.id
-        WHERE pii2.remaining_quantity > 0
+        INNER JOIN currency_rates cr2 ON pi2.currency_id = cr2.currency_id
+        WHERE pii2.remaining_quantity > 0 AND cr2.created_at = (
+    SELECT MAX(cr.created_at)
+    FROM currency_rates cr
+    WHERE cr.currency_id = cr2.currency_id
+  )
     ) AS totalInventoryValue,
     (
         SELECT json_object(
@@ -46,63 +76,69 @@ export class AppRepository extends BaseRepository {
         (SELECT COALESCE(SUM(total_price), 0) FROM sales_invoices WHERE 1 ) AS allTimeSales ,
         (SELECT COALESCE(SUM(total_price), 0) 
      FROM sales_invoices 
-     WHERE 1
-     AND strftime('%Y', created_at) = strftime('%Y', 'now')) AS currentYearSales;
+     WHERE substr(invoice_date, 1, 4) = ${String(currentJYear)} ) AS currentYearSales;
 
   `);
     return result;
   }
 
-  async getLast12MonthsSales() {
-    // تاریخ جاری شمسی
+  async getLast12MonthsSales(): Promise<Last12MonthsSales> {
     const now = moment();
+
     const months: {
       year: number;
       month: number;
       monthName: string;
-      startDate: Date;
-      endDate: Date;
+      startDate: string;
+      endDate: string;
       totalSales: number;
       invoiceCount: number;
     }[] = [];
+
     for (let i = 11; i >= 0; i--) {
       const m = moment(now).subtract(i, "jMonth");
+
       months.push({
         year: m.jYear(),
         month: m.jMonth() + 1,
         monthName: this.getMonthName(m.jMonth() + 1),
-        startDate: m.startOf("jMonth").toDate(),
-        endDate: m.endOf("jMonth").toDate(),
+        startDate: m.clone().startOf("jMonth").format("jYYYY-jMM-jDD"),
+        endDate: m.clone().endOf("jMonth").format("jYYYY-jMM-jDD"),
         totalSales: 0,
         invoiceCount: 0,
       });
     }
 
-    const startDate = moment(now).subtract(11, "jMonth").startOf("jMonth");
-    const endDate = moment(now).endOf("jMonth");
+    // ابتدای اولین ماه
+    const startDate = moment(now)
+      .subtract(11, "jMonth")
+      .startOf("jMonth")
+      .format("jYYYY-jMM-jDD");
 
-    const startDateStr = startDate.toDate().toISOString();
-    const endDateStr = endDate.toDate().toISOString();
+    // انتهای ماه جاری
+    const endDate = moment(now).endOf("jMonth").format("jYYYY-jMM-jDD");
 
     const sales = await this.executor
       .select({
         totalPrice: salesInvoices.totalPrice,
-        saleDate: salesInvoices.createdAt,
+        saleDate: salesInvoices.invoiceDate,
       })
       .from(salesInvoices)
       .where(
-        sql`${salesInvoices.createdAt} >= ${startDateStr} 
-                AND ${salesInvoices.createdAt} <= ${endDateStr}`,
+        sql`${salesInvoices.invoiceDate} >= ${startDate}
+        AND ${salesInvoices.invoiceDate} <= ${endDate}`,
       )
-      .orderBy(sql`${salesInvoices.createdAt} ASC`);
+      .orderBy(sql`${salesInvoices.invoiceDate} ASC`);
 
-    // گروه‌بندی بر اساس ماه شمسی
+    // گروه‌بندی بر اساس تاریخ شمسی
     sales.forEach((sale) => {
-      const jDate = moment(sale.saleDate);
-      const year = jDate.jYear();
-      const month = jDate.jMonth() + 1;
+      if (!sale.saleDate) return;
+
+      // invoiceDate = "1405-05-05"
+      const [year, month] = String(sale.saleDate).split("-").map(Number);
 
       const found = months.find((m) => m.year === year && m.month === month);
+
       if (found) {
         found.totalSales += Number(sale.totalPrice);
         found.invoiceCount += 1;
@@ -118,8 +154,11 @@ export class AppRepository extends BaseRepository {
         invoiceCount: m.invoiceCount,
         formattedMonth: `${m.monthName} ${m.year}`,
       })),
+
       totalSales: months.reduce((sum, m) => sum + m.totalSales, 0),
+
       totalInvoices: months.reduce((sum, m) => sum + m.invoiceCount, 0),
+
       averageMonthlySales:
         months.reduce((sum, m) => sum + m.totalSales, 0) / 12,
     };

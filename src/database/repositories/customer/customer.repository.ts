@@ -2,13 +2,14 @@ import { and, asc, eq, isNull, like } from "drizzle-orm";
 
 import { db } from "../../client";
 
-import { customers, customerTypes } from "../../schema";
+import { customerPayments, customers, customerTypes } from "../../schema";
 
 import {
-  Customer,
+  CustomerPayment,
   CustomerType,
   CustomerWithRelations,
   NewCustomer,
+  NewCustomerPayment,
   NewCustomerType,
 } from "../../types/database";
 import { BaseRepository } from "../base.repository";
@@ -84,6 +85,38 @@ export class CustomerRepository extends BaseRepository {
         deletedAt: new Date().toISOString(),
       })
       .where(eq(customerTypes.id, id));
+  }
+
+  /* ==========================================================
+     CUSTOMER TYPES
+  ========================================================== */
+
+  async listCustomerPayments(): Promise<CustomerPayment[]> {
+    return this.executor.query.customerPayments.findMany({
+      where: isNull(customerPayments.deletedAt),
+      orderBy: [asc(customerPayments.paymentDate)],
+    });
+  }
+
+  async createCustomerPayment(data: NewCustomerPayment) {
+    return this.executor.insert(customerPayments).values(data).returning();
+  }
+
+  async updateCustomerPayment(id: number, data: Partial<NewCustomerPayment>) {
+    return db
+      .update(customerPayments)
+      .set(data)
+      .where(eq(customerPayments.id, id))
+      .returning();
+  }
+
+  async deleteCustomerPayment(id: number) {
+    return db
+      .update(customerPayments)
+      .set({
+        deletedAt: new Date().toISOString(),
+      })
+      .where(eq(customerPayments.id, id));
   }
 }
 

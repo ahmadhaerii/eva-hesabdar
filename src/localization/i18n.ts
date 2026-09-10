@@ -1,3 +1,4 @@
+import { year } from "drizzle-orm/mysql-core";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { email } from "zod";
@@ -130,8 +131,8 @@ i18n.use(initReactI18next).init({
         mostIndebtedDescription: "بدهکارترین مشتری",
         totalDebts: "کل بدهی ها",
         totalDebtsDescription: "جمع کل بدهی مشتریان",
-        stockRial: "ریالی انبار",
-        stockRialDescription: "مجموع ارزش ریالی انبار",
+        stockRial: "ارزش انبار",
+        stockRialDescription: "مجموع ارزش   انبار",
         yearlySales: "فروش سال",
         yearlySalesDescription: "مجموع فروش سال جاری",
         totalSales: "فروش کل",
@@ -150,8 +151,11 @@ i18n.use(initReactI18next).init({
         inventory: "انبار",
         currencies: "ارزها",
         settings: "تنظیمات",
+        payments: "پرداخت ها",
 
         // Common
+        invoiceCount: "تعداد فاکتور",
+        year: "سال",
         percent: "درصد",
         add: "افزودن",
         edit: "ویرایش",
@@ -304,6 +308,9 @@ i18n.use(initReactI18next).init({
         validationTotalPrice: "جمع کل فاکتور نمیتواند صفر باشد",
         validationAmountReceived: "مبلغ دریافتی را وارد نمایید",
         validationSuccess: "اطلاعات با موفقیت ذخیره شد",
+
+        // payments
+        paymentDescription: "توضیحات",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

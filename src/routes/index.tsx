@@ -30,84 +30,47 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  TooltipContentProps,
   XAxis,
 } from "recharts";
 import { getDashboardData, getLast12MonthsSales } from "@/actions/app";
+import {
+  DashboardData,
+  Last12MonthsSales,
+} from "@/database/repositories/app/app.repository";
+import { useCurrencyStore } from "@/stores/currencyStore";
 
-const transactionData = [
-  { month: "مهر", value: 38 },
-  { month: "آبان", value: 52 },
-  { month: "آذر", value: 32 },
-  { month: "دی", value: 12 },
-  { month: "بهمن", value: 35 },
-  { month: "اسفند", value: 28 },
-  { month: "فروردین", value: 25 },
-  { month: "اردبهشت", value: 25 },
-  { month: "خرداد", value: 28 },
-  { month: "تیر", value: 33 },
-  { month: "مرداد", value: 25 },
-  { month: "شهریور", value: 25 },
-];
-const CustomXAxisTick = ({
-  x,
-  y,
-  payload,
-}: {
-  x?: number;
-  y?: number;
-  payload?: {
-    value: string;
-  };
-}) => {
+function myTooltip({ active, payload, label }: TooltipContentProps) {
+  if (!active || payload == null || payload.length === 0) {
+    return null;
+  }
+  const { t } = useTranslation();
+
+  const entry = payload[0];
+  const point = entry?.payload;
+  const data = payload[0].payload;
+
   return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        transform="rotate(-45)"
-        textAnchor="end"
-        direction="rtl"
-        unicodeBidi="plaintext"
-        fill="#71717a"
-        fontSize={12}
-        dx={-5}
-        dy={10}
-      >
-        {payload?.value}
-      </text>
-    </g>
+    <div
+      style={{
+        border: "1px solid #d88488",
+        backgroundColor: "#fff",
+        color: "#18181b",
+        padding: 10,
+        borderRadius: 5,
+        boxShadow: "1px 1px 2px #d88488",
+      }}
+    >
+      <p style={{ margin: 0, fontWeight: 700 }}>
+        {data.formattedMonth}: {entry?.value?.toLocaleString()}
+      </p>
+      <p style={{ margin: 0 }}>{point?.note}</p>
+      <p style={{ margin: 0, borderTop: "1px dashed #f5f5f5" }}>
+        {t("invoiceCount")} : {data.invoiceCount}
+      </p>
+    </div>
   );
-};
-const products = [
-  {
-    name: "Samsung Galaxy S25",
-    brand: "Samsung",
-    icon: Smartphone,
-    color: "blue",
-  },
-  {
-    name: "Apple MacBook Pro",
-    brand: "Apple",
-    icon: Laptop,
-    color: "green",
-  },
-  {
-    name: "Sony WH-1000XM4",
-    brand: "Sony",
-    icon: Headphones,
-    color: "red",
-  },
-  {
-    name: "Dell XPS 13",
-    brand: "Dell",
-    icon: Laptop,
-    color: "gray",
-  },
-  {
-    name: "Smart Band 4",
-    brand: "Xiaomi",
-    icon: Watch,
-    color: "yellow",
-  },
-];
+}
 
 function StatCard({
   title,
@@ -116,7 +79,7 @@ function StatCard({
   icon: Icon = DollarSign,
 }: {
   title: string;
-  value: string;
+  value?: string;
   description: string;
   icon?: React.ElementType;
 }) {
@@ -158,10 +121,21 @@ function ReportCard({ title, value }: { title: string; value: string }) {
 
 function HomePage() {
   const { t } = useTranslation();
+  const defaultCurrency = useCurrencyStore((state) => state.defaultCurrency);
 
-  const [products1, setProducts1] = useState<any[] | undefined>([]);
-  const [customers, setCustomers] = useState<any[] | undefined>([]);
-  const [saleInvoices, setSaleInvoices] = useState<any[] | undefined>([]);
+  const [dashboardData, setDashboardData] = useState<
+    | (DashboardData & {
+        bestSellingProductObject: {
+          productId: number;
+          productName: string;
+          totalSoldQuantity: number;
+        };
+      })
+    | undefined
+  >(undefined);
+  const [last12MonthsSales, setLast12MonthsSales] = useState<
+    Last12MonthsSales | undefined
+  >(undefined);
   const [purchaseInvoices, setPurchaseInvoices] = useState<any[] | undefined>(
     [],
   );
@@ -170,45 +144,23 @@ function HomePage() {
   useEffect(() => {
     startTransition(() => {
       Promise.all([getDashboardData(), getLast12MonthsSales()]).then(
-        ([dddd, xxxx]) => {
-          console.log("dddd", dddd);
-          console.log("xxxx", xxxx);
+        ([dashboardData, last12MonthsSales]) => {
+          dashboardData?.bestSellingProduct.toString();
+          if (dashboardData) {
+            setDashboardData({
+              ...dashboardData,
+              bestSellingProductObject: JSON.parse(
+                dashboardData?.bestSellingProduct,
+              ),
+            });
+          }
+
+          setLast12MonthsSales(last12MonthsSales);
+          console.log("last12MonthsSales", last12MonthsSales);
         },
       );
     });
   }, []);
-
-  // const isRTL = true;
-  // const t1 = {
-  //   dashboard: isRTL ? "داشبورد" : "Dashboard",
-  //   overview: isRTL
-  //     ? "مروری بر سیستم کسب‌وکار شما"
-  //     : "Overview of your business system",
-
-  //   profit: isRTL ? "سود" : "Profit",
-
-  //   totalIncome: isRTL ? "درآمد کل" : "Total Income",
-  //   totalExpense: isRTL ? "هزینه کل" : "Total Expense",
-
-  //   lastWeek: isRTL ? "هفته گذشته" : "Last week",
-  //   lastMonth: isRTL ? "ماه گذشته" : "Last month",
-
-  //   products: isRTL ? "محصولات برتر بر اساس فروش" : "Top Products by Sales",
-
-  //   thisWeek: isRTL ? "این هفته" : "This week",
-
-  //   transaction: isRTL ? "تراکنش‌های کل" : "Total Transaction",
-
-  //   weeklyOverview: isRTL ? "نمای هفتگی" : "Weekly overview",
-
-  //   report: isRTL ? "گزارش" : "Report",
-
-  //   lastMonthTransactions: isRTL
-  //     ? "تراکنش‌های ماه گذشته $23.4K"
-  //     : "Last month transactions $23.4K",
-
-  //   language: isRTL ? "English" : "فارسی",
-  // };
 
   return (
     <main className="min-h-screen bg-[#090909] text-white">
@@ -232,14 +184,18 @@ function HomePage() {
                 {t("products")}
               </p>
 
-              <p className="mt-3 text-2xl font-bold">{products.length}</p>
+              <p className="mt-3 text-2xl font-bold">
+                {dashboardData?.productsCount}
+              </p>
             </CardContent>
           </Card>
           <Card className="border-white/[0.08] bg-[#171717] shadow-none">
             <CardContent className="p-6">
               <p className="text-lg font-semibold text-white">{t("sales")}</p>
 
-              <p className="mt-3 text-2xl font-bold">{saleInvoices?.length}</p>
+              <p className="mt-3 text-2xl font-bold">
+                {dashboardData?.salesInvoicesCount}
+              </p>
             </CardContent>
           </Card>
           <Card className="border-white/[0.08] bg-[#171717] shadow-none">
@@ -249,7 +205,7 @@ function HomePage() {
               </p>
 
               <p className="mt-3 text-2xl font-bold">
-                {purchaseInvoices?.length}
+                {dashboardData?.purchaseInvoicesCount}
               </p>
             </CardContent>
           </Card>
@@ -259,7 +215,9 @@ function HomePage() {
                 {t("customers")}
               </p>
 
-              <p className="mt-3 text-2xl font-bold">{customers?.length}</p>
+              <p className="mt-3 text-2xl font-bold">
+                {dashboardData?.customersCount}
+              </p>
             </CardContent>
           </Card>
         </section>
@@ -269,37 +227,41 @@ function HomePage() {
           <StatCard
             title={t("totalItems")}
             description={t("totalItemsDescription")}
-            value="$4,673"
+            value={dashboardData?.totalRemainingQuantity.toString()}
           />
 
           <StatCard
             title={t("bestSellers")}
             description={t("bestSellersDescription")}
-            value="$4,673"
+            value={dashboardData?.bestSellingProductObject?.productName}
           />
 
           <StatCard
             title={t("mostIndebted")}
             description={t("mostIndebtedDescription")}
-            value="$4,673"
+            value="XXXX"
           />
 
           <StatCard
             title={t("totalDebts")}
             description={t("totalDebtsDescription")}
-            value="$4,673"
+            value="XXXX"
           />
 
           <StatCard
             title={t("stockRial")}
             description={t("stockRialDescription")}
-            value="$4,673"
+            value={
+              dashboardData?.totalInventoryValue.toLocaleString() +
+              " " +
+              defaultCurrency?.name
+            }
           />
 
           <StatCard
             title={t("totalExpense")}
             description={t("lastMonth")}
-            value="$1.28K"
+            value="XXXX"
             icon={CreditCard}
           />
         </section>
@@ -373,12 +335,12 @@ function HomePage() {
             <StatCard
               title={t("yearlySales")}
               description={t("yearlySalesDescription")}
-              value="123123123"
+              value={dashboardData?.currentYearSales.toLocaleString()}
             />
             <StatCard
               title={t("totalSales")}
               description={t("totalSalesDescription")}
-              value="123123123123123123123"
+              value={dashboardData?.allTimeSales.toLocaleString()}
             />
           </div>
 
@@ -389,7 +351,9 @@ function HomePage() {
                 <CardTitle className="text-lg">{t("monthlySales")}</CardTitle>
 
                 <p className="mt-1 text-sm text-zinc-500">
-                  {t("monthlySalesDescription")}
+                  {t("monthlySalesDescription")} :{" "}
+                  {last12MonthsSales?.totalSales.toLocaleString()}{" "}
+                  {defaultCurrency?.name}
                 </p>
               </div>
 
@@ -400,7 +364,7 @@ function HomePage() {
               <div className="h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={transactionData}
+                    data={last12MonthsSales?.months}
                     margin={{
                       top: 25,
                       right: 5,
@@ -410,7 +374,11 @@ function HomePage() {
                   >
                     <CartesianGrid vertical={false} stroke="transparent" />
 
-                    <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                    <XAxis
+                      dataKey="monthName"
+                      axisLine={false}
+                      tickLine={false}
+                    />
 
                     <Tooltip
                       cursor={{
@@ -422,10 +390,11 @@ function HomePage() {
                         borderRadius: "8px",
                         color: "#fff",
                       }}
+                      content={myTooltip}
                     />
 
                     <Bar
-                      dataKey="value"
+                      dataKey="totalSales"
                       radius={[10, 10, 10, 10]}
                       fill="#064e3b"
                     />

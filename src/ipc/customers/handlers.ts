@@ -99,7 +99,7 @@ export const listCustomerType = os.handler(async () => {
 export const createCustomerType = os
   .input(createCustomerTypeInput)
   .handler(async ({ input }) => {
-    return customerService.createCustomerTypes({
+    return customerService.createCustomerType({
       ...input,
       createdAt: new Date().toISOString(),
       updatedAt: null,
@@ -118,4 +118,52 @@ export const deleteCustomerType = os
   .input(deleteCustomerTypeInput)
   .handler(async ({ input }) => {
     return customerService.deleteCustomerType(input.id);
+  });
+
+export const listCustomerPayment = os.handler(async () => {
+  return customerService.listCustomerPayments();
+});
+
+// CustomerPayment
+
+const createCustomerPaymentInput = z.object({
+  name: z.string().min(1),
+  description: z.string().nullable().optional(),
+  profitPercent: z.number().min(1),
+  isActive: z.boolean().optional(),
+});
+const updateCustomerPaymentInput = z.object({
+  id: z.number(),
+  name: z.string().min(1).optional(),
+  profitPercent: z.number().min(1),
+  description: z.string().nullable().optional(),
+  isActive: z.boolean().optional(),
+});
+
+const deleteCustomerPaymentInput = z.object({
+  id: z.number(),
+});
+
+export const createCustomerPayment = os
+  .input(createCustomerPaymentInput)
+  .handler(async ({ input }) => {
+    return customerService.createCustomerPayment({
+      ...input,
+      createdAt: new Date().toISOString(),
+      updatedAt: null,
+      deletedAt: null,
+    });
+  });
+
+export const updateCustomerPayment = os
+  .input(updateCustomerPaymentInput)
+  .handler(async ({ input }) => {
+    const { id, ...data } = input;
+    return customerService.updateCustomerPayment(id, data);
+  });
+
+export const deleteCustomerPayment = os
+  .input(deleteCustomerPaymentInput)
+  .handler(async ({ input }) => {
+    return customerService.deleteCustomerPayment(input.id);
   });

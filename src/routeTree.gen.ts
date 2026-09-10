@@ -15,6 +15,7 @@ import { Route as SecondRouteImport } from './routes/second'
 import { Route as SalesRouteImport } from './routes/sales'
 import { Route as PurchasesRouteImport } from './routes/purchases'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as CurrencyRatesRouteImport } from './routes/currencyRates'
@@ -51,6 +52,11 @@ const ProductsRoute = ProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentsRoute = PaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InventoryRoute = InventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/currencyRates': typeof CurrencyRatesRoute
   '/customers': typeof CustomersRoute
   '/inventory': typeof InventoryRoute
+  '/payments': typeof PaymentsRoute
   '/products': typeof ProductsRoute
   '/purchases': typeof PurchasesRoute
   '/sales': typeof SalesRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/currencyRates': typeof CurrencyRatesRoute
   '/customers': typeof CustomersRoute
   '/inventory': typeof InventoryRoute
+  '/payments': typeof PaymentsRoute
   '/products': typeof ProductsRoute
   '/purchases': typeof PurchasesRoute
   '/sales': typeof SalesRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/currencyRates': typeof CurrencyRatesRoute
   '/customers': typeof CustomersRoute
   '/inventory': typeof InventoryRoute
+  '/payments': typeof PaymentsRoute
   '/products': typeof ProductsRoute
   '/purchases': typeof PurchasesRoute
   '/sales': typeof SalesRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/currencyRates'
     | '/customers'
     | '/inventory'
+    | '/payments'
     | '/products'
     | '/purchases'
     | '/sales'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/currencyRates'
     | '/customers'
     | '/inventory'
+    | '/payments'
     | '/products'
     | '/purchases'
     | '/sales'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/currencyRates'
     | '/customers'
     | '/inventory'
+    | '/payments'
     | '/products'
     | '/purchases'
     | '/sales'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   CurrencyRatesRoute: typeof CurrencyRatesRoute
   CustomersRoute: typeof CustomersRoute
   InventoryRoute: typeof InventoryRoute
+  PaymentsRoute: typeof PaymentsRoute
   ProductsRoute: typeof ProductsRoute
   PurchasesRoute: typeof PurchasesRoute
   SalesRoute: typeof SalesRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payments': {
+      id: '/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inventory': {
       id: '/inventory'
       path: '/inventory'
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   CurrencyRatesRoute: CurrencyRatesRoute,
   CustomersRoute: CustomersRoute,
   InventoryRoute: InventoryRoute,
+  PaymentsRoute: PaymentsRoute,
   ProductsRoute: ProductsRoute,
   PurchasesRoute: PurchasesRoute,
   SalesRoute: SalesRoute,

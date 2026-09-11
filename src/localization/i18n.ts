@@ -233,6 +233,7 @@ i18n.use(initReactI18next).init({
 
         // Customers
         addCustomer: "افزودن مشتری",
+        isAnonymous: "مشتری نامشخص",
         editCustomer: "ویرایش مشتری",
         deleteCustomer: "حذف مشتری",
         customerDescription: "توضیحات",
@@ -310,7 +311,12 @@ i18n.use(initReactI18next).init({
         validationSuccess: "اطلاعات با موفقیت ذخیره شد",
 
         // payments
+        currencyRateAmount: "مبلغ ارزی",
         paymentDescription: "توضیحات",
+        addPayment: "ثبت پرداخت",
+        editPayment: "ویرایش پرداخت",
+        referenceNumber: "شماره رسید",
+        amount: "مبلغ",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

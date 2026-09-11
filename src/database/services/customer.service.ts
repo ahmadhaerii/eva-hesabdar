@@ -59,10 +59,14 @@ export class CustomerService {
   async updateCustomerPayment(
     id: number,
     data: {
-      name?: string;
-      profitPercent: number;
-      description?: string | null;
-      isActive?: boolean;
+      customerId: number;
+      amount: number;
+      currencyRateId: number;
+      currencyRateAmount: number;
+      paymentDate: string;
+      paymentMethod: string;
+      description?: string | null | undefined;
+      referenceNumber?: string | null | undefined;
     },
   ) {
     return customerRepository.updateCustomerPayment(id, data);

@@ -83,6 +83,7 @@ export default function SaleInvoice({
   const [saleUnitPrice, setSaleUnitPrice] = useState<number | null>(null);
   const [totalPrice, setTotalPrice] = useState<number | null>(null);
   const [amountReceived, setAmountReceived] = useState<number | null>(null);
+  const [referenceNumber, setReferenceNumber] = useState("");
   const [helperDescription, setHelperDescription] = useState("");
   const [saleInvoiceError, setSaleInvoiceError] = useState("");
   const [selectedCustomer, setSelectedCustomer] =
@@ -104,9 +105,10 @@ export default function SaleInvoice({
     queryKey: ["customers"],
     queryFn: async () => {
       const data = await getCustomers();
-      if (data) {
-        setCustomerId(data[data.length - 1].id);
-        setSelectedCustomer(data[data.length - 1]);
+      const anonymous = data?.find((customer) => customer.isAnonymous);
+      if (data && anonymous) {
+        setCustomerId(anonymous.id);
+        setSelectedCustomer(anonymous);
       }
       return data;
     },
@@ -152,6 +154,20 @@ export default function SaleInvoice({
   });
 
   const onCreateSaleInvoice = () => {
+    const currency = currenciesWithLastRate.find(
+      (currencyWithLastRate) =>
+        currencyWithLastRate.latestRateId == currencyRateId,
+    );
+    if (
+      currency === undefined ||
+      currency.latestRate === null ||
+      amountReceived === null
+    ) {
+      return;
+    }
+
+    const amount = +(amountReceived / currency.latestRate).toFixed(2);
+
     const data = {
       invoice: {
         customerId: customerId!,
@@ -162,6 +178,12 @@ export default function SaleInvoice({
         createdAt: new Date().toISOString(),
       },
       items: salesInvoiceItems,
+      payment: {
+        amount: amountReceived,
+        currencyRateAmount: amount,
+        currencyRateId: currencyRateId!,
+        referenceNumber: referenceNumber,
+      },
     };
     setSaleInvoiceError("");
     const regex = /^1[34]\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
@@ -177,10 +199,11 @@ export default function SaleInvoice({
       totalPrice &&
       amountReceived &&
       selectedCustomer?.isAnonymous &&
-      totalPrice > amountReceived
+      totalPrice > amount
     ) {
       setSaleInvoiceError(t("validationReceivedAmountLessThanInvoice"));
     } else {
+      console.log(data);
       createMutation.mutate(data);
     }
     console.log(data);
@@ -280,14 +303,22 @@ export default function SaleInvoice({
   }, [quantity, productId, saleUnitPrice]);
 
   useEffect(() => {
-    if (salesInvoiceItems.length > 0) {
+    const currency = currenciesWithLastRate.find(
+      (currencyWithLastRate) =>
+        currencyWithLastRate.latestRateId == currencyRateId,
+    );
+
+    if (currency && currency.latestRate && salesInvoiceItems.length > 0) {
       const total = salesInvoiceItems.reduce(
         (sum, salesInvoiceItem) => sum + salesInvoiceItem.lineTotal,
         0,
       );
-      setTotalPrice(total);
+      let newTotal = total / currency.latestRate;
+      newTotal = +newTotal.toFixed(2);
+
+      setTotalPrice(newTotal);
       setTotalSaleInvoicePriceDescription(
-        `قیمت فروش کل  : ${total.toLocaleString("en-US")} ${defaultCurrency?.name}  ، معادل  ${WordifyFa(total)} ${defaultCurrency?.name}   میباشد`,
+        `قیمت فروش کل  : ${total.toLocaleString("en-US")} ${defaultCurrency?.name}  ، معادل  ${newTotal.toLocaleString()} ${currency.name}  میباشد`,
       );
     } else {
       setTotalSaleInvoicePriceDescription("قیمت فروش محاسبه نشده است");
@@ -330,6 +361,7 @@ export default function SaleInvoice({
     const totalPrice =
       purchaseInvoiceItemsForProduct[purchaseInvoiceItemsForProduct.length - 1]
         ?.totalPrice;
+    console.log("aaaaaaaa");
     console.log(selectedCustomer);
     console.log(currency);
     console.log(totalPrice);
@@ -450,12 +482,12 @@ export default function SaleInvoice({
           </select>
         </div>
         <div className="space-y-2">
-          <label htmlFor="purchase-invoiceDate" className="text-sm font-medium">
+          <label htmlFor="sale-invoiceDate" className="text-sm font-medium">
             {t("purchaseInvoiceDate")}
           </label>
 
           <input
-            id="purchase-invoiceDate"
+            id="sale-invoiceDate"
             value={invoiceDate}
             placeholder="1405-01-01"
             onChange={handleDateChange}
@@ -490,7 +522,6 @@ export default function SaleInvoice({
               </p>
             </div>
           ))}
-          <div></div>
         </div>
       </div>
       <div className="flex items-center justify-between">
@@ -671,7 +702,9 @@ export default function SaleInvoice({
                                 <div>
                                   {purchaseInvoiceItem.remainingQuantity}
                                 </div>
-                                <div>{purchaseInvoiceItem.totalPrice}</div>
+                                <div>
+                                  {purchaseInvoiceItem.totalPrice.toFixed(2)}
+                                </div>
                               </div>
                             );
                           },
@@ -835,6 +868,20 @@ export default function SaleInvoice({
                 {t("validationReceivedAmountLessThanInvoice")}
               </p>
             )}
+        </div>
+        <div className="space-y-2">
+          <label
+            htmlFor="saleInvoice-amount_received"
+            className="text-sm font-medium"
+          >
+            {t("referenceNumber")}
+          </label>
+          <input
+            id="saleInvoice-amount_received"
+            value={referenceNumber}
+            onChange={(event) => setReferenceNumber(event.target.value)}
+            className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
         </div>
       </div>
       {saleInvoiceError && (

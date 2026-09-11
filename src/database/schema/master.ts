@@ -7,6 +7,7 @@ import {
   uniqueIndex,
   index,
 } from "drizzle-orm/sqlite-core";
+import { currencyRates } from "./currency";
 
 /* ==========================================================
    CUSTOMER TYPES
@@ -48,7 +49,11 @@ export const customerPayments = sqliteTable(
     customerId: integer("customer_id")
       .notNull()
       .references(() => customers.id),
+    currencyRateId: integer("currency_rate_id")
+      .notNull()
+      .references(() => currencyRates.id),
     amount: real("amount").notNull(),
+    currencyRateAmount: real("currency_rate_amount").notNull(),
     paymentDate: text("payment_date").notNull(),
     paymentMethod: text("payment_method").notNull(),
     referenceNumber: text("reference_number"),
@@ -58,8 +63,15 @@ export const customerPayments = sqliteTable(
     deletedAt: text("deleted_at"),
   },
   (table) => ({
-    customerIndex: index("idx_customers_name").on(table.customerId),
-    paymentDateIndex: index("idx_customers_name").on(table.paymentDate),
+    customerIndex: index("idx_customers_payments_customer").on(
+      table.customerId,
+    ),
+    currencyRateIdIndex: index("idx_currency_rates_id").on(
+      table.currencyRateId,
+    ),
+    paymentDateIndex: index("idx_customers_payments_payment_data").on(
+      table.paymentDate,
+    ),
   }),
 );
 

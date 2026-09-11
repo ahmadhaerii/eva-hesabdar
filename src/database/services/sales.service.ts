@@ -6,10 +6,17 @@ import {
 import { salesRepository } from "../repositories/sales/sales.repository";
 import { inventoryRepository } from "../repositories/inventory/inventory.repository";
 import { purchaseRepository } from "../repositories/purchase/purchase.repository";
+import { customerService } from "./customer.service";
 
 export interface CreateSalesInvoiceDto {
   invoice: NewSalesInvoice;
   items: NewSalesInvoiceItem[];
+  payment: {
+    amount: number;
+    currencyRateId: number;
+    currencyRateAmount: number;
+    referenceNumber?: string | undefined | null;
+  };
 }
 
 export class SalesService {
@@ -31,6 +38,19 @@ export class SalesService {
         });
         await this.allocateInventory(saleInvoiceItem.id, item);
       }
+      const data = {
+        createdAt: new Date().toISOString(),
+        currencyRateId: invoice.currencyRateId,
+        currencyRateAmount: dto.payment.currencyRateAmount,
+        customerId: invoice.customerId,
+        amount: dto.payment.amount,
+        paymentDate: invoice.invoiceDate,
+        paymentMethod: "",
+        description: `پرداخت وجه به مبلغ ${dto.payment.amount.toLocaleString()} جهت فاکتور شماره ${invoice.id} ثبت شد`,
+        referenceNumber: dto.payment.referenceNumber,
+      };
+      await customerService.createCustomerPayment(data);
+
       console.log("saved");
     } catch (error) {
       console.log(error);

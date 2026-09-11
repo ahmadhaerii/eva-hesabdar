@@ -6,6 +6,7 @@ import { purchaseInvoices } from "../schema/purchase";
 import { inventoryLots } from "../schema/inventory";
 import { salesInvoiceItems } from "../schema/sales";
 import { currencyConversions } from "../schema/settings";
+import { customerPayments } from "../schema";
 
 /* ==========================================================
    CURRENCIES
@@ -44,6 +45,7 @@ export const currencyRateRelations = relations(
     purchaseInvoices: many(purchaseInvoices),
 
     salesInvoices: many(purchaseInvoices),
+    customerPayments: many(customerPayments),
 
     conversions: many(currencyConversions),
   }),

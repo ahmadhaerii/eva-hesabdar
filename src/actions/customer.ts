@@ -86,3 +86,49 @@ export async function deleteCustomerType(id: number) {
     id,
   });
 }
+
+export async function getCustomerPayments(): Promise<
+  Awaited<ReturnType<typeof ipc.client.customer.listCustomerPayment>>
+> {
+  return ipc.client.customer.listCustomerPayment();
+}
+export async function createCustomerPayment(data: {
+  customerId: number;
+  amount: number;
+  currencyRateId: number;
+  currencyRateAmount: number;
+  paymentDate: string;
+  paymentMethod: string;
+  referenceNumber?: string | null;
+  description?: string | null;
+}): Promise<
+  Awaited<ReturnType<typeof ipc.client.customer.createCustomerPayment>>
+> {
+  console.log(data);
+  return ipc.client.customer.createCustomerPayment(data);
+}
+
+export async function updateCustomerPayment(
+  id: number,
+  data: {
+    customerId: number;
+    amount: number;
+    currencyRateAmount: number;
+    paymentDate: string;
+    currencyRateId: number;
+    paymentMethod: string;
+    referenceNumber?: string | null;
+    description?: string | null;
+  },
+) {
+  return ipc.client.customer.updateCustomerPayment({
+    id,
+    ...data,
+  });
+}
+
+export async function deleteCustomerPayment(id: number) {
+  return ipc.client.customer.deleteCustomerPayment({
+    id,
+  });
+}

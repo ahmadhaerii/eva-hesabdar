@@ -474,7 +474,7 @@ function CustomersPage() {
                       htmlFor="product-active"
                       className="text-sm font-medium"
                     >
-                      {t("active")}
+                      {t("isAnonymous")}
                     </label>
                   </div>
                 </div>

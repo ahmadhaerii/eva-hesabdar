@@ -48,6 +48,12 @@ const createSaleInvoiceInput = z.object({
       }),
     )
     .min(1),
+  payment: z.object({
+    referenceNumber: z.string().optional().nullable(),
+    amount: z.number().min(1, "  الزامی است"),
+    currencyRateId: z.number().min(1, "  الزامی است"),
+    currencyRateAmount: z.number().min(1, "  الزامی است"),
+  }),
 });
 export const createSaleInvoice = os
   .input(createSaleInvoiceInput)

@@ -6,6 +6,7 @@ import { customerPayments, customers, customerTypes } from "../../schema";
 
 import {
   CustomerPayment,
+  CustomerPaymentWithRelations,
   CustomerType,
   CustomerWithRelations,
   NewCustomer,
@@ -91,9 +92,17 @@ export class CustomerRepository extends BaseRepository {
      CUSTOMER TYPES
   ========================================================== */
 
-  async listCustomerPayments(): Promise<CustomerPayment[]> {
+  async listCustomerPayments(): Promise<CustomerPaymentWithRelations[]> {
     return this.executor.query.customerPayments.findMany({
       where: isNull(customerPayments.deletedAt),
+      with: {
+        customer: true,
+        currencyRate: {
+          with: {
+            currency: true,
+          },
+        },
+      },
       orderBy: [asc(customerPayments.paymentDate)],
     });
   }

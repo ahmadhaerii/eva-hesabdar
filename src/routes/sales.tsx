@@ -263,8 +263,9 @@ function SalesPage() {
 
       {!isLoading && !isError && saleInvoices.length > 0 && (
         <div className="rounded-lg border">
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 font-medium">
+          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 font-medium">
             <div>{t("invoiceNumber")}</div>
+            <div>{t("customerName")}</div>
             <div>{t("currency")}</div>
             <div>{t("currencyRate")}</div>
             <div>{t("items")}</div>
@@ -277,9 +278,10 @@ function SalesPage() {
           {saleInvoices.map((saleInvoice) => (
             <div
               key={saleInvoice.id}
-              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 last:border-b-0"
+              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 last:border-b-0"
             >
               <div>{saleInvoice.id}</div>
+              <div>{saleInvoice.customer?.displayName}</div>
               <div>{saleInvoice.currencyRate?.currency?.name}</div>
               <div>
                 {saleInvoice.currencyRate?.rate.toLocaleString("en-US")}

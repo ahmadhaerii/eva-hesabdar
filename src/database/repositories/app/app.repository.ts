@@ -10,6 +10,7 @@ import moment from "moment-jalaali";
 export interface DashboardData {
   allTimeSales: number;
   bestSellingProduct: string; // '{"productId":3,"productName":"تست","totalSoldQuantity":112.0}';
+  mostIndebted: string; // '{"productId":3,"productName":"تست","totalSoldQuantity":112.0}';
   currentYearSales: number;
   customersCount: number;
   productsCount: number;
@@ -35,23 +36,65 @@ export class AppRepository extends BaseRepository {
   async getDashboardData(): Promise<DashboardData> {
     const currentJYear = moment().jYear();
 
-    const result: DashboardData = await this.executor.get(sql`
-    SELECT 
+    const result: DashboardData = await this.executor
+      .get(sql`WITH latest_rates AS (
+    SELECT cr.currency_id, cr.rate
+    FROM currency_rates cr
+    INNER JOIN (
+        SELECT currency_id, MAX(id) AS max_id
+        FROM currency_rates
+        GROUP BY currency_id
+    ) m ON m.max_id = cr.id
+)
+SELECT 
     (SELECT COUNT(*) FROM products) AS productsCount,
     (SELECT COUNT(*) FROM customers) AS customersCount,
     (SELECT COUNT(*) FROM purchase_invoices) AS purchaseInvoicesCount,
     (SELECT COUNT(*) FROM sales_invoices) AS salesInvoicesCount,
+    (SELECT json_object(
+        'id', id,
+        'display_name', display_name,
+        'totalInvoices', total_invoices,
+        'totalPayments', total_payments,
+        'debt', debt
+    )
+    FROM (
+        SELECT 
+            c.id,
+            c.display_name,
+            COALESCE(inv.total_invoices, 0) AS total_invoices,
+            COALESCE(pay.total_payments, 0) AS total_payments,
+            COALESCE(inv.total_invoices, 0) - COALESCE(pay.total_payments, 0) AS debt
+        FROM customers c
+        LEFT JOIN (
+            SELECT 
+                si.customer_id, 
+                SUM(si.total_price * lr.rate) AS total_invoices
+            FROM sales_invoices si
+            INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
+            INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
+            GROUP BY si.customer_id
+        ) inv ON inv.customer_id = c.id
+        LEFT JOIN (
+            SELECT 
+                cp.customer_id, 
+                SUM(cp.currency_rate_amount * lr.rate) AS total_payments
+            FROM customer_payments cp
+            INNER JOIN currency_rates cr_base ON cp.currency_rate_id = cr_base.id
+            INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
+            GROUP BY cp.customer_id
+        ) pay ON pay.customer_id = c.id
+        ORDER BY debt DESC
+        LIMIT 1
+    )
+    ) AS mostIndebted,
     (SELECT COALESCE(SUM(remaining_quantity), 0) FROM purchase_invoice_items) AS totalRemainingQuantity,
     (
-        SELECT COALESCE(SUM(pii2.remaining_quantity * pii2.total_price * cr2.rate), 0)
+        SELECT COALESCE(SUM(pii2.remaining_quantity * pii2.total_price * lr.rate), 0)
         FROM purchase_invoice_items pii2
         INNER JOIN purchase_invoices pi2 ON pii2.purchase_invoice_id = pi2.id
-        INNER JOIN currency_rates cr2 ON pi2.currency_id = cr2.currency_id
-        WHERE pii2.remaining_quantity > 0 AND cr2.created_at = (
-    SELECT MAX(cr.created_at)
-    FROM currency_rates cr
-    WHERE cr.currency_id = cr2.currency_id
-  )
+        INNER JOIN latest_rates lr ON lr.currency_id = pi2.currency_id
+        WHERE pii2.remaining_quantity > 0
     ) AS totalInventoryValue,
     (
         SELECT json_object(
@@ -67,17 +110,22 @@ export class AppRepository extends BaseRepository {
             FROM purchase_invoice_items pii3
             INNER JOIN products p ON pii3.product_id = p.id
             INNER JOIN purchase_invoices pi3 ON pii3.purchase_invoice_id = pi3.id
-            WHERE 1
             GROUP BY pii3.product_id, p.name
             ORDER BY total_sold DESC
             LIMIT 1
         )
-    ) AS bestSellingProduct ,
-        (SELECT COALESCE(SUM(total_price), 0) FROM sales_invoices WHERE 1 ) AS allTimeSales ,
-        (SELECT COALESCE(SUM(total_price), 0) 
-     FROM sales_invoices 
-     WHERE substr(invoice_date, 1, 4) = ${String(currentJYear)} ) AS currentYearSales;
-
+    ) AS bestSellingProduct,
+    (SELECT COALESCE(SUM(si.total_price * lr.rate), 0)
+     FROM sales_invoices si
+     INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
+     INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
+    ) AS allTimeSales,
+    (SELECT COALESCE(SUM(si.total_price * lr.rate), 0)
+     FROM sales_invoices si
+     INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
+     INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
+     WHERE substr(si.invoice_date, 1, 4) = ${String(currentJYear)}
+    ) AS currentYearSales
   `);
     return result;
   }

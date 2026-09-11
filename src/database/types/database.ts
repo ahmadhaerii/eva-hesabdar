@@ -9,6 +9,10 @@ export type NewCustomerType = typeof schema.customerTypes.$inferInsert;
 
 export type CustomerPayment = typeof schema.customerPayments.$inferSelect;
 export type NewCustomerPayment = typeof schema.customerPayments.$inferInsert;
+export type CustomerPaymentWithRelations = CustomerPayment & {
+  customer: Customer | null;
+  currencyRate: CurrencyRateWithRelations | null;
+};
 
 export type Customer = typeof schema.customers.$inferSelect;
 export type NewCustomer = typeof schema.customers.$inferInsert;

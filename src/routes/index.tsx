@@ -19,6 +19,10 @@ import {
   Wallet,
   Watch,
   Headphones,
+  Package,
+  CircleDollarSign,
+  HeartCrack,
+  Boxes,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,19 +79,30 @@ function myTooltip({ active, payload, label }: TooltipContentProps) {
 function StatCard({
   title,
   value,
+  secondValue,
   description,
   icon: Icon = DollarSign,
+  iconColor = "oklch(76.5% 0.177 163.223)",
+  iconBackgroundColor = "oklch(20.6% 0.17 162.48)",
 }: {
   title: string;
   value?: string;
+  secondValue?: string;
   description: string;
   icon?: React.ElementType;
+  iconColor?: string;
+  iconBackgroundColor?: string;
 }) {
   return (
     <Card className="border-white/[0.08] bg-[#171717] shadow-none">
       <CardContent className="p-6">
-        <div className="mb-7 flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-          <Icon className="h-5 w-5 text-emerald-400" />
+        <div
+          className="mb-7 flex h-11 w-11 items-center justify-center rounded-md "
+          style={{
+            backgroundColor: iconBackgroundColor,
+          }}
+        >
+          <Icon className="h-5 w-5 " style={{ color: iconColor }} />
         </div>
 
         <p className="text-base font-semibold text-white">{title}</p>
@@ -95,25 +110,11 @@ function StatCard({
         <p className="mt-2 text-sm text-zinc-500">{description}</p>
 
         <p className="mt-1 text-lg font-semibold text-white">{value}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ReportCard({ title, value }: { title: string; value: string }) {
-  return (
-    <Card className="border-white/[0.08] bg-[#171717] shadow-none">
-      <CardContent className="p-7">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-emerald-500/10">
-            <Wallet className="h-5 w-5 text-emerald-400" />
-          </div>
-
-          <div>
-            <p className="text-sm text-zinc-500">This week</p>
-            <p className="mt-1 text-2xl font-semibold text-white">{value}</p>
-          </div>
-        </div>
+        {secondValue && (
+          <p className="mt-1 text-lg font-semibold text-orange-400">
+            {secondValue}
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -129,6 +130,13 @@ function HomePage() {
           productId: number;
           productName: string;
           totalSoldQuantity: number;
+        };
+        mostIndebted: {
+          id: number;
+          display_name: string;
+          totalInvoices: number;
+          totalPayments: number;
+          debt: number;
         };
       })
     | undefined
@@ -147,11 +155,13 @@ function HomePage() {
         ([dashboardData, last12MonthsSales]) => {
           dashboardData?.bestSellingProduct.toString();
           if (dashboardData) {
+            console.log(dashboardData);
             setDashboardData({
               ...dashboardData,
               bestSellingProductObject: JSON.parse(
                 dashboardData?.bestSellingProduct,
               ),
+              mostIndebted: JSON.parse(dashboardData?.mostIndebted),
             });
           }
 
@@ -228,24 +238,34 @@ function HomePage() {
             title={t("totalItems")}
             description={t("totalItemsDescription")}
             value={dashboardData?.totalRemainingQuantity.toString()}
+            icon={Package}
           />
 
           <StatCard
             title={t("bestSellers")}
             description={t("bestSellersDescription")}
             value={dashboardData?.bestSellingProductObject?.productName}
+            icon={CircleDollarSign}
+            iconColor="#00bcff"
+            iconBackgroundColor="#00bcff55"
           />
 
           <StatCard
             title={t("mostIndebted")}
             description={t("mostIndebtedDescription")}
-            value="XXXX"
+            value={dashboardData?.mostIndebted.display_name}
+            secondValue={dashboardData?.mostIndebted.debt.toLocaleString()}
+            icon={HeartCrack}
+            iconColor="#ff2056"
+            iconBackgroundColor="#ff205655"
           />
 
           <StatCard
             title={t("totalDebts")}
             description={t("totalDebtsDescription")}
             value="XXXX"
+            iconColor="#ffb900"
+            iconBackgroundColor="#ffb90055"
           />
 
           <StatCard
@@ -256,6 +276,9 @@ function HomePage() {
               " " +
               defaultCurrency?.name
             }
+            icon={Boxes}
+            iconColor="#8188d3"
+            iconBackgroundColor="#3f43bd52"
           />
 
           <StatCard

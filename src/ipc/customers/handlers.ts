@@ -127,17 +127,25 @@ export const listCustomerPayment = os.handler(async () => {
 // CustomerPayment
 
 const createCustomerPaymentInput = z.object({
-  name: z.string().min(1),
+  customerId: z.number().min(1),
+  amount: z.number().min(1),
+  currencyRateAmount: z.number().min(1),
+  paymentDate: z.string().min(1),
+  paymentMethod: z.string(),
+  referenceNumber: z.string().nullable().optional(),
+  currencyRateId: z.number().min(1),
   description: z.string().nullable().optional(),
-  profitPercent: z.number().min(1),
-  isActive: z.boolean().optional(),
 });
 const updateCustomerPaymentInput = z.object({
   id: z.number(),
-  name: z.string().min(1).optional(),
-  profitPercent: z.number().min(1),
+  customerId: z.number().min(1),
+  currencyRateId: z.number().min(1),
+  currencyRateAmount: z.number().min(1),
+  amount: z.number().min(1),
+  paymentDate: z.string().min(1),
+  paymentMethod: z.string().min(1),
+  referenceNumber: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
-  isActive: z.boolean().optional(),
 });
 
 const deleteCustomerPaymentInput = z.object({

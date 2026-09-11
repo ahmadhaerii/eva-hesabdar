@@ -153,7 +153,7 @@ export default function PurchaseItems({
   useEffect(() => {
     if (unitPrice !== null && freightShare !== null && quantity !== null) {
       setHelperDescription(
-        `قیمت خرید هر واحد این محصول : ${unitPrice + (unitPrice * freightShare) / 100} ${purchaseInvoice.currency?.name} میباشد`,
+        `قیمت خرید هر واحد این محصول : ${(unitPrice + (unitPrice * freightShare) / 100).toFixed(2)} ${purchaseInvoice.currency?.name} میباشد`,
       );
     } else {
       setHelperDescription("قیمت فروش محاسبه نشده است");

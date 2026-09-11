@@ -34,6 +34,12 @@ export async function createSaleInvoice(data: {
     updatedAt?: string | null | undefined;
     deletedAt?: string | null | undefined;
   }[];
+  payment: {
+    amount: number;
+    currencyRateAmount: number;
+    currencyRateId: number;
+    referenceNumber: string | null | undefined;
+  };
 }): Promise<Awaited<ReturnType<typeof ipc.client.sale.createSaleInvoice>>> {
   console.log("before createSaleInvoice");
 

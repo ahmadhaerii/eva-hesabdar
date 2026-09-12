@@ -23,6 +23,7 @@ import {
   CircleDollarSign,
   HeartCrack,
   Boxes,
+  Receipt,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -239,6 +240,8 @@ function HomePage() {
             description={t("totalItemsDescription")}
             value={dashboardData?.totalRemainingQuantity.toString()}
             icon={Package}
+            iconColor="#00d492"
+            iconBackgroundColor="#00bc7d20"
           />
 
           <StatCard
@@ -247,7 +250,7 @@ function HomePage() {
             value={dashboardData?.bestSellingProductObject?.productName}
             icon={CircleDollarSign}
             iconColor="#00bcff"
-            iconBackgroundColor="#00bcff55"
+            iconBackgroundColor="#00bcff25"
           />
 
           <StatCard
@@ -257,7 +260,7 @@ function HomePage() {
             secondValue={dashboardData?.mostIndebted.debt.toLocaleString()}
             icon={HeartCrack}
             iconColor="#ff2056"
-            iconBackgroundColor="#ff205655"
+            iconBackgroundColor="#ff205625"
           />
 
           <StatCard
@@ -265,7 +268,7 @@ function HomePage() {
             description={t("totalDebtsDescription")}
             value="XXXX"
             iconColor="#ffb900"
-            iconBackgroundColor="#ffb90055"
+            iconBackgroundColor="#ffb90025"
           />
 
           <StatCard
@@ -278,14 +281,16 @@ function HomePage() {
             }
             icon={Boxes}
             iconColor="#8188d3"
-            iconBackgroundColor="#3f43bd52"
+            iconBackgroundColor="#3f43bd25"
           />
 
           <StatCard
-            title={t("totalExpense")}
-            description={t("lastMonth")}
-            value="XXXX"
-            icon={CreditCard}
+            title={t("stockValue")}
+            description={t("stockValueDescription")}
+            value={dashboardData?.totalInventoryValueInCurrency.toLocaleString()}
+            icon={Receipt}
+            iconColor="#c34e27"
+            iconBackgroundColor="#c34e2725"
           />
         </section>
 
@@ -375,8 +380,7 @@ function HomePage() {
 
                 <p className="mt-1 text-sm text-zinc-500">
                   {t("monthlySalesDescription")} :{" "}
-                  {last12MonthsSales?.totalSales.toLocaleString()}{" "}
-                  {defaultCurrency?.name}
+                  {last12MonthsSales?.totalSales.toLocaleString()}
                 </p>
               </div>
 
@@ -574,7 +578,7 @@ function HomePage() {
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500 ">
                   <DollarSign className="h-5 w-5 text-emerald-400" />
                 </div>
 

@@ -17,6 +17,7 @@ export interface DashboardData {
   purchaseInvoicesCount: number;
   salesInvoicesCount: number;
   totalInventoryValue: number;
+  totalInventoryValueInCurrency: number;
   totalRemainingQuantity: number;
 }
 export interface Last12MonthsSales {
@@ -96,6 +97,12 @@ SELECT
         INNER JOIN latest_rates lr ON lr.currency_id = pi2.currency_id
         WHERE pii2.remaining_quantity > 0
     ) AS totalInventoryValue,
+     (
+        SELECT COALESCE(SUM(pii2.remaining_quantity * pii2.total_price), 0)
+        FROM purchase_invoice_items pii2
+        INNER JOIN purchase_invoices pi2 ON pii2.purchase_invoice_id = pi2.id
+        WHERE pii2.remaining_quantity > 0
+    ) AS totalInventoryValueInCurrency,
     (
         SELECT json_object(
             'productId', product_id,
@@ -115,12 +122,12 @@ SELECT
             LIMIT 1
         )
     ) AS bestSellingProduct,
-    (SELECT COALESCE(SUM(si.total_price * lr.rate), 0)
+    (SELECT COALESCE(SUM(si.total_price  ), 0)
      FROM sales_invoices si
      INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
      INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
     ) AS allTimeSales,
-    (SELECT COALESCE(SUM(si.total_price * lr.rate), 0)
+    (SELECT COALESCE(SUM(si.total_price  ), 0)
      FROM sales_invoices si
      INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
      INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id

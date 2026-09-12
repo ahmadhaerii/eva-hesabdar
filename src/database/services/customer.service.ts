@@ -10,6 +10,10 @@ export class CustomerService {
     const list = await customerRepository.listCustomers();
     return list;
   }
+  async listCustomersWithDebt() {
+    const list = await customerRepository.listCustomersWithDebt();
+    return list;
+  }
   async createCustomer(data: NewCustomer) {
     return customerRepository.createCustomer(data);
   }

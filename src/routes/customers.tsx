@@ -19,6 +19,7 @@ import {
   deleteCustomer,
   getCustomers,
   getCustomerTypes,
+  listCustomersWithDebt,
   updateCustomer,
 } from "@/actions/customer";
 import CustomerType from "@/features/customers/customerType";

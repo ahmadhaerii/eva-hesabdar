@@ -5,6 +5,11 @@ export async function getCustomers(): Promise<
 > {
   return ipc.client.customer.listCustomers();
 }
+export async function listCustomersWithDebt(): Promise<
+  Awaited<ReturnType<typeof ipc.client.customer.listCustomersWithDebt>>
+> {
+  return ipc.client.customer.listCustomersWithDebt();
+}
 export async function createCustomer(data: {
   customerTypeId: number;
   customProfitPercent?: number | null;

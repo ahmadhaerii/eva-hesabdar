@@ -11,6 +11,14 @@ export const listCustomers = os.handler(async () => {
     console.error("error", error);
   }
 });
+export const listCustomersWithDebt = os.handler(async () => {
+  try {
+    const list = await customerService.listCustomersWithDebt();
+    return list;
+  } catch (error) {
+    console.error("error", error);
+  }
+});
 
 const createCustomerInput = z.object({
   displayName: z.string().min(1),

@@ -1,8 +1,13 @@
-import { and, asc, eq, isNull, like } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, like, sql } from "drizzle-orm";
 
 import { db } from "../../client";
 
-import { customerPayments, customers, customerTypes } from "../../schema";
+import {
+  customerPayments,
+  customers,
+  customerTypes,
+  salesInvoices,
+} from "../../schema";
 
 import {
   CustomerPayment,
@@ -24,6 +29,48 @@ export class CustomerRepository extends BaseRepository {
       },
       orderBy: [asc(customers.displayName)],
     });
+  }
+
+  async listCustomersWithDebt() {
+    const invoicesSubquery = this.executor
+      .select({
+        customerId: salesInvoices.customerId,
+        totalInvoices: sql<number>`SUM(${salesInvoices.totalPrice} )`.as(
+          "total_invoices",
+        ),
+      })
+      .from(salesInvoices)
+      .groupBy(salesInvoices.customerId)
+      .as("inv");
+
+    const paymentsSubquery = this.executor
+      .select({
+        customerId: customerPayments.customerId,
+        totalPayments:
+          sql<number>`SUM(${customerPayments.currencyRateAmount} )`.as(
+            "total_payments",
+          ),
+      })
+      .from(customerPayments)
+      .groupBy(customerPayments.customerId)
+      .as("pay");
+
+    const debtExpr = sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0) - COALESCE(${paymentsSubquery.totalPayments}, 0)`;
+
+    return this.executor
+      .select({
+        id: customers.id,
+        displayName: customers.displayName,
+        mobile: customers.mobile,
+        totalInvoices: sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0)`,
+        totalPayments: sql<number>`COALESCE(${paymentsSubquery.totalPayments}, 0)`,
+        debt: debtExpr.as("debt"),
+      })
+      .from(customers)
+      .leftJoin(invoicesSubquery, eq(invoicesSubquery.customerId, customers.id))
+      .leftJoin(paymentsSubquery, eq(paymentsSubquery.customerId, customers.id))
+      .where(isNull(customers.deletedAt))
+      .orderBy(desc(debtExpr));
   }
 
   async createCustomer(data: NewCustomer) {

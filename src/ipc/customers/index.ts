@@ -1,5 +1,6 @@
 import {
   listCustomers,
+  listCustomersWithDebt,
   listCustomerType,
   listCustomerPayment,
   createCustomer,
@@ -15,6 +16,7 @@ import {
 
 export const customer = {
   listCustomers,
+  listCustomersWithDebt,
   listCustomerType,
   listCustomerPayment,
   createCustomer,

@@ -73,6 +73,65 @@ export class CustomerRepository extends BaseRepository {
       .orderBy(desc(debtExpr));
   }
 
+  async listCustomersWithLastOrderDate() {
+    const invoicesSubquery = this.executor
+      .select({
+        customerId: salesInvoices.customerId,
+        totalInvoices: sql<number>`SUM(${salesInvoices.totalPrice} )`.as(
+          "total_invoices",
+        ),
+      })
+      .from(salesInvoices)
+      .groupBy(salesInvoices.customerId)
+      .as("inv");
+
+    const paymentsSubquery = this.executor
+      .select({
+        customerId: customerPayments.customerId,
+        totalPayments:
+          sql<number>`SUM(${customerPayments.currencyRateAmount} )`.as(
+            "total_payments",
+          ),
+      })
+      .from(customerPayments)
+      .groupBy(customerPayments.customerId)
+      .as("pay");
+
+    const lastOrderSubquery = this.executor
+      .select({
+        customerId: salesInvoices.customerId,
+        lastOrderDate: sql<string>`MAX(${salesInvoices.invoiceDate})`.as(
+          "last_order_date",
+        ),
+      })
+      .from(salesInvoices)
+      .groupBy(salesInvoices.customerId)
+      .as("lastord");
+    const debtExpr = sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0) - COALESCE(${paymentsSubquery.totalPayments}, 0)`;
+
+    return this.executor
+      .select({
+        id: customers.id,
+        displayName: customers.displayName,
+        mobile: customers.mobile,
+        totalInvoices: sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0)`,
+        totalPayments: sql<number>`COALESCE(${paymentsSubquery.totalPayments}, 0)`,
+        debt: debtExpr.as("debt"),
+        lastOrderDate: sql<string>`${lastOrderSubquery.lastOrderDate}`.as(
+          "last_order_date",
+        ),
+      })
+      .from(customers)
+      .leftJoin(invoicesSubquery, eq(invoicesSubquery.customerId, customers.id))
+      .leftJoin(paymentsSubquery, eq(paymentsSubquery.customerId, customers.id))
+      .leftJoin(
+        lastOrderSubquery,
+        eq(lastOrderSubquery.customerId, customers.id),
+      )
+      .where(isNull(customers.deletedAt))
+      .orderBy(asc(lastOrderSubquery.lastOrderDate));
+  }
+
   async createCustomer(data: NewCustomer) {
     return this.executor.insert(customers).values(data).returning();
   }

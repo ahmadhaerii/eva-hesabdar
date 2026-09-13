@@ -16,21 +16,17 @@ import { Button } from "@/components/ui/button";
 
 import * as React from "react";
 import {
-  ArrowDownRight,
-  ArrowUpRight,
-  CreditCard,
   DollarSign,
-  Laptop,
   MoreVertical,
-  Smartphone,
-  Wallet,
-  Watch,
-  Headphones,
   Package,
   CircleDollarSign,
   HeartCrack,
   Boxes,
   Receipt,
+  Users,
+  Box,
+  RotateCwFadingClock,
+  BadgeDollarSign,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,6 +48,7 @@ import {
 } from "@/database/repositories/app/app.repository";
 import { useCurrencyStore } from "@/stores/currencyStore";
 import { DebtCustomers } from "@/features/customers/debtCustomers";
+import { UnfaithfulCustomers } from "@/features/customers/unfaithfulCustomers";
 
 function myTooltip({ active, payload, label }: TooltipContentProps) {
   if (!active || payload == null || payload.length === 0) {
@@ -202,6 +199,9 @@ function HomePage() {
               {dialogComponent === "DebtCustomers" && (
                 <DebtCustomers></DebtCustomers>
               )}
+              {dialogComponent === "UnfaithfulCustomers" && (
+                <UnfaithfulCustomers></UnfaithfulCustomers>
+              )}
             </DialogContent>
           </Dialog>
         </section>
@@ -316,7 +316,7 @@ function HomePage() {
         {/* Main content */}
         <section className="grid gap-6 xl:grid-cols-[250px_250px_minmax(0,1fr)]">
           {/* Products */}
-          <Card className="border-white/[0.08] bg-[#171717] shadow-none">
+          <Card className="border-white/[0.08]  shadow-none">
             <CardHeader>
               <CardTitle className="text-lg">{t("products")}</CardTitle>
             </CardHeader>
@@ -339,42 +339,42 @@ function HomePage() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/[0.04]">
-                  <CreditCard className="h-5 w-5 text-zinc-300" />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-violet-300/[0.04]">
+                  <RotateCwFadingClock className="h-5 w-5 text-violet-500" />
                 </div>
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-white">
                     لیست کالاهای راکد
                   </p>
-
-                  <p className="mt-1 text-sm text-zinc-500">شسی</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/[0.04]">
-                  <CreditCard className="h-5 w-5 text-zinc-300" />
+              <div
+                className="flex items-center gap-4"
+                onClick={() => {
+                  setDialogStatus(true);
+                  setDialogComponent("UnfaithfulCustomers");
+                }}
+              >
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-teal-400/[0.04]">
+                  <Users className="h-5 w-5 text-teal-400" />
                 </div>
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-white">
                     لیست مشتریان بی وفا
                   </p>
-
-                  <p className="mt-1 text-sm text-zinc-500">شسیشسی</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/[0.04]">
-                  <CreditCard className="h-5 w-5 text-zinc-300" />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-orange-300/[0.04]">
+                  <Box className="h-5 w-5 text-orange-300" />
                 </div>
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-white">
                     لیست کالاهای رو به اتمام
                   </p>
-
-                  <p className="mt-1 text-sm text-zinc-500">شسی</p>
                 </div>
               </div>
             </CardContent>
@@ -386,11 +386,16 @@ function HomePage() {
               title={t("yearlySales")}
               description={t("yearlySalesDescription")}
               value={dashboardData?.currentYearSales.toLocaleString()}
+              iconColor="#00d492"
+              iconBackgroundColor="#00bc7d20"
             />
             <StatCard
               title={t("totalSales")}
               description={t("totalSalesDescription")}
               value={dashboardData?.allTimeSales.toLocaleString()}
+              icon={BadgeDollarSign}
+              iconColor="#00d492"
+              iconBackgroundColor="#00bc7d20"
             />
           </div>
 

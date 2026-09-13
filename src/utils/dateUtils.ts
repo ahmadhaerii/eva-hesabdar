@@ -7,6 +7,11 @@ export const toPersianDate = (isoDate: string) => {
   const m = moment(isoDate);
   return m.format("jYYYY/jMM/jDD");
 };
+export const daysSinceLastOrder = (jDate: string) => {
+  if (!jDate) return "";
+  const m = moment(jDate, "jYYYY-jM-jD");
+  return moment().diff(m, "days");
+};
 
 export const toPersianDateTime = (isoDate: string) => {
   if (!isoDate) return "";

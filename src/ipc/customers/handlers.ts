@@ -19,6 +19,14 @@ export const listCustomersWithDebt = os.handler(async () => {
     console.error("error", error);
   }
 });
+export const listCustomersWithLastOrderDate = os.handler(async () => {
+  try {
+    const list = await customerService.listCustomersWithLastOrderDate();
+    return list;
+  } catch (error) {
+    console.error("error", error);
+  }
+});
 
 const createCustomerInput = z.object({
   displayName: z.string().min(1),

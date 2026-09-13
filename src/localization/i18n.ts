@@ -326,6 +326,7 @@ i18n.use(initReactI18next).init({
         received: "دریافتی",
         debtRateAmount: "بدهی ارزی",
         debt: "بدهی ",
+        dayBefore: "روز قبل ",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

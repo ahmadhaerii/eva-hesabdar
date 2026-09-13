@@ -12,6 +12,7 @@ export interface DashboardData {
   bestSellingProduct: string; // '{"productId":3,"productName":"تست","totalSoldQuantity":112.0}';
   mostIndebted: string; // '{"productId":3,"productName":"تست","totalSoldQuantity":112.0}';
   currentYearSales: number;
+  totalDebt: number;
   customersCount: number;
   productsCount: number;
   purchaseInvoicesCount: number;
@@ -37,8 +38,8 @@ export class AppRepository extends BaseRepository {
   async getDashboardData(): Promise<DashboardData> {
     const currentJYear = moment().jYear();
 
-    const result: DashboardData = await this.executor
-      .get(sql`WITH latest_rates AS (
+    const result: DashboardData = await this.executor.get(sql`
+        WITH latest_rates AS (
     SELECT cr.currency_id, cr.rate
     FROM currency_rates cr
     INNER JOIN (
@@ -46,9 +47,38 @@ export class AppRepository extends BaseRepository {
         FROM currency_rates
         GROUP BY currency_id
     ) m ON m.max_id = cr.id
+) ,
+customer_debts AS (
+    SELECT 
+        c.id,
+        c.display_name,
+        COALESCE(inv.total_invoices, 0) AS total_invoices,
+        COALESCE(pay.total_payments, 0) AS total_payments,
+        COALESCE(inv.total_invoices, 0) - COALESCE(pay.total_payments, 0) AS debt
+    FROM customers c
+    LEFT JOIN (
+        SELECT 
+            si.customer_id, 
+            SUM(si.total_price * lr.rate) AS total_invoices
+        FROM sales_invoices si
+        INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
+        INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
+        GROUP BY si.customer_id
+    ) inv ON inv.customer_id = c.id
+    LEFT JOIN (
+        SELECT 
+            cp.customer_id, 
+            SUM(cp.currency_rate_amount * lr.rate) AS total_payments
+        FROM customer_payments cp
+        INNER JOIN currency_rates cr_base ON cp.currency_rate_id = cr_base.id
+        INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
+        GROUP BY cp.customer_id
+    ) pay ON pay.customer_id = c.id
 )
 SELECT 
     (SELECT COUNT(*) FROM products) AS productsCount,
+(SELECT COALESCE(SUM(debt), 0) FROM customer_debts WHERE debt > 0) AS totalDebt,
+
     (SELECT COUNT(*) FROM customers) AS customersCount,
     (SELECT COUNT(*) FROM purchase_invoices) AS purchaseInvoicesCount,
     (SELECT COUNT(*) FROM sales_invoices) AS salesInvoicesCount,

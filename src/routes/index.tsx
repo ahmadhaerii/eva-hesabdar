@@ -5,7 +5,14 @@ import { useTranslation } from "react-i18next";
 import { getCustomers } from "@/actions/customer";
 import { getSaleInvoices } from "@/actions/sale";
 import { getPurchaseInvoices } from "@/actions/purchase";
-// **********************************************************************
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 import * as React from "react";
 import {
@@ -44,6 +51,7 @@ import {
   Last12MonthsSales,
 } from "@/database/repositories/app/app.repository";
 import { useCurrencyStore } from "@/stores/currencyStore";
+import { DebtCustomers } from "@/features/customers/debtCustomers";
 
 function myTooltip({ active, payload, label }: TooltipContentProps) {
   if (!active || payload == null || payload.length === 0) {
@@ -145,9 +153,8 @@ function HomePage() {
   const [last12MonthsSales, setLast12MonthsSales] = useState<
     Last12MonthsSales | undefined
   >(undefined);
-  const [purchaseInvoices, setPurchaseInvoices] = useState<any[] | undefined>(
-    [],
-  );
+  const [dialogStatus, setDialogStatus] = useState(false);
+  const [dialogComponent, setDialogComponent] = useState("");
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -174,7 +181,7 @@ function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#090909] text-white">
+    <main className="min-h-screen  ">
       <div className="mx-auto max-w-[1600px] p-5 md:p-8">
         {/* Header */}
         <header className="mb-7 flex items-center justify-between">
@@ -186,6 +193,18 @@ function HomePage() {
             <p className="mt-1 text-sm text-zinc-500">{t("overview")}</p>
           </div>
         </header>
+        <section>
+          <Dialog
+            open={dialogStatus}
+            onOpenChange={(onOpen: boolean) => setDialogStatus(onOpen)}
+          >
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
+              {dialogComponent === "DebtCustomers" && (
+                <DebtCustomers></DebtCustomers>
+              )}
+            </DialogContent>
+          </Dialog>
+        </section>
 
         {/* Profit cards */}
         <section className="mb-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -266,7 +285,7 @@ function HomePage() {
           <StatCard
             title={t("totalDebts")}
             description={t("totalDebtsDescription")}
-            value="XXXX"
+            value={dashboardData?.totalDebt.toLocaleString()}
             iconColor="#ffb900"
             iconBackgroundColor="#ffb90025"
           />
@@ -303,17 +322,20 @@ function HomePage() {
             </CardHeader>
 
             <CardContent className="space-y-5">
-              <div className="flex items-center gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/[0.04]">
-                  <CreditCard className="h-5 w-5 text-zinc-300" />
+              <div
+                className="flex items-center gap-4 cursor-pointer"
+                onClick={() => {
+                  setDialogStatus(true);
+                  setDialogComponent("DebtCustomers");
+                }}
+              >
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-[#ff205625]">
+                  <HeartCrack className="h-5 w-5 text-[#ff2056]" />
                 </div>
-
-                <div className="min-w-0">
+                <div className="min-w-0 ">
                   <p className="truncate text-sm font-medium text-white">
-                    لیست بدهکاران
+                    {t("debtCustomersList")}
                   </p>
-
-                  <p className="mt-1 text-sm text-zinc-500">شسیشسی</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">

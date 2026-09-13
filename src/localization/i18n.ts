@@ -320,6 +320,13 @@ i18n.use(initReactI18next).init({
         referenceNumber: "شماره رسید",
         amount: "مبلغ",
 
+        //
+        debtCustomersList: " لیست بدهکاران",
+        sumSalePurchase: "مجموع فاکتورها",
+        received: "دریافتی",
+        debtRateAmount: "بدهی ارزی",
+        debt: "بدهی ",
+
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",
       },

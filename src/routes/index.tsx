@@ -465,7 +465,7 @@ function HomePage() {
                 </div>
               </div>
               <div
-                className="flex items-center gap-4"
+                className="flex items-center gap-4 cursor-pointer"
                 onClick={() => {
                   setDialogStatus(true);
                   setDialogComponent("UnfaithfulCustomers");
@@ -477,7 +477,7 @@ function HomePage() {
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-white">
-                    لیست مشتریان بی وفا
+                    {t("unfaithfulCustomersList")}
                   </p>
                 </div>
               </div>

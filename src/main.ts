@@ -20,7 +20,7 @@ function createWindow() {
       process.platform === "darwin" ? { x: 5, y: 5 } : undefined,
     webPreferences: {
       contextIsolation: true,
-      devTools: inDevelopment,
+      devTools: true,
       nodeIntegration: true,
       nodeIntegrationInSubFrames: false,
 

@@ -148,8 +148,8 @@ export const listCustomerPayments = os
 
 const createCustomerPaymentInput = z.object({
   customerId: z.number().min(1),
-  amount: z.number().min(1),
-  currencyRateAmount: z.number().min(1),
+  amount: z.number(),
+  currencyRateAmount: z.number(),
   paymentDate: z.string().min(1),
   paymentMethod: z.string(),
   referenceNumber: z.string().nullable().optional(),

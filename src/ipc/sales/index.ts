@@ -1,21 +1,11 @@
 import {
   listSaleInvoices,
+  getSaleInvoice,
   createSaleInvoice,
-  listPurchaseInvoiceItems,
-  addPurchaseInvoiceItem,
-  deletePurchaseInvoice,
-  deletePurchaseInvoiceItem,
-  updatePurchaseInvoice,
-  updatePurchaseInvoiceItem,
 } from "./handlers";
 
 export const sale = {
   listSaleInvoices,
+  getSaleInvoice,
   createSaleInvoice,
-  listPurchaseInvoiceItems,
-  addPurchaseInvoiceItem,
-  deletePurchaseInvoice,
-  deletePurchaseInvoiceItem,
-  updatePurchaseInvoice,
-  updatePurchaseInvoiceItem,
 };

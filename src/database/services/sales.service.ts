@@ -26,6 +26,12 @@ export class SalesService {
     const list = await salesRepository.listSaleInvoices();
     return list;
   }
+
+  async getSaleInvoice(id: number) {
+    const list = await salesRepository.getSaleInvoice(id);
+    return list;
+  }
+
   async createSaleInvoice(dto: CreateSalesInvoiceDto) {
     try {
       const [invoice] = await salesRepository.createSaleInvoice(dto.invoice);
@@ -56,6 +62,7 @@ export class SalesService {
       console.log(error);
     }
   }
+
   private async allocateInventory(
     saleInvoiceItemId: number,
     item: NewSalesInvoiceItem,
@@ -93,6 +100,7 @@ export class SalesService {
       );
     }
   }
+
   // remove below
 
   //   async create(dto: CreateSalesInvoiceDto) {

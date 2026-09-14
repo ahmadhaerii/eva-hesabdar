@@ -344,6 +344,7 @@ i18n.use(initReactI18next).init({
 
         //
         debtCustomersList: " لیست بدهکاران",
+        unfaithfulCustomersList: " لیست مشتریان بی وفا",
         sumSalePurchase: "مجموع فاکتورها",
         received: "دریافتی",
         debtRateAmount: "بدهی ارزی",

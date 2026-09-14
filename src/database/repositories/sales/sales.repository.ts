@@ -36,6 +36,28 @@ export class SalesRepository extends BaseRepository {
       orderBy: [desc(salesInvoices.invoiceDate)],
     });
   }
+  async getSaleInvoice(
+    id: number,
+  ): Promise<SalesInvoiceWithRelations | undefined> {
+    return this.executor.query.salesInvoices.findFirst({
+      with: {
+        currencyRate: {
+          with: {
+            currency: true,
+          },
+        },
+        customer: true,
+        saleInvoiceItems: {
+          with: {
+            product: true,
+            allocations: true,
+          },
+        },
+      },
+      where: eq(salesInvoices.id, id),
+      orderBy: [desc(salesInvoices.invoiceDate)],
+    });
+  }
 
   async createSaleInvoice(data: NewSalesInvoice) {
     return this.executor.insert(salesInvoices).values(data).returning();

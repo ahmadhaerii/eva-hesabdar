@@ -18,3 +18,9 @@ export async function getLast12MonthsSales(): Promise<
 > {
   return ipc.client.app.getLast12MonthsSales();
 }
+
+export async function createCustomerStatement(
+  customerId: number,
+): Promise<Awaited<ReturnType<typeof ipc.client.app.createCustomerStatement>>> {
+  return ipc.client.app.createCustomerStatement(customerId);
+}

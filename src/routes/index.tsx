@@ -27,6 +27,7 @@ import {
   Box,
   RotateCwFadingClock,
   BadgeDollarSign,
+  Plus,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,7 +42,11 @@ import {
   TooltipContentProps,
   XAxis,
 } from "recharts";
-import { getDashboardData, getLast12MonthsSales } from "@/actions/app";
+import {
+  createCustomerStatement,
+  getDashboardData,
+  getLast12MonthsSales,
+} from "@/actions/app";
 import {
   DashboardData,
   Last12MonthsSales,
@@ -49,6 +54,8 @@ import {
 import { useCurrencyStore } from "@/stores/currencyStore";
 import { DebtCustomers } from "@/features/customers/debtCustomers";
 import { UnfaithfulCustomers } from "@/features/customers/unfaithfulCustomers";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { exportAccountStatementToExcel } from "@/utils/exportAccountStatement";
 
 function myTooltip({ active, payload, label }: TooltipContentProps) {
   if (!active || payload == null || payload.length === 0) {
@@ -128,8 +135,10 @@ function StatCard({
 
 function HomePage() {
   const { t } = useTranslation();
-  const defaultCurrency = useCurrencyStore((state) => state.defaultCurrency);
+  const queryClient = useQueryClient();
 
+  const defaultCurrency = useCurrencyStore((state) => state.defaultCurrency);
+  const [customerId, setCustomerId] = useState<number | undefined>(undefined);
   const [dashboardData, setDashboardData] = useState<
     | (DashboardData & {
         bestSellingProductObject: {
@@ -150,8 +159,31 @@ function HomePage() {
   const [last12MonthsSales, setLast12MonthsSales] = useState<
     Last12MonthsSales | undefined
   >(undefined);
+  const [canGetReport, setCanGetReport] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const {
+    data: customers = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["customers"],
+    queryFn: getCustomers,
+  });
+
+  const { data: customerStatement = [] } = useQuery({
+    queryKey: ["createCustomerStatement"],
+    queryFn: async () => {
+      const data = await createCustomerStatement(customerId!);
+      await exportAccountStatementToExcel(data, "گردش-حساب-مرداد");
+      setCanGetReport(false);
+    },
+    enabled: !!customerId && canGetReport,
+  });
+
   const [dialogStatus, setDialogStatus] = useState(false);
   const [dialogComponent, setDialogComponent] = useState("");
+  const [error, setError] = useState("");
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -189,6 +221,76 @@ function HomePage() {
 
             <p className="mt-1 text-sm text-zinc-500">{t("overview")}</p>
           </div>
+
+          <Dialog open={open} onOpenChange={(open: boolean) => setOpen(open)}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="ml-2 h-4 w-4" />
+
+                {t("customerReport")}
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t("customerReport")}</DialogTitle>
+              </DialogHeader>
+
+              <form
+                className="space-y-4"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (customerId === undefined) {
+                    setError(t("selectCustomerError"));
+                    return;
+                  }
+                  setCanGetReport(true);
+                  queryClient.invalidateQueries({
+                    queryKey: ["createCustomerStatement"],
+                  });
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="">
+                    <label
+                      htmlFor="customer-type"
+                      className="text-sm font-medium"
+                    >
+                      {t("filterCustomer")}
+                    </label>
+
+                    <select
+                      id="customer-type"
+                      value={customerId?.toString() ?? ""}
+                      onChange={(event) => setCustomerId(+event.target.value)}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="">{t("selectCustomer")}</option>
+
+                      {customers.map((customer) => (
+                        <option key={customer.id} value={customer.id}>
+                          {customer.displayName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                {error && <p className="text-sm text-destructive">{error}</p>}
+
+                <div className="flex justify-start gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setOpen(false)}
+                  >
+                    {t("cancel")}
+                  </Button>
+
+                  <Button type="submit">{t("getCustomerReport")}</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </header>
         <section>
           <Dialog

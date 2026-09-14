@@ -11,6 +11,14 @@ export const listProducts = os.handler(async () => {
     console.error("error", error);
   }
 });
+export const inventorySummary = os.handler(async () => {
+  try {
+    const list = await productService.inventorySummary();
+    return list;
+  } catch (error) {
+    console.error("error", error);
+  }
+});
 
 const createProductInput = z.object({
   name: z.string().min(1),

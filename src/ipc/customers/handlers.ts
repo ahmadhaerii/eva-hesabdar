@@ -108,6 +108,8 @@ const deleteCustomerTypeInput = z.object({
   id: z.number(),
 });
 
+const idTypeInput = z.number().optional();
+
 export const listCustomerType = os.handler(async () => {
   return customerService.listCustomerTypes();
 });
@@ -136,9 +138,11 @@ export const deleteCustomerType = os
     return customerService.deleteCustomerType(input.id);
   });
 
-export const listCustomerPayment = os.handler(async () => {
-  return customerService.listCustomerPayments();
-});
+export const listCustomerPayments = os
+  .input(idTypeInput)
+  .handler(async ({ input }) => {
+    return customerService.listCustomerPayments(input);
+  });
 
 // CustomerPayment
 

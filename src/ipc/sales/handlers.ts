@@ -40,6 +40,7 @@ const createSaleInvoiceInput = z.object({
         saleUnitPrice: z.number().min(0),
         suggestedUnitPrice: z.number(),
         lineTotal: z.number().min(0),
+        lineTotalCurrencyAmount: z.number().min(0),
         selectedRowOfPurchaseInvoiceItems: z.array(z.number()),
         description: z.string().optional().nullable(),
         createdAt: z.string(),

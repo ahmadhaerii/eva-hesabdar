@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckIcon, Plus, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +34,9 @@ import { CurrencyWithRate } from "@/database/repositories/currency/currency.repo
 function PaymentsPage() {
   const { t } = useTranslation();
   const defaultCurrency = useCurrencyStore((state) => state.defaultCurrency);
+  const [customerIdForFilter, setCustomerIdForFilter] = useState<
+    number | undefined
+  >(undefined);
 
   const {
     data: customers = [],
@@ -50,7 +53,7 @@ function PaymentsPage() {
     isError: isErrorCustomerPayments,
   } = useQuery({
     queryKey: ["customerPayments"],
-    queryFn: getCustomerPayments,
+    queryFn: () => getCustomerPayments(customerIdForFilter),
   });
   const {
     data: currenciesWithLastRate = [],
@@ -75,11 +78,10 @@ function PaymentsPage() {
   const [description, setDescription] = useState("");
   const [currencyRateId, setCurrencyRateId] = useState<number | null>(null);
   const [currency, setCurrency] = useState<CurrencyWithRate | null>(null);
-  const [customerId, setCustomerId] = useState<number | null>(null);
   const [amount, setAmount] = useState<number | null>(null);
   const [paymentDate, setPaymentDate] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
-
+  const [customerId, setCustomerId] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -165,6 +167,12 @@ function PaymentsPage() {
     setDialogDeleteOpen(false);
     setOpen(false);
   };
+
+  useEffect(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["customerPayments"],
+    });
+  }, [customerIdForFilter]);
 
   return (
     <div className="space-y-6">
@@ -482,6 +490,31 @@ function PaymentsPage() {
             </div>
           </DialogContent>
         </Dialog>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="">
+          <label htmlFor="customer-type" className="text-sm font-medium">
+            {t("filterCustomer")}
+          </label>
+
+          <select
+            id="customer-type"
+            value={customerIdForFilter?.toString() ?? ""}
+            onChange={(event) => setCustomerIdForFilter(+event.target.value)}
+            disabled={createMutation.isPending || isLoading}
+            className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="">
+              {isLoading ? t("loading") : t("selectCustomer")}
+            </option>
+
+            {customers.map((customer) => (
+              <option key={customer.id} value={customer.id}>
+                {customer.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {isLoading && <div className="text-muted-foreground">{t("loading")}</div>}

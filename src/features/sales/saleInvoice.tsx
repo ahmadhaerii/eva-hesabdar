@@ -44,6 +44,7 @@ interface InvoiceItem {
   salesInvoiceId: number;
   selectedRowOfPurchaseInvoiceItems: number[];
   lineTotal: number;
+  lineTotalCurrencyAmount: number;
   createdAt: string;
 }
 interface SaleInvoiceProps {
@@ -361,13 +362,7 @@ export default function SaleInvoice({
     const totalPrice =
       purchaseInvoiceItemsForProduct[purchaseInvoiceItemsForProduct.length - 1]
         ?.totalPrice;
-    console.log("aaaaaaaa");
-    console.log(selectedCustomer);
-    console.log(currency);
-    console.log(totalPrice);
-    console.log(profitPercent);
-    console.log(currency?.latestRate);
-    console.log(productId);
+
     if (
       selectedCustomer &&
       currency &&
@@ -588,7 +583,10 @@ export default function SaleInvoice({
                   setError("این محصول قبلا به فاکتور اضافه شده است");
                   return;
                 }
-
+                const currency = currenciesWithLastRate.find(
+                  (currencyWithLastRate) =>
+                    currencyWithLastRate.latestRateId == currencyRateId,
+                );
                 setError("");
                 const newInvoiceItem: InvoiceItem = {
                   id: Date.now(),
@@ -599,6 +597,9 @@ export default function SaleInvoice({
                   saleUnitPrice: result.data.saleUnitPrice,
                   salesInvoiceId: 0,
                   lineTotal: result.data.quantity * result.data.saleUnitPrice,
+                  lineTotalCurrencyAmount:
+                    (result.data.quantity * result.data.saleUnitPrice) /
+                    currency?.latestRate!,
                   selectedRowOfPurchaseInvoiceItems:
                     selectedRowOfPurchaseInvoiceItems,
                   createdAt: new Date().toISOString(),

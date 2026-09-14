@@ -5,6 +5,11 @@ export async function getProducts(): Promise<
 > {
   return ipc.client.product.listProducts();
 }
+export async function inventorySummary(): Promise<
+  Awaited<ReturnType<typeof ipc.client.product.inventorySummary>>
+> {
+  return ipc.client.product.inventorySummary();
+}
 
 export async function createProduct(data: {
   name: string;
@@ -36,9 +41,3 @@ export async function deleteProduct(id: number) {
     id,
   });
 }
-
-// export function searchProducts(keyword: string) {
-//   return ipc.client.product.searchProducts({
-//     keyword,
-//   });
-// }

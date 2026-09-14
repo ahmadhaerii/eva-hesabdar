@@ -1,9 +1,15 @@
-import { and, asc, eq, isNull, like } from "drizzle-orm";
-import { categories, products, units } from "../../schema";
+import { and, asc, eq, isNull, like, sql } from "drizzle-orm";
+import {
+  categories,
+  products,
+  purchaseInvoiceItems,
+  units,
+} from "../../schema";
 
 import {
   Category,
   CategoryWithRelations,
+  InventorySummary,
   NewCategory,
   NewProduct,
   NewUnit,
@@ -27,6 +33,26 @@ export class ProductRepository extends BaseRepository {
       },
       orderBy: [asc(products.name)],
     });
+  }
+
+  async inventorySummary(): Promise<InventorySummary[]> {
+    const rows = await this.executor
+      .select({
+        productId: products.id,
+        productName: products.name,
+        totalPurchased: sql<number>`COALESCE(SUM(${purchaseInvoiceItems.quantity}), 0)`,
+        totalRemaining: sql<number>`COALESCE(SUM(${purchaseInvoiceItems.remainingQuantity}), 0)`,
+        totalSoldOrUsed: sql<number>`COALESCE(SUM(${purchaseInvoiceItems.quantity} - ${purchaseInvoiceItems.remainingQuantity}), 0)`,
+      })
+      .from(products)
+      .leftJoin(
+        purchaseInvoiceItems,
+        eq(purchaseInvoiceItems.productId, products.id),
+      )
+      .groupBy(products.id)
+      .orderBy(products.name);
+
+    return rows;
   }
 
   async getById(id: number): Promise<Product | undefined> {

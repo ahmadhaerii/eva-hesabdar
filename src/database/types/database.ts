@@ -34,6 +34,14 @@ export type ProductWithRelations = Product & {
   category: Category | null;
   unit: Unit | null;
 };
+
+export type InventorySummary = {
+  productId: number;
+  productName: string;
+  totalPurchased: number;
+  totalRemaining: number;
+  totalSoldOrUsed: number;
+};
 /* ==========================================================
    CURRENCY
 ========================================================== */

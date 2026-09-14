@@ -74,25 +74,13 @@ export const salesInvoiceItems = sqliteTable(
 
     quantity: real("quantity").notNull(),
 
-    //  fifoUnitCost: real("fifo_unit_cost").notNull(),
-
-    // purchaseCurrencyId: integer("purchase_currency_id")
-    //   .notNull()
-    //   .references(() => currencies.id),
-
-    // purchaseCurrencyRate: real("purchase_currency_rate").notNull(),
-
-    // Sale Snapshot
-    // saleExchangeRate: real("sale_exchange_rate").notNull(),
-
-    // customerProfitPercent: real("customer_profit_percent").notNull(),
-
     suggestedUnitPrice: real("suggested_unit_price").notNull(),
 
-    // Final user price
     saleUnitPrice: real("sale_unit_price").notNull(),
 
     lineTotal: real("line_total").notNull(),
+
+    lineTotalCurrencyAmount: real("line_total_currency_amount").notNull(),
 
     description: text("description"),
   },

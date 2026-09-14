@@ -121,6 +121,9 @@ i18n.use(initReactI18next).init({
         documentation: "مستندات",
         madeBy: "ساخته شده توسط احمد حائری",
 
+        customerReport: "دریافت گزارش",
+        getCustomerReport: "دریافت گزارش مشتری",
+        selectCustomerError: "لطفا مشتری را انتخاب کنید",
         titleHomePage: "خانه",
         overview: "نمای کلی کسب و کار ",
         totalItems: "کل کالاها",
@@ -313,6 +316,7 @@ i18n.use(initReactI18next).init({
         validationSuccess: "اطلاعات با موفقیت ذخیره شد",
 
         // payments
+        filterCustomer: "فیلتر مشتری",
         currencyRateAmount: "مبلغ ارزی",
         paymentDescription: "توضیحات",
         addPayment: "ثبت پرداخت",
@@ -327,6 +331,9 @@ i18n.use(initReactI18next).init({
         debtRateAmount: "بدهی ارزی",
         debt: "بدهی ",
         dayBefore: "روز قبل ",
+        lastOrderDate: "آخرین سفارش",
+        saleCount: "تعداد فروش",
+        purchaseCount: "تعداد خرید",
 
         // Dashboard
         dashboardHeader: "مروری بر سیستم کسب‌وکار شما",

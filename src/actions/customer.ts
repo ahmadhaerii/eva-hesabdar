@@ -100,10 +100,12 @@ export async function deleteCustomerType(id: number) {
   });
 }
 
-export async function getCustomerPayments(): Promise<
-  Awaited<ReturnType<typeof ipc.client.customer.listCustomerPayment>>
+export async function getCustomerPayments(
+  id: number | undefined,
+): Promise<
+  Awaited<ReturnType<typeof ipc.client.customer.listCustomerPayments>>
 > {
-  return ipc.client.customer.listCustomerPayment();
+  return ipc.client.customer.listCustomerPayments(id);
 }
 export async function createCustomerPayment(data: {
   customerId: number;

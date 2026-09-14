@@ -57,8 +57,8 @@ export class CustomerService {
 
   // customerPayment
 
-  async listCustomerPayments() {
-    return customerRepository.listCustomerPayments();
+  async listCustomerPayments(customerId?: number) {
+    return customerRepository.listCustomerPayments(customerId);
   }
 
   async createCustomerPayment(data: NewCustomerPayment) {

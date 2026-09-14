@@ -198,9 +198,14 @@ export class CustomerRepository extends BaseRepository {
      CUSTOMER TYPES
   ========================================================== */
 
-  async listCustomerPayments(): Promise<CustomerPaymentWithRelations[]> {
+  async listCustomerPayments(
+    customerId?: number,
+  ): Promise<CustomerPaymentWithRelations[]> {
     return this.executor.query.customerPayments.findMany({
-      where: isNull(customerPayments.deletedAt),
+      where: and(
+        isNull(customerPayments.deletedAt),
+        customerId ? eq(customerPayments.customerId, customerId) : undefined,
+      ),
       with: {
         customer: true,
         currencyRate: {

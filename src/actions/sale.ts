@@ -27,6 +27,7 @@ export async function createSaleInvoice(data: {
     saleUnitPrice: number;
     suggestedUnitPrice: number;
     lineTotal: number;
+    lineTotalCurrencyAmount: number;
     createdAt: string;
     selectedRowOfPurchaseInvoiceItems: number[];
     id?: number | undefined;

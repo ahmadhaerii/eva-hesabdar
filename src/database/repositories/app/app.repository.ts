@@ -34,6 +34,20 @@ export interface Last12MonthsSales {
   totalInvoices: number;
   averageMonthlySales: number;
 }
+export interface DashboardStats {
+  countLastMonth: number;
+  countThisYear: number;
+  countTotal: number;
+  paymentsLastMonth: number;
+  paymentsThisYear: number;
+  paymentsTotal: number;
+  profitLastMonth: number;
+  profitThisYear: number;
+  profitTotal: number;
+  salesLastMonth: number;
+  salesThisYear: number;
+  salesTotal: number;
+}
 export class AppRepository extends BaseRepository {
   async getDashboardData(): Promise<DashboardData> {
     const currentJYear = moment().jYear();
@@ -166,7 +180,6 @@ SELECT
   `);
     return result;
   }
-
   async getLast12MonthsSales(): Promise<Last12MonthsSales> {
     const now = moment();
 
@@ -265,6 +278,101 @@ SELECT
       "اسفند",
     ];
     return monthNames[month - 1];
+  }
+
+  getJalaliRanges() {
+    moment.loadPersian({ usePersianDigits: false, dialect: "persian-modern" });
+
+    const now = moment();
+
+    return {
+      today: now.format("jYYYY-jMM-jDD"), // 1405-05-05
+      monthStart: now.clone().startOf("jMonth").format("jYYYY-jMM-jDD"), // 1405-05-01
+      yearStart: now.clone().startOf("jYear").format("jYYYY-jMM-jDD"), // 1405-01-01
+    };
+  }
+  async getDashboardStats() {
+    const { today, monthStart, yearStart } = this.getJalaliRanges();
+
+    const result = await this.executor.get<{
+      countLastMonth: number;
+      countThisYear: number;
+      countTotal: number;
+
+      salesLastMonth: number;
+      salesThisYear: number;
+      salesTotal: number;
+
+      profitLastMonth: number;
+      profitThisYear: number;
+      profitTotal: number;
+
+      paymentsLastMonth: number;
+      paymentsThisYear: number;
+      paymentsTotal: number;
+    }>(sql`
+    WITH item_cost AS (
+      SELECT
+        sia.sales_invoice_item_id AS salesInvoiceItemId,
+        SUM(sia.quantity * pii.total_price) AS cost    
+      FROM sales_inventory_allocations sia
+      JOIN purchase_invoice_items pii ON pii.id = sia.purchase_invoice_item_id
+      GROUP BY sia.sales_invoice_item_id
+    ),
+
+    sales_stats AS (
+      SELECT
+        COUNT(DISTINCT CASE WHEN si.invoice_date >= ${monthStart} AND si.invoice_date <= ${today} THEN si.id END) AS countLastMonth,
+        COUNT(DISTINCT CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today} THEN si.id END) AS countThisYear,
+        COUNT(DISTINCT si.id) AS countTotal,
+
+        SUM(CASE WHEN si.invoice_date >= ${monthStart} AND si.invoice_date <= ${today}
+                 THEN sii.line_total_currency_amount ELSE 0 END) AS salesLastMonth,
+        SUM(CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today}
+                 THEN sii.line_total_currency_amount ELSE 0 END) AS salesThisYear,
+        SUM(sii.line_total_currency_amount) AS salesTotal,
+
+        SUM(CASE WHEN si.invoice_date >= ${monthStart} AND si.invoice_date <= ${today}
+                 THEN (sii.line_total_currency_amount - COALESCE(ic.cost, 0)) ELSE 0 END) AS profitLastMonth,
+        SUM(CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today}
+                 THEN (sii.line_total_currency_amount - COALESCE(ic.cost, 0)) ELSE 0 END) AS profitThisYear,
+        SUM(sii.line_total_currency_amount - COALESCE(ic.cost, 0)) AS profitTotal
+      FROM sales_invoices si
+      JOIN sales_invoice_items sii ON sii.sales_invoice_id = si.id
+      LEFT JOIN item_cost ic ON ic.salesInvoiceItemId = sii.id
+      WHERE  si.deleted_at IS NULL
+    ),
+
+    payment_stats AS (
+      SELECT
+        SUM(CASE WHEN payment_date >= ${monthStart} AND payment_date <= ${today} THEN currency_rate_amount ELSE 0 END) AS paymentsLastMonth,
+        SUM(CASE WHEN payment_date >= ${yearStart}  AND payment_date <= ${today} THEN currency_rate_amount ELSE 0 END) AS paymentsThisYear,
+        SUM(currency_rate_amount) AS paymentsTotal
+      FROM customer_payments
+      WHERE deleted_at IS NULL
+    )
+
+    SELECT * FROM sales_stats, payment_stats;
+  `);
+
+    // مقادیر NULL رو به 0 تبدیل می‌کنیم (وقتی هیچ داده‌ای نیست)
+    return {
+      countLastMonth: result?.countLastMonth ?? 0,
+      countThisYear: result?.countThisYear ?? 0,
+      countTotal: result?.countTotal ?? 0,
+
+      salesLastMonth: result?.salesLastMonth ?? 0,
+      salesThisYear: result?.salesThisYear ?? 0,
+      salesTotal: result?.salesTotal ?? 0,
+
+      profitLastMonth: result?.profitLastMonth ?? 0,
+      profitThisYear: result?.profitThisYear ?? 0,
+      profitTotal: result?.profitTotal ?? 0,
+
+      paymentsLastMonth: result?.paymentsLastMonth ?? 0,
+      paymentsThisYear: result?.paymentsThisYear ?? 0,
+      paymentsTotal: result?.paymentsTotal ?? 0,
+    };
   }
 }
 

@@ -13,6 +13,11 @@ export async function getDashboardData(): Promise<
 > {
   return ipc.client.app.getDashboardData();
 }
+export async function getDashboardStats(): Promise<
+  Awaited<ReturnType<typeof ipc.client.app.getDashboardStats>>
+> {
+  return ipc.client.app.getDashboardStats();
+}
 export async function getLast12MonthsSales(): Promise<
   Awaited<ReturnType<typeof ipc.client.app.getLast12MonthsSales>>
 > {

@@ -28,6 +28,9 @@ import {
   RotateCwFadingClock,
   BadgeDollarSign,
   Plus,
+  Handshake,
+  CreditCardPlus,
+  BanknoteArrowUp,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,10 +48,12 @@ import {
 import {
   createCustomerStatement,
   getDashboardData,
+  getDashboardStats,
   getLast12MonthsSales,
 } from "@/actions/app";
 import {
   DashboardData,
+  DashboardStats,
   Last12MonthsSales,
 } from "@/database/repositories/app/app.repository";
 import { useCurrencyStore } from "@/stores/currencyStore";
@@ -159,6 +164,10 @@ function HomePage() {
   const [last12MonthsSales, setLast12MonthsSales] = useState<
     Last12MonthsSales | undefined
   >(undefined);
+  const [dashboardStats, setDashboardStats] = useState<
+    DashboardStats | undefined
+  >(undefined);
+
   const [canGetReport, setCanGetReport] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -188,24 +197,28 @@ function HomePage() {
 
   useEffect(() => {
     startTransition(() => {
-      Promise.all([getDashboardData(), getLast12MonthsSales()]).then(
-        ([dashboardData, last12MonthsSales]) => {
-          dashboardData?.bestSellingProduct.toString();
-          if (dashboardData) {
-            console.log(dashboardData);
-            setDashboardData({
-              ...dashboardData,
-              bestSellingProductObject: JSON.parse(
-                dashboardData?.bestSellingProduct,
-              ),
-              mostIndebted: JSON.parse(dashboardData?.mostIndebted),
-            });
-          }
+      Promise.all([
+        getDashboardStats(),
+        getDashboardData(),
+        getLast12MonthsSales(),
+      ]).then(([getDashboardStats, dashboardData, last12MonthsSales]) => {
+        setDashboardStats(getDashboardStats);
+        console.log("getDashboardStats", getDashboardStats);
+        dashboardData?.bestSellingProduct.toString();
+        if (dashboardData) {
+          console.log(dashboardData);
+          setDashboardData({
+            ...dashboardData,
+            bestSellingProductObject: JSON.parse(
+              dashboardData?.bestSellingProduct,
+            ),
+            mostIndebted: JSON.parse(dashboardData?.mostIndebted),
+          });
+        }
 
-          setLast12MonthsSales(last12MonthsSales);
-          console.log("last12MonthsSales", last12MonthsSales);
-        },
-      );
+        setLast12MonthsSales(last12MonthsSales);
+        console.log("last12MonthsSales", last12MonthsSales);
+      });
     });
   }, []);
 
@@ -564,157 +577,165 @@ function HomePage() {
         {/* Bottom reports */}
         <section className="mt-6 grid gap-0 overflow-hidden rounded-xl border border-white/[0.08] bg-[#171717] md:grid-cols-3">
           <div className="border-b border-white/[0.08] p-7 last:border-b-0 md:border-b-0  ">
-            <h3 className="text-lg font-semibold">{t("report")}</h3>
+            <h3 className="text-lg font-semibold">{t("reportMonth")}</h3>
 
             <p className="mt-1 text-sm text-zinc-500">
-              {t("lastMonthTransactions")}
+              {t("reportMonthDescription")}
             </p>
 
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-sky-500/10">
+                  <Handshake className="h-5 w-5 text-sky-500" />
                 </div>
 
-                <span className="font-medium">{t("totalIncome")}</span>
+                <span className="font-medium">{t("countLastMonth")}</span>
               </div>
 
-              <strong>$4,673</strong>
+              <strong>{dashboardStats?.countLastMonth.toLocaleString()}</strong>
+            </div>
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-yellow-500/10">
+                  <DollarSign className="h-5 w-5 text-yellow-500" />
+                </div>
+
+                <span className="font-medium">{t("salesLastMonth")}</span>
+              </div>
+
+              <strong>{dashboardStats?.salesLastMonth.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
+                  <CreditCardPlus className="h-5 w-5 text-emerald-400" />
                 </div>
 
-                <span className="font-medium">{t("totalIncome")}</span>
+                <span className="font-medium">{t("paymentsLastMonth")}</span>
               </div>
 
-              <strong>$4,673</strong>
+              <strong>
+                {dashboardStats?.paymentsLastMonth.toLocaleString()}
+              </strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
                 </div>
 
-                <span className="font-medium">{t("totalIncome")}</span>
+                <span className="font-medium">{t("profitLastMonth")}</span>
               </div>
 
-              <strong>$4,673</strong>
-            </div>
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
-                </div>
-
-                <span className="font-medium">{t("totalIncome")}</span>
-              </div>
-
-              <strong>$4,673</strong>
+              <strong>
+                {dashboardStats?.profitLastMonth.toLocaleString()}
+              </strong>
             </div>
           </div>
           <div className="border-b border-white/[0.08] p-7 md:border-b-0 md:border-r md:border-l ">
-            <h3 className="text-lg font-semibold">{t("transaction")}</h3>
-
-            <p className="mt-1 text-sm text-zinc-500">{t("weeklyOverview")}</p>
-
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
-                </div>
-
-                <span className="font-medium">{t("totalIncome")}</span>
-              </div>
-
-              <strong>$4,67311</strong>
-            </div>
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
-                </div>
-
-                <span className="font-medium">{t("totalIncome")}</span>
-              </div>
-
-              <strong>$4,67311</strong>
-            </div>
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
-                </div>
-
-                <span className="font-medium">{t("totalIncome")}</span>
-              </div>
-
-              <strong>$4,67311</strong>
-            </div>
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
-                </div>
-
-                <span className="font-medium">{t("totalIncome")}</span>
-              </div>
-
-              <strong>$4,67311</strong>
-            </div>
-          </div>
-          <div className="border-b border-white/[0.08] p-7 last:border-b-0 md:border-b-0   ">
-            <h3 className="text-lg font-semibold">{t("report")}</h3>
+            <h3 className="text-lg font-semibold">{t("reportYear")}</h3>
 
             <p className="mt-1 text-sm text-zinc-500">
-              {t("lastMonthTransactions")}
+              {t("reportYearDescription")}
             </p>
 
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-sky-500/10">
+                  <Handshake className="h-5 w-5 text-sky-500" />
                 </div>
 
-                <span className="font-medium">{t("totalIncome")}</span>
+                <span className="font-medium">{t("countThisYear")}</span>
               </div>
 
-              <strong>$4,673</strong>
+              <strong>{dashboardStats?.countThisYear.toLocaleString()}</strong>
+            </div>
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-yellow-500/10">
+                  <DollarSign className="h-5 w-5 text-yellow-500" />
+                </div>
+
+                <span className="font-medium">{t("salesThisYear")}</span>
+              </div>
+
+              <strong>{dashboardStats?.salesThisYear.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
+                  <CreditCardPlus className="h-5 w-5 text-emerald-400" />
                 </div>
 
-                <span className="font-medium">{t("totalIncome")}</span>
+                <span className="font-medium">{t("paymentsThisYear")}</span>
               </div>
 
-              <strong>$4,673</strong>
+              <strong>
+                {dashboardStats?.paymentsThisYear.toLocaleString()}
+              </strong>
+            </div>
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
+                </div>
+
+                <span className="font-medium">{t("profitThisYear")}</span>
+              </div>
+
+              <strong>{dashboardStats?.profitThisYear.toLocaleString()}</strong>
+            </div>
+          </div>
+          <div className="border-b border-white/[0.08] p-7 last:border-b-0 md:border-b-0   ">
+            <h3 className="text-lg font-semibold">{t("reportTotal")}</h3>
+
+            <p className="mt-1 text-sm text-zinc-500">
+              {t("reportTotalDescription")}
+            </p>
+
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-sky-500/10">
+                  <Handshake className="h-5 w-5 text-sky-500" />
+                </div>
+
+                <span className="font-medium">{t("countTotal")}</span>
+              </div>
+
+              <strong>{dashboardStats?.countTotal.toLocaleString()}</strong>
+            </div>
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-yellow-500/10">
+                  <DollarSign className="h-5 w-5 text-yellow-500" />
+                </div>
+
+                <span className="font-medium">{t("salesTotal")}</span>
+              </div>
+
+              <strong>{dashboardStats?.salesTotal.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
+                  <CreditCardPlus className="h-5 w-5 text-emerald-400" />
                 </div>
 
-                <span className="font-medium">{t("totalIncome")}</span>
+                <span className="font-medium">{t("paymentsTotal")}</span>
               </div>
 
-              <strong>$4,673</strong>
+              <strong>{dashboardStats?.paymentsTotal.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500 ">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
                 </div>
 
-                <span className="font-medium">{t("totalIncome")}</span>
+                <span className="font-medium">{t("profitTotal")}</span>
               </div>
 
-              <strong>$4,673</strong>
+              <strong>{dashboardStats?.profitTotal.toLocaleString()}</strong>
             </div>
           </div>
         </section>

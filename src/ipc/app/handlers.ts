@@ -15,6 +15,14 @@ export const getDashboardData = os.handler(async () => {
     console.error("error", error);
   }
 });
+export const getDashboardStats = os.handler(async () => {
+  try {
+    const list = await appService.getDashboardStats();
+    return list;
+  } catch (error) {
+    console.error("error", error);
+  }
+});
 const idTypeInput = z.number();
 
 export const createCustomerStatement = os

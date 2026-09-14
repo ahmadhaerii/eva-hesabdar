@@ -6,6 +6,10 @@ export class AppService {
     const list = await appRepository.getDashboardData();
     return list;
   }
+  async getDashboardStats() {
+    const list = await appRepository.getDashboardStats();
+    return list;
+  }
   async createCustomerStatement(customerId: number) {
     const list =
       await createCustomerStatementExcel.createCustomerStatement(customerId);

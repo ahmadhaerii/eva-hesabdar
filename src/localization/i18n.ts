@@ -207,6 +207,7 @@ i18n.use(initReactI18next).init({
         select: "انتخاب",
         invoiceNumber: "شماره فاکتور",
         items: "اقلام",
+        mostUsed: "لیست های پر کاربرد",
 
         // Categories
         category: "دسته‌بندی",
@@ -332,6 +333,10 @@ i18n.use(initReactI18next).init({
         validationTotalPrice: "جمع کل فاکتور نمیتواند صفر باشد",
         validationAmountReceived: "مبلغ دریافتی را وارد نمایید",
         validationSuccess: "اطلاعات با موفقیت ذخیره شد",
+        showSaleInvoice: "نمایش فاکتور فروش",
+        lineTotalCurrencyAmount: "مجموع ارزی",
+        totalSaleInvoicePriceDescription:
+          "قیمت فروش کل  :  {{total}}  {{ currencyName }}  ، معادل   {{ TotalCurrencyAmount }}  {{currencyAmountName}}  میباشد",
 
         // payments
         filterCustomer: "فیلتر مشتری",

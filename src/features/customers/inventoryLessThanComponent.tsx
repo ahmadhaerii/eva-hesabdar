@@ -10,9 +10,9 @@ import { useCurrencyStore } from "@/stores/currencyStore";
 import { listCurrenciesWithLastRate } from "@/actions/currency";
 import { CurrencyWithRate } from "@/database/repositories/currency/currency.repository";
 import { daysSinceLastOrder } from "@/utils/dateUtils";
-import { inventorySummary } from "@/actions/product";
+import { inventorySummary, inventorySummaryLessThan } from "@/actions/product";
 
-function inventoryComponent() {
+export function InventoryLessThanComponent() {
   const { t } = useTranslation();
   const defaultCurrency = useCurrencyStore((state) => state.defaultCurrency);
   const [currency, setCurrency] = useState<CurrencyWithRate | undefined>(
@@ -25,7 +25,7 @@ function inventoryComponent() {
     isError,
   } = useQuery({
     queryKey: ["inventorySummary"],
-    queryFn: inventorySummary,
+    queryFn: inventorySummaryLessThan,
   });
 
   return (
@@ -41,6 +41,7 @@ function inventoryComponent() {
       {isError && (
         <div className="text-destructive">دریافت داده ها با خطا مواجه شد.</div>
       )}
+      <div className="text-destructive">{isError}.</div>
 
       {!isLoading && !isError && inventorySummaries.length === 0 && (
         <div className="rounded-lg border p-8 text-center">
@@ -73,7 +74,3 @@ function inventoryComponent() {
     </div>
   );
 }
-
-export const Route = createFileRoute("/inventory")({
-  component: inventoryComponent,
-});

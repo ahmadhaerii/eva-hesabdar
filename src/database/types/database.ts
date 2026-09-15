@@ -105,12 +105,16 @@ export type SalesInvoiceWithRelations =
   typeof schema.salesInvoices.$inferSelect & {
     currencyRate: CurrencyRateWithRelations;
     customer: Customer;
-    saleInvoiceItems: SalesInvoiceItem[];
+    saleInvoiceItems: SalesInvoiceItemWithRelations[];
   };
 
 export type NewSalesInvoice = typeof schema.salesInvoices.$inferInsert;
 
 export type SalesInvoiceItem = typeof schema.salesInvoiceItems.$inferSelect;
+export type SalesInvoiceItemWithRelations = SalesInvoiceItem & {
+  product: Product;
+  allocations: SalesInventoryAllocation[];
+};
 
 export type NewSalesInvoiceItem =
   typeof schema.salesInvoiceItems.$inferInsert & {

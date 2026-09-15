@@ -30,7 +30,7 @@ import { listCurrenciesWithLastRate } from "@/actions/currency";
 import { cn } from "@/utils/tailwind";
 import { useCurrencyStore } from "@/stores/currencyStore";
 import { WordifyFa } from "@/utils/wordify";
-import { createSaleInvoice } from "@/actions/sale";
+import { createSaleInvoice, getSaleInvoice } from "@/actions/sale";
 interface purchaseInvoiceWithRelations {
   purchaseInvoice: PurchaseInvoiceWithRelations;
 }
@@ -49,13 +49,9 @@ interface InvoiceItem {
 }
 interface SaleInvoiceProps {
   onClose: () => void;
-  saleInvoiceEditingId: number | null;
 }
 
-export default function SaleInvoice({
-  onClose,
-  saleInvoiceEditingId = null,
-}: SaleInvoiceProps) {
+export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
   const { t } = useTranslation();
 
   const [customerId, setCustomerId] = useState<number | null>(1);
@@ -73,7 +69,6 @@ export default function SaleInvoice({
     setSelectedRowOfPurchaseInvoiceItems,
   ] = useState<number[]>([]);
 
-  const [invoiceNumber, setInvoiceNumber] = useState<number | null>(null);
   const [salesInvoiceItems, setSalesInvoiceItems] = useState<InvoiceItem[]>([]);
   const [currencyRateId, setCurrencyRateId] = useState<number | null>(null);
   const [invoiceDate, setInvoiceDate] = useState("");
@@ -124,7 +119,6 @@ export default function SaleInvoice({
     queryFn: async () => {
       const data = await listCurrenciesWithLastRate();
       if (data) {
-        //todo get last rate from store and set it
         setCurrencyRateId(data[data.length - 1].latestRateId);
       }
       return data;
@@ -186,6 +180,7 @@ export default function SaleInvoice({
         referenceNumber: referenceNumber,
       },
     };
+
     setSaleInvoiceError("");
     const regex = /^1[34]\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
     if (salesInvoiceItems.length <= 0) {
@@ -462,7 +457,7 @@ export default function SaleInvoice({
               setCustomerId(+event.target.value);
               onSelectedCustomer(+event.target.value);
             }}
-            disabled={createMutation.isPending || isLoadingCustomers}
+            disabled={createMutation.isPending}
             className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">
@@ -530,12 +525,10 @@ export default function SaleInvoice({
           }
         >
           <DialogTrigger asChild>
-            {!!!saleInvoiceEditingId && (
-              <Button>
-                <Plus className="ml-2 h-4 w-4" />
-                {t("addSaleItem")}
-              </Button>
-            )}
+            <Button>
+              <Plus className="ml-2 h-4 w-4" />
+              {t("addSaleItem")}
+            </Button>
           </DialogTrigger>
 
           <DialogContent className=" sm:max-w-2xl">
@@ -880,6 +873,7 @@ export default function SaleInvoice({
           <input
             id="saleInvoice-amount_received"
             value={referenceNumber}
+            disabled={createMutation.isPending}
             onChange={(event) => setReferenceNumber(event.target.value)}
             className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
@@ -901,14 +895,12 @@ export default function SaleInvoice({
         >
           {t("cancel")}
         </Button>
-        {!!!saleInvoiceEditingId && (
-          <Button
-            disabled={createMutation.isPending}
-            onClick={() => onCreateSaleInvoice()}
-          >
-            {createMutation.isPending ? t("loading") : t("createSaleInvoice")}
-          </Button>
-        )}
+        <Button
+          disabled={createMutation.isPending}
+          onClick={() => onCreateSaleInvoice()}
+        >
+          {createMutation.isPending ? t("loading") : t("createSaleInvoice")}
+        </Button>
       </div>
     </div>
   );

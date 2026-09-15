@@ -11,6 +11,12 @@ export async function inventorySummary(): Promise<
   return ipc.client.product.inventorySummary();
 }
 
+export async function inventorySummaryLessThan(): Promise<
+  Awaited<ReturnType<typeof ipc.client.product.inventorySummaryLessThan>>
+> {
+  return ipc.client.product.inventorySummaryLessThan();
+}
+
 export async function createProduct(data: {
   name: string;
   categoryId: number;

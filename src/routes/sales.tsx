@@ -24,6 +24,7 @@ import PurchaseItems from "@/features/purchases/purchaseItems";
 import { useCurrencyStore } from "@/stores/currencyStore";
 import SaleInvoice from "@/features/sales/saleInvoice";
 import { getSaleInvoices } from "@/actions/sale";
+import ShowSaleInvoice from "@/features/sales/showSaleInvoice";
 
 function SalesPage() {
   const { t } = useTranslation();
@@ -187,18 +188,30 @@ function SalesPage() {
             <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
               <DialogHeader>
                 <DialogTitle>
-                  {editingId ? t("editSaleInvoice") : t("addSaleInvoice")}
+                  {editingId ? t("showSaleInvoice") : t("addSaleInvoice")}
                 </DialogTitle>
               </DialogHeader>
-              <SaleInvoice
-                saleInvoiceEditingId={editingId}
-                onClose={() => {
-                  setDialogSaleInvoiceOpen(false);
-                  queryClient.invalidateQueries({
-                    queryKey: ["saleInvoices"],
-                  });
-                }}
-              />
+              {editingId === null && (
+                <SaleInvoice
+                  onClose={() => {
+                    setDialogSaleInvoiceOpen(false);
+                    queryClient.invalidateQueries({
+                      queryKey: ["saleInvoices"],
+                    });
+                  }}
+                />
+              )}
+              {editingId !== null && (
+                <ShowSaleInvoice
+                  saleInvoiceEditingId={editingId}
+                  onClose={() => {
+                    setDialogSaleInvoiceOpen(false);
+                    queryClient.invalidateQueries({
+                      queryKey: ["saleInvoices"],
+                    });
+                  }}
+                />
+              )}
             </DialogContent>
           </Dialog>
         </div>
@@ -263,7 +276,7 @@ function SalesPage() {
 
       {!isLoading && !isError && saleInvoices.length > 0 && (
         <div className="rounded-lg border">
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 font-medium">
+          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 font-medium">
             <div>{t("invoiceNumber")}</div>
             <div>{t("customerName")}</div>
             <div>{t("currency")}</div>
@@ -271,14 +284,13 @@ function SalesPage() {
             <div>{t("items")}</div>
             <div>{t("totalPrice")}</div>
             <div>{t("purchaseInvoiceDate")}</div>
-            <div>{t("description")}</div>
             <div>{t("actions")}</div>
           </div>
 
           {saleInvoices.map((saleInvoice) => (
             <div
               key={saleInvoice.id}
-              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 last:border-b-0"
+              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 last:border-b-0"
             >
               <div>{saleInvoice.id}</div>
               <div>{saleInvoice.customer?.displayName}</div>
@@ -290,9 +302,6 @@ function SalesPage() {
               <div>{saleInvoice.totalPrice.toLocaleString()}</div>
 
               <div>{saleInvoice.invoiceDate}</div>
-              <div className="text-muted-foreground">
-                {saleInvoice.description || "—"}
-              </div>
 
               <div className="flex gap-2">
                 <Button

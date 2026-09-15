@@ -50,7 +50,31 @@ export class ProductRepository extends BaseRepository {
         eq(purchaseInvoiceItems.productId, products.id),
       )
       .groupBy(products.id)
+      .where(eq(products.isActive, true))
       .orderBy(products.name);
+
+    return rows;
+  }
+  async inventorySummaryLessThan(): Promise<InventorySummary[]> {
+    const rows = await this.executor
+      .select({
+        productId: products.id,
+        productName: products.name,
+        totalPurchased: sql<number>`COALESCE(SUM(${purchaseInvoiceItems.quantity}), 0)`,
+        totalRemaining: sql<number>`COALESCE(SUM(${purchaseInvoiceItems.remainingQuantity}), 0)`,
+        totalSoldOrUsed: sql<number>`COALESCE(SUM(${purchaseInvoiceItems.quantity} - ${purchaseInvoiceItems.remainingQuantity}), 0)`,
+      })
+      .from(products)
+      .leftJoin(
+        purchaseInvoiceItems,
+        eq(purchaseInvoiceItems.productId, products.id),
+      )
+      .groupBy(products.id)
+      .having(
+        sql`COALESCE(SUM(${purchaseInvoiceItems.remainingQuantity}), 0) < 3`,
+      )
+      .where(eq(products.isActive, true))
+      .orderBy(purchaseInvoiceItems.remainingQuantity);
 
     return rows;
   }

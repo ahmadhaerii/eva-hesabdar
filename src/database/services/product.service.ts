@@ -15,6 +15,10 @@ export class ProductService {
     const list = await productRepository.inventorySummary();
     return list;
   }
+  async inventorySummaryLessThan() {
+    const list = await productRepository.inventorySummaryLessThan();
+    return list;
+  }
 
   // async getById(id: number) {
   //   return productRepository.getById(id);

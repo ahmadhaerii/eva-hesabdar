@@ -61,6 +61,7 @@ import { DebtCustomers } from "@/features/customers/debtCustomers";
 import { UnfaithfulCustomers } from "@/features/customers/unfaithfulCustomers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { exportAccountStatementToExcel } from "@/utils/exportAccountStatement";
+import { InventoryLessThanComponent } from "@/features/customers/inventoryLessThanComponent";
 
 function myTooltip({ active, payload, label }: TooltipContentProps) {
   if (!active || payload == null || payload.length === 0) {
@@ -153,10 +154,11 @@ function HomePage() {
         };
         mostIndebted: {
           id: number;
-          display_name: string;
+          displayName: string;
           totalInvoices: number;
           totalPayments: number;
           debt: number;
+          debtCurrencyAmount: number;
         };
       })
     | undefined
@@ -202,11 +204,12 @@ function HomePage() {
         getDashboardData(),
         getLast12MonthsSales(),
       ]).then(([getDashboardStats, dashboardData, last12MonthsSales]) => {
+        console.log("dashboardData", dashboardData);
+
         setDashboardStats(getDashboardStats);
         console.log("getDashboardStats", getDashboardStats);
         dashboardData?.bestSellingProduct.toString();
         if (dashboardData) {
-          console.log(dashboardData);
           setDashboardData({
             ...dashboardData,
             bestSellingProductObject: JSON.parse(
@@ -316,6 +319,9 @@ function HomePage() {
               )}
               {dialogComponent === "UnfaithfulCustomers" && (
                 <UnfaithfulCustomers></UnfaithfulCustomers>
+              )}{" "}
+              {dialogComponent === "InventoryComponent" && (
+                <InventoryLessThanComponent></InventoryLessThanComponent>
               )}
             </DialogContent>
           </Dialog>
@@ -389,9 +395,13 @@ function HomePage() {
 
           <StatCard
             title={t("mostIndebted")}
-            description={t("mostIndebtedDescription")}
-            value={dashboardData?.mostIndebted.display_name}
-            secondValue={dashboardData?.mostIndebted.debt.toLocaleString()}
+            description={dashboardData?.mostIndebted.displayName!}
+            value={dashboardData?.mostIndebted?.debtCurrencyAmount.toLocaleString()}
+            secondValue={
+              dashboardData?.mostIndebted.debt.toLocaleString() +
+              " " +
+              defaultCurrency?.name
+            }
             icon={HeartCrack}
             iconColor="#ff2056"
             iconBackgroundColor="#ff205625"
@@ -433,7 +443,7 @@ function HomePage() {
           {/* Products */}
           <Card className="border-white/[0.08]  shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">{t("products")}</CardTitle>
+              <CardTitle className="text-lg">{t("mostUsed")}</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-5">
@@ -453,17 +463,7 @@ function HomePage() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-violet-300/[0.04]">
-                  <RotateCwFadingClock className="h-5 w-5 text-violet-500" />
-                </div>
 
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-white">
-                    لیست کالاهای راکد
-                  </p>
-                </div>
-              </div>
               <div
                 className="flex items-center gap-4 cursor-pointer"
                 onClick={() => {
@@ -481,7 +481,13 @@ function HomePage() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div
+                className="flex items-center gap-4 cursor-pointer"
+                onClick={() => {
+                  setDialogStatus(true);
+                  setDialogComponent("InventoryComponent");
+                }}
+              >
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-orange-300/[0.04]">
                   <Box className="h-5 w-5 text-orange-300" />
                 </div>

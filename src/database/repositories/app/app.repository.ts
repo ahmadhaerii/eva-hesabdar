@@ -68,12 +68,13 @@ customer_debts AS (
         c.display_name,
         COALESCE(inv.total_invoices, 0) AS total_invoices,
         COALESCE(pay.total_payments, 0) AS total_payments,
-        COALESCE(inv.total_invoices, 0) - COALESCE(pay.total_payments, 0) AS debt
+        COALESCE(inv.total_invoices, 0) - COALESCE(pay.total_payments, 0) AS debt 
     FROM customers c
     LEFT JOIN (
         SELECT 
             si.customer_id, 
-            SUM(si.total_price * lr.rate) AS total_invoices
+            SUM(si.total_price * lr.rate) AS total_invoices,
+            SUM(si.total_price ) AS total_invoices_currency_amount
         FROM sales_invoices si
         INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
         INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
@@ -82,7 +83,8 @@ customer_debts AS (
     LEFT JOIN (
         SELECT 
             cp.customer_id, 
-            SUM(cp.currency_rate_amount * lr.rate) AS total_payments
+            SUM(cp.currency_rate_amount ) AS total_payments_currency_amount,
+            SUM(cp.amount ) AS total_payments 
         FROM customer_payments cp
         INNER JOIN currency_rates cr_base ON cp.currency_rate_id = cr_base.id
         INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
@@ -91,17 +93,18 @@ customer_debts AS (
 )
 SELECT 
     (SELECT COUNT(*) FROM products) AS productsCount,
-(SELECT COALESCE(SUM(debt), 0) FROM customer_debts WHERE debt > 0) AS totalDebt,
+    (SELECT COALESCE(SUM(debt), 0) FROM customer_debts WHERE debt > 0) AS totalDebt,
 
     (SELECT COUNT(*) FROM customers) AS customersCount,
     (SELECT COUNT(*) FROM purchase_invoices) AS purchaseInvoicesCount,
     (SELECT COUNT(*) FROM sales_invoices) AS salesInvoicesCount,
     (SELECT json_object(
         'id', id,
-        'display_name', display_name,
+        'displayName', display_name,
         'totalInvoices', total_invoices,
         'totalPayments', total_payments,
-        'debt', debt
+        'debt', debt,
+        'debtCurrencyAmount', debt_currency_amount
     )
     FROM (
         SELECT 
@@ -109,12 +112,17 @@ SELECT
             c.display_name,
             COALESCE(inv.total_invoices, 0) AS total_invoices,
             COALESCE(pay.total_payments, 0) AS total_payments,
-            COALESCE(inv.total_invoices, 0) - COALESCE(pay.total_payments, 0) AS debt
+            COALESCE(inv.total_invoices, 0) - COALESCE(pay.total_payments, 0) AS debt ,
+            COALESCE(inv.total_invoices_currency_amount, 0) AS total_invoices_currency_amount,
+            COALESCE(inv.total_invoices_currency_amount, 0) - COALESCE(pay.total_payments_currency_amount, 0) AS debt_currency_amount,
+            COALESCE(pay.total_payments, 0) AS total_payments_currency_amount 
         FROM customers c
         LEFT JOIN (
             SELECT 
                 si.customer_id, 
-                SUM(si.total_price * lr.rate) AS total_invoices
+                SUM(si.total_price * lr.rate) AS total_invoices,
+                SUM(si.total_price ) AS total_invoices_currency_amount
+
             FROM sales_invoices si
             INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
             INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
@@ -123,7 +131,8 @@ SELECT
         LEFT JOIN (
             SELECT 
                 cp.customer_id, 
-                SUM(cp.currency_rate_amount * lr.rate) AS total_payments
+                 SUM(cp.currency_rate_amount ) AS total_payments_currency_amount,
+                  SUM(cp.amount ) AS total_payments 
             FROM customer_payments cp
             INNER JOIN currency_rates cr_base ON cp.currency_rate_id = cr_base.id
             INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
@@ -134,7 +143,7 @@ SELECT
     )
     ) AS mostIndebted,
     (SELECT COALESCE(SUM(remaining_quantity), 0) FROM purchase_invoice_items) AS totalRemainingQuantity,
-    (
+      (
         SELECT COALESCE(SUM(pii2.remaining_quantity * pii2.total_price * lr.rate), 0)
         FROM purchase_invoice_items pii2
         INNER JOIN purchase_invoices pi2 ON pii2.purchase_invoice_id = pi2.id

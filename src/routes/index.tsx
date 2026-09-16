@@ -285,7 +285,7 @@ function HomePage() {
 
                       {customers.map((customer) => (
                         <option key={customer.id} value={customer.id}>
-                          {customer.displayName}
+                          {customer?.displayName}
                         </option>
                       ))}
                     </select>
@@ -395,10 +395,10 @@ function HomePage() {
 
           <StatCard
             title={t("mostIndebted")}
-            description={dashboardData?.mostIndebted.displayName!}
+            description={dashboardData?.mostIndebted?.displayName!}
             value={dashboardData?.mostIndebted?.debtCurrencyAmount.toLocaleString()}
             secondValue={
-              dashboardData?.mostIndebted.debt.toLocaleString() +
+              dashboardData?.mostIndebted?.debt.toLocaleString() +
               " " +
               defaultCurrency?.name
             }

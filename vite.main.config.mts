@@ -7,9 +7,4 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
-  build: {
-    rollupOptions: {
-      external: ["@libsql/client"],
-    },
-  },
 });

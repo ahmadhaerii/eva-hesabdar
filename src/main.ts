@@ -9,6 +9,10 @@ import { UpdateSourceType, updateElectronApp } from "update-electron-app";
 import { ipcContext } from "@/ipc/context";
 import { IPC_CHANNELS, inDevelopment } from "./constants";
 import { getBasePath } from "./utils/path";
+import log from "electron-log/main";
+log.initialize();
+log.transports.file.level = "debug";
+log.info("App starting...");
 
 function createWindow() {
   const basePath = getBasePath();
@@ -70,12 +74,18 @@ async function setupORPC() {
 
 app.whenReady().then(async () => {
   try {
+    const { runMigrations } = await import("./database/migrate");
+    await runMigrations();
+
     createWindow();
     await installExtensions();
     checkForUpdates();
     await setupORPC();
   } catch (error) {
     console.error("Error during app initialization:", error);
+    log.error("FATAL STARTUP ERROR:", error);
+    const { dialog } = await import("electron");
+    dialog.showErrorBox("Startup Error", String(error));
   }
 });
 

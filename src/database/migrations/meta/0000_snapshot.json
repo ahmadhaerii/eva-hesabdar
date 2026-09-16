@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "53885ac9-ad70-44e8-883c-b3880ce9c512",
+  "id": "c861731c-c549-4bfe-b182-150939f65b13",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -72,8 +72,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "contacts": {
-      "name": "contacts",
+    "customer_payments": {
+      "name": "customer_payments",
       "columns": {
         "id": {
           "name": "id",
@@ -82,64 +82,50 @@
           "notNull": true,
           "autoincrement": true
         },
-        "code": {
-          "name": "code",
+        "customer_id": {
+          "name": "customer_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currency_rate_id": {
+          "name": "currency_rate_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currency_rate_amount": {
+          "name": "currency_rate_amount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "payment_date": {
+          "name": "payment_date",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "display_name": {
-          "name": "display_name",
+        "payment_method": {
+          "name": "payment_method",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "national_id": {
-          "name": "national_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "economic_code": {
-          "name": "economic_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "phone": {
-          "name": "phone",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "mobile": {
-          "name": "mobile",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "address": {
-          "name": "address",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "postal_code": {
-          "name": "postal_code",
+        "reference_number": {
+          "name": "reference_number",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -151,14 +137,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
         },
         "created_at": {
           "name": "created_at",
@@ -183,124 +161,35 @@
         }
       },
       "indexes": {
-        "uq_contacts_code": {
-          "name": "uq_contacts_code",
+        "idx_customers_payments_customer": {
+          "name": "idx_customers_payments_customer",
           "columns": [
-            "code"
-          ],
-          "isUnique": true
-        },
-        "idx_contacts_name": {
-          "name": "idx_contacts_name",
-          "columns": [
-            "display_name"
+            "customer_id"
           ],
           "isUnique": false
         },
-        "idx_contacts_mobile": {
-          "name": "idx_contacts_mobile",
+        "idx_currency_rates_id": {
+          "name": "idx_currency_rates_id",
           "columns": [
-            "mobile"
+            "currency_rate_id"
           ],
           "isUnique": false
         },
-        "idx_contacts_active": {
-          "name": "idx_contacts_active",
+        "idx_customers_payments_payment_data": {
+          "name": "idx_customers_payments_payment_data",
           "columns": [
-            "is_active"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "customer_profiles": {
-      "name": "customer_profiles",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "contact_id": {
-          "name": "contact_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "customer_type_id": {
-          "name": "customer_type_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "custom_profit_percent": {
-          "name": "custom_profit_percent",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "credit_limit": {
-          "name": "credit_limit",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 0
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "uq_customer_profile": {
-          "name": "uq_customer_profile",
-          "columns": [
-            "contact_id"
-          ],
-          "isUnique": true
-        },
-        "idx_customer_profile_type": {
-          "name": "idx_customer_profile_type",
-          "columns": [
-            "customer_type_id"
+            "payment_date"
           ],
           "isUnique": false
         }
       },
       "foreignKeys": {
-        "customer_profiles_contact_id_contacts_id_fk": {
-          "name": "customer_profiles_contact_id_contacts_id_fk",
-          "tableFrom": "customer_profiles",
-          "tableTo": "contacts",
+        "customer_payments_customer_id_customers_id_fk": {
+          "name": "customer_payments_customer_id_customers_id_fk",
+          "tableFrom": "customer_payments",
+          "tableTo": "customers",
           "columnsFrom": [
-            "contact_id"
+            "customer_id"
           ],
           "columnsTo": [
             "id"
@@ -308,12 +197,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "customer_profiles_customer_type_id_customer_types_id_fk": {
-          "name": "customer_profiles_customer_type_id_customer_types_id_fk",
-          "tableFrom": "customer_profiles",
-          "tableTo": "customer_types",
+        "customer_payments_currency_rate_id_currency_rates_id_fk": {
+          "name": "customer_payments_currency_rate_id_currency_rates_id_fk",
+          "tableFrom": "customer_payments",
+          "tableTo": "currency_rates",
           "columnsFrom": [
-            "customer_type_id"
+            "currency_rate_id"
           ],
           "columnsTo": [
             "id"
@@ -409,6 +298,173 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "customers": {
+      "name": "customers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "national_id": {
+          "name": "national_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customer_type_id": {
+          "name": "customer_type_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "custom_profit_percent": {
+          "name": "custom_profit_percent",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "mobile": {
+          "name": "mobile",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "postal_code": {
+          "name": "postal_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "is_anonymous": {
+          "name": "is_anonymous",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_customers_name": {
+          "name": "idx_customers_name",
+          "columns": [
+            "display_name"
+          ],
+          "isUnique": false
+        },
+        "idx_customers_mobile": {
+          "name": "idx_customers_mobile",
+          "columns": [
+            "mobile"
+          ],
+          "isUnique": false
+        },
+        "idx_customers_active": {
+          "name": "idx_customers_active",
+          "columns": [
+            "is_active"
+          ],
+          "isUnique": false
+        },
+        "idx_customer_type": {
+          "name": "idx_customer_type",
+          "columns": [
+            "customer_type_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "customers_customer_type_id_customer_types_id_fk": {
+          "name": "customers_customer_type_id_customer_types_id_fk",
+          "tableFrom": "customers",
+          "tableTo": "customer_types",
+          "columnsFrom": [
+            "customer_type_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "products": {
       "name": "products",
       "columns": {
@@ -500,34 +556,7 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {
-        "products_category_id_categories_id_fk": {
-          "name": "products_category_id_categories_id_fk",
-          "tableFrom": "products",
-          "tableTo": "categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "products_unit_id_units_id_fk": {
-          "name": "products_unit_id_units_id_fk",
-          "tableFrom": "products",
-          "tableTo": "units",
-          "columnsFrom": [
-            "unit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -638,13 +667,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "symbol": {
-          "name": "symbol",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "is_base": {
           "name": "is_base",
           "type": "integer",
@@ -742,13 +764,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "effective_at": {
-          "name": "effective_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "description": {
           "name": "description",
           "type": "text",
@@ -772,13 +787,6 @@
           ],
           "isUnique": false
         },
-        "idx_currency_rates_effective": {
-          "name": "idx_currency_rates_effective",
-          "columns": [
-            "effective_at"
-          ],
-          "isUnique": false
-        },
         "idx_currency_rates_lookup": {
           "name": "idx_currency_rates_lookup",
           "columns": [
@@ -795,80 +803,6 @@
           "tableTo": "currencies",
           "columnsFrom": [
             "currency_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "purchase_costs": {
-      "name": "purchase_costs",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "purchase_invoice_id": {
-          "name": "purchase_invoice_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "amount": {
-          "name": "amount",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "idx_purchase_cost_invoice": {
-          "name": "idx_purchase_cost_invoice",
-          "columns": [
-            "purchase_invoice_id"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "purchase_costs_purchase_invoice_id_purchase_invoices_id_fk": {
-          "name": "purchase_costs_purchase_invoice_id_purchase_invoices_id_fk",
-          "tableFrom": "purchase_costs",
-          "tableTo": "purchase_invoices",
-          "columnsFrom": [
-            "purchase_invoice_id"
           ],
           "columnsTo": [
             "id"
@@ -912,30 +846,30 @@
           "notNull": true,
           "autoincrement": false
         },
-        "unit_cost": {
-          "name": "unit_cost",
+        "remaining_quantity": {
+          "name": "remaining_quantity",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "allocated_cost": {
-          "name": "allocated_cost",
+        "unit_price": {
+          "name": "unit_price",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "freight_share": {
+          "name": "freight_share",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": 0
         },
-        "final_unit_cost": {
-          "name": "final_unit_cost",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "line_total": {
-          "name": "line_total",
+        "total_price": {
+          "name": "total_price",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
@@ -1014,13 +948,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "contact_id": {
-          "name": "contact_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "currency_id": {
           "name": "currency_id",
           "type": "integer",
@@ -1031,13 +958,6 @@
         "currency_rate_id": {
           "name": "currency_rate_id",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "currency_rate": {
-          "name": "currency_rate",
-          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -1087,13 +1007,6 @@
           ],
           "isUnique": true
         },
-        "idx_purchase_contact": {
-          "name": "idx_purchase_contact",
-          "columns": [
-            "contact_id"
-          ],
-          "isUnique": false
-        },
         "idx_purchase_currency": {
           "name": "idx_purchase_currency",
           "columns": [
@@ -1117,19 +1030,6 @@
         }
       },
       "foreignKeys": {
-        "purchase_invoices_contact_id_contacts_id_fk": {
-          "name": "purchase_invoices_contact_id_contacts_id_fk",
-          "tableFrom": "purchase_invoices",
-          "tableTo": "contacts",
-          "columnsFrom": [
-            "contact_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "purchase_invoices_currency_id_currencies_id_fk": {
           "name": "purchase_invoices_currency_id_currencies_id_fk",
           "tableFrom": "purchase_invoices",
@@ -1475,8 +1375,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "inventory_lot_id": {
-          "name": "inventory_lot_id",
+        "purchase_invoice_item_id": {
+          "name": "purchase_invoice_item_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -1484,20 +1384,6 @@
         },
         "quantity": {
           "name": "quantity",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "fifo_unit_cost": {
-          "name": "fifo_unit_cost",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "fifo_total_cost": {
-          "name": "fifo_total_cost",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
@@ -1519,10 +1405,10 @@
           ],
           "isUnique": false
         },
-        "idx_sales_alloc_lot": {
-          "name": "idx_sales_alloc_lot",
+        "idx_sales_alloc_purchase_invoice_item": {
+          "name": "idx_sales_alloc_purchase_invoice_item",
           "columns": [
-            "inventory_lot_id"
+            "purchase_invoice_item_id"
           ],
           "isUnique": false
         }
@@ -1541,12 +1427,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "sales_inventory_allocations_inventory_lot_id_inventory_lots_id_fk": {
-          "name": "sales_inventory_allocations_inventory_lot_id_inventory_lots_id_fk",
+        "sales_inventory_allocations_purchase_invoice_item_id_purchase_invoice_items_id_fk": {
+          "name": "sales_inventory_allocations_purchase_invoice_item_id_purchase_invoice_items_id_fk",
           "tableFrom": "sales_inventory_allocations",
-          "tableTo": "inventory_lots",
+          "tableTo": "purchase_invoice_items",
           "columnsFrom": [
-            "inventory_lot_id"
+            "purchase_invoice_item_id"
           ],
           "columnsTo": [
             "id"
@@ -1590,41 +1476,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "fifo_unit_cost": {
-          "name": "fifo_unit_cost",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "purchase_currency_id": {
-          "name": "purchase_currency_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "purchase_currency_rate": {
-          "name": "purchase_currency_rate",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "sale_exchange_rate": {
-          "name": "sale_exchange_rate",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "customer_profit_percent": {
-          "name": "customer_profit_percent",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "suggested_unit_price": {
           "name": "suggested_unit_price",
           "type": "real",
@@ -1641,6 +1492,13 @@
         },
         "line_total": {
           "name": "line_total",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "line_total_currency_amount": {
+          "name": "line_total_currency_amount",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
@@ -1696,19 +1554,6 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-        },
-        "sales_invoice_items_purchase_currency_id_currencies_id_fk": {
-          "name": "sales_invoice_items_purchase_currency_id_currencies_id_fk",
-          "tableFrom": "sales_invoice_items",
-          "tableTo": "currencies",
-          "columnsFrom": [
-            "purchase_currency_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -1732,8 +1577,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "contact_id": {
-          "name": "contact_id",
+        "customer_id": {
+          "name": "customer_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -1746,16 +1591,16 @@
           "notNull": true,
           "autoincrement": false
         },
-        "currency_rate": {
-          "name": "currency_rate",
-          "type": "real",
+        "invoice_date": {
+          "name": "invoice_date",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "invoice_date": {
-          "name": "invoice_date",
-          "type": "text",
+        "total_price": {
+          "name": "total_price",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -1805,13 +1650,6 @@
           ],
           "isUnique": true
         },
-        "idx_sales_contact": {
-          "name": "idx_sales_contact",
-          "columns": [
-            "contact_id"
-          ],
-          "isUnique": false
-        },
         "idx_sales_date": {
           "name": "idx_sales_date",
           "columns": [
@@ -1828,12 +1666,12 @@
         }
       },
       "foreignKeys": {
-        "sales_invoices_contact_id_contacts_id_fk": {
-          "name": "sales_invoices_contact_id_contacts_id_fk",
+        "sales_invoices_customer_id_customers_id_fk": {
+          "name": "sales_invoices_customer_id_customers_id_fk",
           "tableFrom": "sales_invoices",
-          "tableTo": "contacts",
+          "tableTo": "customers",
           "columnsFrom": [
-            "contact_id"
+            "customer_id"
           ],
           "columnsTo": [
             "id"

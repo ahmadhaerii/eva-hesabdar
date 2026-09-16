@@ -208,19 +208,30 @@ function HomePage() {
 
         setDashboardStats(getDashboardStats);
         console.log("getDashboardStats", getDashboardStats);
-        dashboardData?.bestSellingProduct.toString();
         if (dashboardData) {
-          setDashboardData({
-            ...dashboardData,
-            bestSellingProductObject: JSON.parse(
-              dashboardData?.bestSellingProduct,
-            ),
-            mostIndebted: JSON.parse(dashboardData?.mostIndebted),
-          });
+          try {
+            setDashboardData({
+              ...dashboardData,
+              bestSellingProductObject: JSON.parse(
+                dashboardData?.bestSellingProduct,
+              ),
+              mostIndebted: JSON.parse(dashboardData?.mostIndebted),
+            });
+          } catch (error) {
+            console.error(error);
+          }
         }
 
         setLast12MonthsSales(last12MonthsSales);
         console.log("last12MonthsSales", last12MonthsSales);
+
+        const loading = document.getElementById("loading");
+
+        if (loading) {
+          setTimeout(() => {
+            loading.remove();
+          }, 3000);
+        }
       });
     });
   }, []);

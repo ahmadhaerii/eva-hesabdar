@@ -61,7 +61,7 @@ export default function BaseLayout({
 
   return (
     <div className="h-screen overflow-hidden bg-background">
-      <DragWindowRegion title="electron-shadcn" />
+      <DragWindowRegion title="EVA" />
 
       <div className="flex h-[calc(100vh-2rem)]">
         {/* Sidebar */}
@@ -69,9 +69,7 @@ export default function BaseLayout({
           {/* Brand */}
           <div className="flex h-14 items-center border-b px-5">
             <div>
-              <h1 className="text-base font-semibold">ERP</h1>
-
-              <p className="text-xs text-muted-foreground">{t("categories")}</p>
+              <h1 className="text-base font-semibold">{t("menu")}</h1>
             </div>
           </div>
 
@@ -109,9 +107,7 @@ export default function BaseLayout({
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Header */}
           <header className="flex h-14 shrink-0 items-center justify-between border-b bg-card px-6">
-            <div>
-              <h2 className="text-sm font-medium">Dashboard</h2>
-            </div>
+            <div></div>
             <div className="flex items-center gap-3">
               <span className="text-sm text-muted-foreground">Admin</span>
               <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">

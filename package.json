@@ -1,6 +1,6 @@
 {
-  "name": "electron-shadcn",
-  "productName": "electron-shadcn",
+  "name": "EVA",
+  "productName": "EVA",
   "version": "1.4.1",
   "description": "Electron Forge with shadcn-ui (Vite + Typescript)",
   "main": ".vite/build/main.js",
@@ -22,7 +22,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
   },
-  "author": "ROG <luanroger.dev@gmail.com>",
+  "author": "ahmadhaerii <ahmadhaerii@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@base-ui/react": "^1.7.0",

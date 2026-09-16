@@ -9,7 +9,7 @@ i18n.use(initReactI18next).init({
   resources: {
     en: {
       translation: {
-        appName: "electron-shadcn",
+        appName: "EVA",
         documentation: "Documentation",
         madeBy: "Made by LuanRoger",
 
@@ -117,6 +117,7 @@ i18n.use(initReactI18next).init({
 
     fa: {
       translation: {
+        menu: "منو",
         appName: "نرم‌افزار مدیریت",
         documentation: "مستندات",
         madeBy: "ساخته شده توسط احمد حائری",

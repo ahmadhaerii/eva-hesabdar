@@ -97,8 +97,8 @@ const config: ForgeConfig = {
         draft: true,
         prerelease: false,
         repository: {
-          name: "electron-shadcn",
-          owner: "LuanRoger",
+          name: "EVA",
+          owner: "ahmadhaerii",
         },
       },
 

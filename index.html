@@ -3,12 +3,19 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>electron-shadcn Template</title>
+    <title>EVA</title>
     <meta content="script-src 'self';" http-equiv="Content-Security-Policy">
     <link href="/src/styles/global.css" rel="stylesheet">
+    <style>
+      #loading { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; } #loading img { width: 256px; height: 256px; object-fit: contain; }
+    </style>
   </head>
   <body>
-    <div id="app" />
+    <div id="loading" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex;background: black; ">
+      <img src="/assets/eva.png" alt="Loading" />
+  </div>
+    <div id="app"></div>    
     <script src="/src/renderer.ts" type="module"></script>
   </body>
+ 
 </html>

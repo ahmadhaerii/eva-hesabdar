@@ -214,7 +214,7 @@ export class CustomerRepository extends BaseRepository {
           },
         },
       },
-      orderBy: [asc(customerPayments.paymentDate)],
+      orderBy: [desc(customerPayments.paymentDate)],
     });
   }
 

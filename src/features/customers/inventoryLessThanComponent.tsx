@@ -65,8 +65,8 @@ export function InventoryLessThanComponent() {
             >
               <div>{inventorySummary.productName}</div>
               <div>{inventorySummary.totalPurchased?.toLocaleString()}</div>
-              <div>{inventorySummary.totalRemaining?.toLocaleString()}</div>
               <div>{inventorySummary.totalSoldOrUsed?.toLocaleString()}</div>
+              <div>{inventorySummary.totalRemaining?.toLocaleString()}</div>
             </div>
           ))}
         </div>

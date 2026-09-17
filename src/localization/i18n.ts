@@ -133,7 +133,7 @@ i18n.use(initReactI18next).init({
         bestSellersDescription: "پرفروشترین کالای انبار",
         mostIndebted: "بدهکارترین",
         mostIndebtedDescription: "بدهکارترین مشتری",
-        totalDebts: "کل بدهی ها",
+        totalDebts: "کل طلب ها",
         totalDebtsDescription: "جمع کل بدهی مشتریان",
         stockRial: "ارزش انبار",
         stockRialDescription: "مجموع ارزش   انبار",

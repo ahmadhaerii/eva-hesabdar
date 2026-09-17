@@ -68,11 +68,12 @@ customer_debts AS (
         c.display_name,
         COALESCE(inv.total_invoices, 0) AS total_invoices,
         COALESCE(pay.total_payments, 0) AS total_payments,
-        COALESCE(inv.total_invoices, 0) - COALESCE(pay.total_payments, 0) AS debt 
+    ( COALESCE(inv.total_invoices_currency_amount, 0) - COALESCE(pay.total_payments_currency_amount, 0) )* inv.last_rate AS debt 
     FROM customers c
     LEFT JOIN (
         SELECT 
             si.customer_id, 
+             lr.rate as last_rate ,
             SUM(si.total_price * lr.rate) AS total_invoices,
             SUM(si.total_price ) AS total_invoices_currency_amount
         FROM sales_invoices si
@@ -112,7 +113,7 @@ SELECT
             c.display_name,
             COALESCE(inv.total_invoices, 0) AS total_invoices,
             COALESCE(pay.total_payments, 0) AS total_payments,
-            COALESCE(inv.total_invoices, 0) - COALESCE(pay.total_payments, 0) AS debt ,
+            (COALESCE(inv.total_invoices_currency_amount, 0) - COALESCE(pay.total_payments_currency_amount, 0)) * inv.last_rate AS debt ,
             COALESCE(inv.total_invoices_currency_amount, 0) AS total_invoices_currency_amount,
             COALESCE(inv.total_invoices_currency_amount, 0) - COALESCE(pay.total_payments_currency_amount, 0) AS debt_currency_amount,
             COALESCE(pay.total_payments, 0) AS total_payments_currency_amount 
@@ -120,6 +121,7 @@ SELECT
         LEFT JOIN (
             SELECT 
                 si.customer_id, 
+                lr.rate as last_rate ,
                 SUM(si.total_price * lr.rate) AS total_invoices,
                 SUM(si.total_price ) AS total_invoices_currency_amount
 

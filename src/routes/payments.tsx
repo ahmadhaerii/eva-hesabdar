@@ -17,6 +17,7 @@ import { number, z } from "zod";
 import {
   createCustomer,
   createCustomerPayment,
+  customerWithDebt,
   deleteCustomer,
   getCustomerPayments,
   getCustomers,
@@ -30,7 +31,38 @@ import { useCurrencyStore } from "@/stores/currencyStore";
 import { listCurrenciesWithLastRate } from "@/actions/currency";
 import { cn } from "@/utils/tailwind";
 import { CurrencyWithRate } from "@/database/repositories/currency/currency.repository";
-
+interface DebtDescriptionProps {
+  latestRate: number;
+  debt: number;
+  amount: number;
+  onDebtClick: (value: number) => void;
+}
+function DebtDescription({
+  latestRate,
+  debt,
+  amount,
+  onDebtClick,
+}: DebtDescriptionProps) {
+  const { t } = useTranslation();
+  const adjustment = debt * latestRate - amount;
+  return (
+    <div className="m-2">
+      <p className="mt-2 bg-helper-mix py-1 px-2.5 rounded-xl   text-helper">
+        {t("customerDebtDescription", {
+          debt: (debt * latestRate).toLocaleString(),
+        })}
+      </p>
+      <p
+        className="mt-2 cursor-pointer bg-helper-mix py-1 px-2.5 rounded-xl  text-helper"
+        onClick={() => onDebtClick(adjustment)}
+      >
+        {t("customerDebtAdjustmentDescription", {
+          debt: adjustment.toLocaleString(),
+        })}
+      </p>
+    </div>
+  );
+}
 function PaymentsPage() {
   const { t } = useTranslation();
   const defaultCurrency = useCurrencyStore((state) => state.defaultCurrency);
@@ -55,6 +87,8 @@ function PaymentsPage() {
     queryKey: ["customerPayments"],
     queryFn: () => getCustomerPayments(customerIdForFilter),
   });
+  const [customerId, setCustomerId] = useState<number | null>(null);
+
   const {
     data: currenciesWithLastRate = [],
     isLoading: isLoadingCurrenciesWithLastRate,
@@ -70,6 +104,21 @@ function PaymentsPage() {
       return data;
     },
   });
+
+  const {
+    data: customerDebt,
+    isLoading: isLoadingcustomerDebt,
+    isError: isErrorcustomerDebt,
+  } = useQuery({
+    queryKey: ["customerWithDebt", customerId],
+    queryFn: async () => {
+      const data = await customerWithDebt(customerId!);
+      console.log("customerWithDebt", data);
+      return data[0];
+    },
+    enabled: !!customerId,
+  });
+
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
@@ -79,9 +128,11 @@ function PaymentsPage() {
   const [currencyRateId, setCurrencyRateId] = useState<number | null>(null);
   const [currency, setCurrency] = useState<CurrencyWithRate | null>(null);
   const [amount, setAmount] = useState<number | null>(null);
+  const [adjustmentAmount, setAdjustmentAmount] = useState<number | null>(null);
+  const [currencyRateAdjustmentAmount, setCurrencyRateAdjustmentAmount] =
+    useState<number | null>(null);
   const [paymentDate, setPaymentDate] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
-  const [customerId, setCustomerId] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -108,6 +159,8 @@ function PaymentsPage() {
         description: string | null;
         customerId: number;
         amount: number;
+        adjustmentAmount: number;
+        currencyRateAdjustmentAmount: number;
         currencyRateAmount: number;
         currencyRateId: number;
         paymentDate: string;
@@ -162,6 +215,7 @@ function PaymentsPage() {
     setAmount(null);
     setPaymentDate("");
     setReferenceNumber("");
+    setAdjustmentAmount(null);
 
     setError("");
     setDialogDeleteOpen(false);
@@ -211,6 +265,7 @@ function PaymentsPage() {
                   const result = z
                     .object({
                       amount: z.number().min(1),
+                      adjustmentAmount: z.number(),
                       currencyRateId: z.number().min(1),
                       paymentDate: z.string().min(1),
                       referenceNumber: z.string().nullable().optional(),
@@ -229,6 +284,7 @@ function PaymentsPage() {
                     .safeParse({
                       amount,
                       paymentDate,
+                      adjustmentAmount,
                       currencyRateId,
                       referenceNumber,
                       description,
@@ -257,9 +313,12 @@ function PaymentsPage() {
                       id: editingId,
                       data: {
                         amount: result.data.amount,
-                        currencyRateAmount: +(
-                          result.data.amount / currency.latestRate
-                        ),
+                        adjustmentAmount: result.data.adjustmentAmount,
+                        currencyRateAdjustmentAmount:
+                          result.data.adjustmentAmount / currency.latestRate,
+                        currencyRateAmount:
+                          result.data.amount / currency.latestRate,
+
                         currencyRateId: result.data.currencyRateId,
                         customerId: result.data.customerId,
                         description: result.data.description || null,
@@ -271,9 +330,11 @@ function PaymentsPage() {
                   } else {
                     createMutation.mutate({
                       amount: result.data.amount,
-                      currencyRateAmount: +(
-                        result.data.amount / currency.latestRate
-                      ),
+                      adjustmentAmount: result.data.adjustmentAmount,
+                      currencyRateAdjustmentAmount:
+                        result.data.adjustmentAmount / currency.latestRate,
+                      currencyRateAmount:
+                        result.data.amount / currency.latestRate,
                       currencyRateId: result.data.currencyRateId,
                       customerId: result.data.customerId,
                       description: result.data.description || null,
@@ -286,7 +347,7 @@ function PaymentsPage() {
               >
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <div className="space-y-2">
+                    <div className="m-2">
                       <label
                         htmlFor="customer-type"
                         className="text-sm font-medium"
@@ -313,7 +374,7 @@ function PaymentsPage() {
                       </select>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="m-2">
                       <label
                         htmlFor="payment-amount"
                         className="text-sm font-medium"
@@ -331,7 +392,28 @@ function PaymentsPage() {
                       />
                       {amount && WordifyFa(amount)} {defaultCurrency?.name}
                     </div>
-                    <div className="space-y-2">
+                    <div className="m-2">
+                      <label
+                        htmlFor="payment-amount"
+                        className="text-sm font-medium"
+                      >
+                        {t("adjustmentAmount")}
+                      </label>
+                      <input
+                        id="payment-amount"
+                        value={adjustmentAmount?.toLocaleString()}
+                        onChange={(event) =>
+                          setAdjustmentAmount(
+                            +event.target.value.replaceAll(",", ""),
+                          )
+                        }
+                        disabled={createMutation.isPending}
+                        className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                      />
+                      {adjustmentAmount && WordifyFa(adjustmentAmount)}{" "}
+                      {defaultCurrency?.name}
+                    </div>
+                    <div className="m-2">
                       <label
                         htmlFor="payment-paymentDate"
                         className="text-sm font-medium"
@@ -349,7 +431,7 @@ function PaymentsPage() {
                       />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="m-2">
                       <label
                         htmlFor="customer-referenceNumber"
                         className="text-sm font-medium"
@@ -404,6 +486,14 @@ function PaymentsPage() {
                         ))}
                       </div>
                     </div>
+                    {customerDebt && customerDebt.debt > 0 && (
+                      <DebtDescription
+                        amount={amount!}
+                        latestRate={currency?.latestRate!}
+                        debt={customerDebt.debt}
+                        onDebtClick={(value) => setAdjustmentAmount(value)}
+                      ></DebtDescription>
+                    )}
                   </div>
 
                   <div className="space-y-2 sm:col-span-2">
@@ -523,13 +613,13 @@ function PaymentsPage() {
         <div className="text-destructive">دریافت داده ها با خطا مواجه شد.</div>
       )}
 
-      {!isLoading && !isError && customers.length === 0 && (
+      {!isLoading && !isError && customerPayments.length === 0 && (
         <div className="rounded-lg border p-8 text-center">
           <p className="text-muted-foreground">{t("noData")}</p>
         </div>
       )}
 
-      {!isLoading && !isError && customers.length > 0 && (
+      {!isLoading && !isError && customerPayments.length > 0 && (
         <div className="rounded-lg border">
           <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_3fr_auto] gap-4 border-b p-4 font-medium">
             <div>{t("customerName")}</div>

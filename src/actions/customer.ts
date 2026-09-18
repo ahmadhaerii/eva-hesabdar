@@ -107,9 +107,18 @@ export async function getCustomerPayments(
 > {
   return ipc.client.customer.listCustomerPayments(id);
 }
+
+export async function customerWithDebt(
+  id: number,
+): Promise<Awaited<ReturnType<typeof ipc.client.customer.customerWithDebt>>> {
+  return ipc.client.customer.customerWithDebt(id);
+}
+
 export async function createCustomerPayment(data: {
   customerId: number;
   amount: number;
+  adjustmentAmount: number;
+  currencyRateAdjustmentAmount: number;
   currencyRateId: number;
   currencyRateAmount: number;
   paymentDate: string;
@@ -128,6 +137,8 @@ export async function updateCustomerPayment(
   data: {
     customerId: number;
     amount: number;
+    adjustmentAmount: number;
+    currencyRateAdjustmentAmount: number;
     currencyRateAmount: number;
     paymentDate: string;
     currencyRateId: number;

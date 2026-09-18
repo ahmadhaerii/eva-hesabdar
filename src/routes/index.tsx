@@ -652,7 +652,38 @@ function HomePage() {
                 {dashboardStats?.profitLastMonth?.toLocaleString()}
               </strong>
             </div>
+
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
+                </div>
+
+                <span className="font-medium">{t("discountLastMonth")}</span>
+              </div>
+
+              <strong>
+                {dashboardStats?.discountLastMonth?.toLocaleString()}
+              </strong>
+            </div>
+
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
+                </div>
+
+                <span className="font-medium">
+                  {t("adjustmentAmountLastMonth")}
+                </span>
+              </div>
+
+              <strong>
+                {dashboardStats?.adjustmentAmountLastMonth?.toLocaleString()}
+              </strong>
+            </div>
           </div>
+
           <div className="border-b border-white/[0.08] p-7 md:border-b-0 md:border-r md:border-l ">
             <h3 className="text-lg font-semibold">{t("reportYear")}</h3>
 
@@ -708,6 +739,34 @@ function HomePage() {
                 {dashboardStats?.profitThisYear?.toLocaleString()}
               </strong>
             </div>
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
+                </div>
+
+                <span className="font-medium">{t("discountThisYear")}</span>
+              </div>
+
+              <strong>
+                {dashboardStats?.discountThisYear?.toLocaleString()}
+              </strong>
+            </div>
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
+                </div>
+
+                <span className="font-medium">
+                  {t("adjustmentAmountThisYear")}
+                </span>
+              </div>
+
+              <strong>
+                {dashboardStats?.adjustmentAmountThisYear?.toLocaleString()}
+              </strong>
+            </div>
           </div>
           <div className="border-b border-white/[0.08] p-7 last:border-b-0 md:border-b-0   ">
             <h3 className="text-lg font-semibold">{t("reportTotal")}</h3>
@@ -727,6 +786,7 @@ function HomePage() {
 
               <strong>{dashboardStats?.countTotal?.toLocaleString()}</strong>
             </div>
+
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-md bg-yellow-500/10">
@@ -738,6 +798,7 @@ function HomePage() {
 
               <strong>{dashboardStats?.salesTotal?.toLocaleString()}</strong>
             </div>
+
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500/10">
@@ -749,6 +810,7 @@ function HomePage() {
 
               <strong>{dashboardStats?.paymentsTotal?.toLocaleString()}</strong>
             </div>
+
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
@@ -759,6 +821,32 @@ function HomePage() {
               </div>
 
               <strong>{dashboardStats?.profitTotal?.toLocaleString()}</strong>
+            </div>
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
+                </div>
+
+                <span className="font-medium">{t("discountTotal")}</span>
+              </div>
+
+              <strong>{dashboardStats?.discountTotal?.toLocaleString()}</strong>
+            </div>
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-violet-500/10">
+                  <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
+                </div>
+
+                <span className="font-medium">
+                  {t("adjustmentAmountTotal")}
+                </span>
+              </div>
+
+              <strong>
+                {dashboardStats?.adjustmentAmountTotal?.toLocaleString()}
+              </strong>
             </div>
           </div>
         </section>

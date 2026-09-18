@@ -61,6 +61,10 @@ export class CustomerService {
     return customerRepository.listCustomerPayments(customerId);
   }
 
+  async customerWithDebt(customerId: number) {
+    return customerRepository.customerWithDebt(customerId);
+  }
+
   async createCustomerPayment(data: NewCustomerPayment) {
     return customerRepository.createCustomerPayment(data);
   }
@@ -69,6 +73,8 @@ export class CustomerService {
     data: {
       customerId: number;
       amount: number;
+      currencyRateAdjustmentAmount: number;
+      adjustmentAmount: number;
       currencyRateId: number;
       currencyRateAmount: number;
       paymentDate: string;

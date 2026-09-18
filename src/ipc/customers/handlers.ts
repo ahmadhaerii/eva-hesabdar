@@ -109,6 +109,7 @@ const deleteCustomerTypeInput = z.object({
 });
 
 const idTypeInput = z.number().optional();
+const idTypeInputNotNull = z.number();
 
 export const listCustomerType = os.handler(async () => {
   return customerService.listCustomerTypes();
@@ -143,12 +144,19 @@ export const listCustomerPayments = os
   .handler(async ({ input }) => {
     return customerService.listCustomerPayments(input);
   });
+export const customerWithDebt = os
+  .input(idTypeInputNotNull)
+  .handler(async ({ input }) => {
+    return customerService.customerWithDebt(input);
+  });
 
 // CustomerPayment
 
 const createCustomerPaymentInput = z.object({
   customerId: z.number().min(1),
   amount: z.number(),
+  adjustmentAmount: z.number(),
+  currencyRateAdjustmentAmount: z.number(),
   currencyRateAmount: z.number(),
   paymentDate: z.string().min(1),
   paymentMethod: z.string(),
@@ -162,6 +170,8 @@ const updateCustomerPaymentInput = z.object({
   currencyRateId: z.number().min(1),
   currencyRateAmount: z.number().min(1),
   amount: z.number().min(1),
+  adjustmentAmount: z.number(),
+  currencyRateAdjustmentAmount: z.number(),
   paymentDate: z.string().min(1),
   paymentMethod: z.string().min(1),
   referenceNumber: z.string().nullable().optional(),

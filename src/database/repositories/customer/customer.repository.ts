@@ -31,6 +31,53 @@ export class CustomerRepository extends BaseRepository {
     });
   }
 
+  async customerWithDebt(customerId: number) {
+    const invoicesSubquery = this.executor
+      .select({
+        customerId: salesInvoices.customerId,
+        totalInvoices: sql<number>`SUM(${salesInvoices.amountPayable} )`.as(
+          "total_invoices",
+        ),
+      })
+      .from(salesInvoices)
+      .where(eq(salesInvoices.customerId, customerId))
+      .as("inv");
+
+    const paymentsSubquery = this.executor
+      .select({
+        customerId: customerPayments.customerId,
+        totalPayments:
+          sql<number>`SUM(${customerPayments.currencyRateAmount} )`.as(
+            "total_payments",
+          ),
+        totalAdjustmentAmount:
+          sql<number>`SUM(${customerPayments.currencyRateAdjustmentAmount} )`.as(
+            "total_adjustment_amount",
+          ),
+      })
+      .from(customerPayments)
+      .where(eq(customerPayments.customerId, customerId))
+      .as("pay");
+
+    const debtExpr = sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0) - (COALESCE(${paymentsSubquery.totalPayments}, 0) + COALESCE(${paymentsSubquery.totalAdjustmentAmount}, 0))`;
+
+    return this.executor
+      .select({
+        id: customers.id,
+        displayName: customers.displayName,
+        mobile: customers.mobile,
+        totalInvoices: sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0)`,
+        totalPayments: sql<number>`COALESCE(${paymentsSubquery.totalPayments}, 0)`,
+        totalAdjustmentAmount: sql<number>`COALESCE(${paymentsSubquery.totalAdjustmentAmount}, 0)`,
+        debt: debtExpr.as("debt"),
+      })
+      .from(customers)
+      .leftJoin(invoicesSubquery, eq(invoicesSubquery.customerId, customers.id))
+      .leftJoin(paymentsSubquery, eq(paymentsSubquery.customerId, customers.id))
+      .where(eq(customers.id, customerId))
+      .orderBy(desc(debtExpr));
+  }
+
   async listCustomersWithDebt() {
     const invoicesSubquery = this.executor
       .select({
@@ -50,12 +97,16 @@ export class CustomerRepository extends BaseRepository {
           sql<number>`SUM(${customerPayments.currencyRateAmount} )`.as(
             "total_payments",
           ),
+        totalAdjustmentAmount:
+          sql<number>`SUM(${customerPayments.currencyRateAdjustmentAmount} )`.as(
+            "total_adjustment_amount",
+          ),
       })
       .from(customerPayments)
       .groupBy(customerPayments.customerId)
       .as("pay");
 
-    const debtExpr = sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0) - COALESCE(${paymentsSubquery.totalPayments}, 0)`;
+    const debtExpr = sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0) - (COALESCE(${paymentsSubquery.totalPayments}, 0)+ COALESCE(${paymentsSubquery.totalAdjustmentAmount}, 0) )`;
 
     return this.executor
       .select({
@@ -64,6 +115,7 @@ export class CustomerRepository extends BaseRepository {
         mobile: customers.mobile,
         totalInvoices: sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0)`,
         totalPayments: sql<number>`COALESCE(${paymentsSubquery.totalPayments}, 0)`,
+        totalAdjustmentAmount: sql<number>`COALESCE(${paymentsSubquery.totalAdjustmentAmount}, 0)`,
         debt: debtExpr.as("debt"),
       })
       .from(customers)
@@ -92,6 +144,10 @@ export class CustomerRepository extends BaseRepository {
           sql<number>`SUM(${customerPayments.currencyRateAmount} )`.as(
             "total_payments",
           ),
+        totalAdjustmentAmount:
+          sql<number>`SUM(${customerPayments.currencyRateAdjustmentAmount} )`.as(
+            "total_adjustment_amount",
+          ),
       })
       .from(customerPayments)
       .groupBy(customerPayments.customerId)
@@ -107,7 +163,8 @@ export class CustomerRepository extends BaseRepository {
       .from(salesInvoices)
       .groupBy(salesInvoices.customerId)
       .as("lastord");
-    const debtExpr = sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0) - COALESCE(${paymentsSubquery.totalPayments}, 0)`;
+
+    const debtExpr = sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0) - (COALESCE(${paymentsSubquery.totalPayments}, 0) + COALESCE(${paymentsSubquery.totalAdjustmentAmount}, 0) )`;
 
     return this.executor
       .select({
@@ -116,6 +173,7 @@ export class CustomerRepository extends BaseRepository {
         mobile: customers.mobile,
         totalInvoices: sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0)`,
         totalPayments: sql<number>`COALESCE(${paymentsSubquery.totalPayments}, 0)`,
+        totalAdjustmentAmount: sql<number>`COALESCE(${paymentsSubquery.totalAdjustmentAmount}, 0)`,
         debt: debtExpr.as("debt"),
         lastOrderDate: sql<string>`${lastOrderSubquery.lastOrderDate}`.as(
           "last_order_date",

@@ -350,6 +350,10 @@ i18n.use(initReactI18next).init({
         editPayment: "ویرایش پرداخت",
         referenceNumber: "شماره رسید",
         amount: "مبلغ",
+        adjustmentAmount: "تخفیف پرداخت",
+        customerDebtDescription: "کل بدهی مشتری {{debt}} میباشد",
+        customerDebtAdjustmentDescription:
+          "بدهی باقی مانده بعد از پرداخت {{debt}} میباشد",
 
         //
         debtCustomersList: " لیست بدهکاران",

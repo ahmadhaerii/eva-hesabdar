@@ -50,6 +50,8 @@ export class SalesService {
         currencyRateAmount: dto.payment.currencyRateAmount,
         customerId: invoice.customerId,
         amount: dto.payment.amount,
+        adjustmentAmount: 0,
+        currencyRateAdjustmentAmount: 0,
         paymentDate: invoice.invoiceDate,
         paymentMethod: "",
         description: `پرداخت وجه به مبلغ ${dto?.payment?.amount?.toLocaleString()} جهت فاکتور شماره ${invoice.id} ثبت شد`,

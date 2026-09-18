@@ -28,7 +28,7 @@ const createSaleInvoiceInput = z.object({
     invoiceNumber: z.string(),
     customerId: z.number().min(1, "مشتری الزامی است"),
     totalPrice: z.number().min(1, "جمع الزامی است"),
-    discount: z.number().min(1, "  الزامی است"),
+    discount: z.number(),
     amountPayable: z.number().min(1, "  الزامی است"),
     currencyRateId: z.number().min(1, "نرخ ارز الزامی است"),
     invoiceDate: z.string().min(1, "تاریخ فاکتور الزامی است"),

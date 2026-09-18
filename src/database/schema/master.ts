@@ -53,6 +53,10 @@ export const customerPayments = sqliteTable(
       .notNull()
       .references(() => currencyRates.id),
     amount: real("amount").notNull(),
+    adjustmentAmount: real("adjustment_amount").notNull(),
+    currencyRateAdjustmentAmount: real(
+      "currency_rate_adjustment_amount",
+    ).notNull(),
     currencyRateAmount: real("currency_rate_amount").notNull(),
     paymentDate: text("payment_date").notNull(),
     paymentMethod: text("payment_method").notNull(),

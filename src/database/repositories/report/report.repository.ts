@@ -57,6 +57,9 @@ export class CreateCustomerStatementExcel extends BaseRepository {
         description: customerPayments.description,
 
         referenceNumber: customerPayments.referenceNumber,
+        adjustmentAmount: customerPayments.adjustmentAmount,
+        currencyRateAdjustmentAmount:
+          customerPayments.currencyRateAdjustmentAmount,
 
         currencyName: currencies.name,
       })

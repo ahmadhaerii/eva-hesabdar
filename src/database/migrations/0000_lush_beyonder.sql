@@ -14,6 +14,8 @@ CREATE TABLE `customer_payments` (
 	`customer_id` integer NOT NULL,
 	`currency_rate_id` integer NOT NULL,
 	`amount` real NOT NULL,
+	`adjustment_amount` real NOT NULL,
+	`currency_rate_adjustment_amount` real NOT NULL,
 	`currency_rate_amount` real NOT NULL,
 	`payment_date` text NOT NULL,
 	`payment_method` text NOT NULL,

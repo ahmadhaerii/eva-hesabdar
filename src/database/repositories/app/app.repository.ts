@@ -47,6 +47,14 @@ export interface DashboardStats {
   salesLastMonth: number;
   salesThisYear: number;
   salesTotal: number;
+
+  adjustmentAmountLastMonth: number;
+  adjustmentAmountThisYear: number;
+  adjustmentAmountTotal: number;
+
+  discountLastMonth: number;
+  discountThisYear: number;
+  discountTotal: number;
 }
 export class AppRepository extends BaseRepository {
   async getDashboardData(): Promise<DashboardData> {
@@ -68,7 +76,7 @@ customer_debts AS (
         c.display_name,
         COALESCE(inv.total_invoices, 0) AS total_invoices,
         COALESCE(pay.total_payments, 0) AS total_payments,
-    ( COALESCE(inv.total_invoices_currency_amount, 0) - COALESCE(pay.total_payments_currency_amount, 0) )* inv.last_rate AS debt 
+    ( COALESCE(inv.total_invoices_currency_amount, 0) - (COALESCE(pay.total_payments_currency_amount, 0) + COALESCE(pay.total_currency_rate_adjustment_amount, 0) ) ) * inv.last_rate AS debt 
     FROM customers c
     LEFT JOIN (
         SELECT 
@@ -85,6 +93,7 @@ customer_debts AS (
         SELECT 
             cp.customer_id, 
             SUM(cp.currency_rate_amount ) AS total_payments_currency_amount,
+            SUM(cp.currency_rate_adjustment_amount ) AS total_currency_rate_adjustment_amount,
             SUM(cp.amount ) AS total_payments 
         FROM customer_payments cp
         INNER JOIN currency_rates cr_base ON cp.currency_rate_id = cr_base.id
@@ -113,9 +122,9 @@ SELECT
             c.display_name,
             COALESCE(inv.total_invoices, 0) AS total_invoices,
             COALESCE(pay.total_payments, 0) AS total_payments,
-            (COALESCE(inv.total_invoices_currency_amount, 0) - COALESCE(pay.total_payments_currency_amount, 0)) * inv.last_rate AS debt ,
+            (COALESCE(inv.total_invoices_currency_amount, 0) - (COALESCE(pay.total_payments_currency_amount, 0)+ COALESCE(pay.total_currency_rate_adjustment_amount, 0))) * inv.last_rate AS debt ,
             COALESCE(inv.total_invoices_currency_amount, 0) AS total_invoices_currency_amount,
-            COALESCE(inv.total_invoices_currency_amount, 0) - COALESCE(pay.total_payments_currency_amount, 0) AS debt_currency_amount,
+            COALESCE(inv.total_invoices_currency_amount, 0) - (COALESCE(pay.total_payments_currency_amount, 0) + COALESCE(pay.total_currency_rate_adjustment_amount, 0) ) AS debt_currency_amount,
             COALESCE(pay.total_payments, 0) AS total_payments_currency_amount 
         FROM customers c
         LEFT JOIN (
@@ -134,6 +143,8 @@ SELECT
             SELECT 
                 cp.customer_id, 
                  SUM(cp.currency_rate_amount ) AS total_payments_currency_amount,
+                             SUM(cp.currency_rate_adjustment_amount ) AS total_currency_rate_adjustment_amount,
+
                   SUM(cp.amount ) AS total_payments 
             FROM customer_payments cp
             INNER JOIN currency_rates cr_base ON cp.currency_rate_id = cr_base.id
@@ -321,6 +332,14 @@ SELECT
       paymentsLastMonth: number;
       paymentsThisYear: number;
       paymentsTotal: number;
+
+      discountLastMonth: number;
+      discountThisYear: number;
+      discountTotal: number;
+
+      adjustmentAmountLastMonth: number;
+      adjustmentAmountThisYear: number;
+      adjustmentAmountTotal: number;
     }>(sql`
     WITH item_cost AS (
       SELECT
@@ -337,15 +356,26 @@ SELECT
         COUNT(DISTINCT CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today} THEN si.id END) AS countThisYear,
         COUNT(DISTINCT si.id) AS countTotal,
 
+
         SUM(CASE WHEN si.invoice_date >= ${monthStart} AND si.invoice_date <= ${today}
                  THEN si.amount_payable ELSE 0 END) AS salesLastMonth,
-
 
         SUM(CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today}
                  THEN si.amount_payable ELSE 0 END) AS salesThisYear,
 
-
         SUM(si.amount_payable) AS salesTotal,
+
+
+        
+        SUM(CASE WHEN si.invoice_date >= ${monthStart} AND si.invoice_date <= ${today}
+                 THEN si.discount ELSE 0 END) AS discountLastMonth,
+
+        SUM(CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today}
+                 THEN si.discount ELSE 0 END) AS discountThisYear,
+
+        SUM(si.discount) AS discountTotal,
+
+
 
         SUM(CASE WHEN si.invoice_date >= ${monthStart} AND si.invoice_date <= ${today}
                  THEN (sii.line_total_currency_amount - COALESCE(ic.cost, 0)) ELSE 0 END)   -  
@@ -370,7 +400,12 @@ SELECT
       SELECT
         SUM(CASE WHEN payment_date >= ${monthStart} AND payment_date <= ${today} THEN currency_rate_amount ELSE 0 END) AS paymentsLastMonth,
         SUM(CASE WHEN payment_date >= ${yearStart}  AND payment_date <= ${today} THEN currency_rate_amount ELSE 0 END) AS paymentsThisYear,
-        SUM(currency_rate_amount) AS paymentsTotal
+        SUM(currency_rate_amount) AS paymentsTotal, 
+
+        SUM(CASE WHEN payment_date >= ${monthStart} AND payment_date <= ${today} THEN currency_rate_adjustment_amount ELSE 0 END) AS adjustmentAmountLastMonth,
+        SUM(CASE WHEN payment_date >= ${yearStart}  AND payment_date <= ${today} THEN currency_rate_adjustment_amount ELSE 0 END) AS adjustmentAmountThisYear,
+        SUM(currency_rate_adjustment_amount) AS adjustmentAmountTotal
+
       FROM customer_payments
       WHERE deleted_at IS NULL
     )
@@ -395,6 +430,14 @@ SELECT
       paymentsLastMonth: result?.paymentsLastMonth ?? 0,
       paymentsThisYear: result?.paymentsThisYear ?? 0,
       paymentsTotal: result?.paymentsTotal ?? 0,
+
+      discountLastMonth: result?.discountLastMonth ?? 0,
+      discountThisYear: result?.discountThisYear ?? 0,
+      discountTotal: result?.discountTotal ?? 0,
+
+      adjustmentAmountLastMonth: result?.adjustmentAmountLastMonth ?? 0,
+      adjustmentAmountThisYear: result?.adjustmentAmountThisYear ?? 0,
+      adjustmentAmountTotal: result?.adjustmentAmountTotal ?? 0,
     };
   }
 }

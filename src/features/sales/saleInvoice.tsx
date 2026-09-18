@@ -78,7 +78,14 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
   const [suggestedUnitPrice, setSuggestedUnitPrice] = useState(0);
   const [saleUnitPrice, setSaleUnitPrice] = useState<number | null>(null);
   const [totalPrice, setTotalPrice] = useState<number | null>(null);
-  const [amountReceived, setAmountReceived] = useState<number | null>(null);
+  const [totalPriceBaseCurrency, setTotalPriceBaseCurrency] = useState<
+    number | null
+  >(null);
+  const [discount, setDiscount] = useState<number>(0);
+  const [amountPayable, setAmountPayable] = useState<number>(0);
+  const [discountCurrency, setDiscountCurrency] = useState<number>(0);
+  const [amountPayableDescription, setAmountPayableDescription] = useState("");
+  const [amountReceived, setAmountReceived] = useState<number>(0);
   const [referenceNumber, setReferenceNumber] = useState("");
   const [helperDescription, setHelperDescription] = useState("");
   const [saleInvoiceError, setSaleInvoiceError] = useState("");
@@ -161,7 +168,7 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
       return;
     }
 
-    const amount = +(amountReceived / currency.latestRate).toFixed(2);
+    const amount = +(amountReceived / currency.latestRate);
 
     const data = {
       invoice: {
@@ -170,6 +177,8 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
         invoiceNumber: new Date().toISOString(),
         invoiceDate: invoiceDate,
         totalPrice: totalPrice!,
+        amountPayable: amountPayable!,
+        discount: discountCurrency!,
         createdAt: new Date().toISOString(),
       },
       items: salesInvoiceItems,
@@ -189,6 +198,8 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
       setSaleInvoiceError(t("validationInvoiceDate"));
     } else if (totalPrice === null) {
       setSaleInvoiceError(t("validationTotalPrice"));
+    } else if (discount === null) {
+      setSaleInvoiceError(t("validationDiscount"));
     } else if (amountReceived === null) {
       setSaleInvoiceError(t("validationAmountReceived"));
     } else if (
@@ -217,35 +228,6 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
       console.error(error);
 
       setError(" افزودن آیتم با خطا مواجه شد.");
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: {
-        purchaseInvoiceId: number;
-        productId: number;
-        quantity: number;
-        remainingQuantity: number;
-        freightShare: number;
-        unitPrice: number;
-        totalPrice: number;
-        description?: string | null | undefined;
-      };
-    }) => updatePurchaseInvoiceItem(id, data),
-
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["purchaseInvoiceItems"],
-      });
-      resetForm();
-    },
-    onError: (error) => {
-      console.error(error);
     },
   });
 
@@ -280,6 +262,7 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
   const resetForm = () => {
     setEditingId(null);
     setProductId(null);
+    setDiscount(0);
     setQuantity(0);
     setSaleUnitPrice(null);
     setError("");
@@ -310,16 +293,25 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
         0,
       );
       let newTotal = total / currency.latestRate;
-      newTotal = +newTotal.toFixed(2);
 
+      setTotalPriceBaseCurrency(total);
       setTotalPrice(newTotal);
       setTotalSaleInvoicePriceDescription(
-        `قیمت فروش کل  : ${total.toLocaleString("en-US")} ${defaultCurrency?.name}  ، معادل  ${newTotal.toLocaleString()} ${currency.name}  میباشد`,
+        `قیمت فروش کل  : ${total.toLocaleString("en-US")} ${defaultCurrency?.name}  ، معادل  ${newTotal.toFixed(3).toLocaleString()} ${currency.name}  میباشد`,
+      );
+      const myAmountPayable = total - discount;
+      let myAmountPayableCurrency = myAmountPayable / currency.latestRate;
+      let discountCurrency = discount / currency.latestRate;
+
+      setAmountPayable(myAmountPayableCurrency);
+      setDiscountCurrency(discountCurrency);
+      setAmountPayableDescription(
+        `مبلغ قابل پرداخت : ${myAmountPayable.toLocaleString("en-US")} ${defaultCurrency?.name}  ، معادل  ${myAmountPayableCurrency.toFixed(3).toLocaleString()} ${currency.name}  میباشد`,
       );
     } else {
       setTotalSaleInvoicePriceDescription("قیمت فروش محاسبه نشده است");
     }
-  }, [salesInvoiceItems]);
+  }, [salesInvoiceItems, discount]);
 
   const onSelectedCustomer = (customerId: number) => {
     const customer = customers.find((customer) => customer.id === customerId);
@@ -647,7 +639,6 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
                       onChange={(event) => setQuantity(+event.target.value)}
                       disabled={createMutation.isPending}
                       className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                      autoFocus
                     />
                     {quantity > totalRemainingQuantity && (
                       <p className="text-xs text-destructive">
@@ -697,7 +688,7 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
                                   {purchaseInvoiceItem.remainingQuantity}
                                 </div>
                                 <div>
-                                  {purchaseInvoiceItem.totalPrice.toFixed(2)}
+                                  {purchaseInvoiceItem.totalPrice.toFixed(3)}
                                 </div>
                               </div>
                             );
@@ -728,7 +719,6 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
                     }
                     disabled={createMutation.isPending}
                     className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    autoFocus
                   />
                   {saleUnitPrice && WordifyFa(saleUnitPrice)}{" "}
                   {defaultCurrency?.name}
@@ -841,6 +831,24 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
             htmlFor="saleInvoice-amount_received"
             className="text-sm font-medium"
           >
+            {t("discount")}
+          </label>
+          <input
+            id="saleInvoice-amount_received"
+            value={discount?.toLocaleString()}
+            onChange={(event) =>
+              setDiscount(+event.target.value.replaceAll(",", ""))
+            }
+            disabled={createMutation.isPending}
+            className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
+          {discount && WordifyFa(discount)} {defaultCurrency?.name}
+        </div>
+        <div className="space-y-2">
+          <label
+            htmlFor="saleInvoice-amount_received"
+            className="text-sm font-medium"
+          >
             {t("amountReceived")}
           </label>
           <input
@@ -851,17 +859,16 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
             }
             disabled={createMutation.isPending}
             className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-            autoFocus
           />
           {amountReceived && WordifyFa(amountReceived)} {defaultCurrency?.name}
-          {totalPrice &&
-            amountReceived &&
-            selectedCustomer?.isAnonymous &&
-            totalPrice > amountReceived && (
-              <p className="text-xs text-destructive">
-                {t("validationReceivedAmountLessThanInvoice")}
-              </p>
-            )}
+          {totalPriceBaseCurrency &&
+          amountReceived &&
+          selectedCustomer?.isAnonymous &&
+          totalPriceBaseCurrency > amountReceived ? (
+            <p className="text-xs text-destructive">
+              {t("validationReceivedAmountLessThanInvoice")}
+            </p>
+          ) : null}
         </div>
         <div className="space-y-2">
           <label
@@ -879,6 +886,11 @@ export default function SaleInvoice({ onClose }: SaleInvoiceProps) {
           />
         </div>
       </div>
+      {amountPayableDescription && (
+        <p className="bg-helper-mix py-1 px-2.5 rounded-xl text-sm text-helper">
+          {amountPayableDescription}
+        </p>
+      )}
       {saleInvoiceError && (
         <p className="bg-destructive-mix py-1 px-2.5 rounded-xl text-sm text-destructive">
           {saleInvoiceError}

@@ -229,6 +229,8 @@ CREATE TABLE `sales_invoices` (
 	`currency_rate_id` integer NOT NULL,
 	`invoice_date` text NOT NULL,
 	`total_price` real NOT NULL,
+	`discount` real NOT NULL,
+	`amount_payable` real NOT NULL,
 	`description` text,
 	`deleted_at` text,
 	`status` text DEFAULT 'Draft' NOT NULL,

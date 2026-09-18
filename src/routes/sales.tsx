@@ -282,7 +282,7 @@ function SalesPage() {
             <div>{t("currency")}</div>
             <div>{t("currencyRate")}</div>
             <div>{t("items")}</div>
-            <div>{t("totalPrice")}</div>
+            <div>{t("total")}</div>
             <div>{t("purchaseInvoiceDate")}</div>
             <div>{t("actions")}</div>
           </div>
@@ -299,8 +299,7 @@ function SalesPage() {
                 {saleInvoice.currencyRate?.rate.toLocaleString("en-US")}
               </div>
               <div>{saleInvoice.saleInvoiceItems.length}</div>
-              <div>{saleInvoice.totalPrice.toLocaleString()}</div>
-
+              <div>{saleInvoice.amountPayable.toLocaleString()}</div>
               <div>{saleInvoice.invoiceDate}</div>
 
               <div className="flex gap-2">

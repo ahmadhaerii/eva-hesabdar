@@ -259,7 +259,7 @@ function PaymentsPage() {
                         amount: result.data.amount,
                         currencyRateAmount: +(
                           result.data.amount / currency.latestRate
-                        ).toFixed(2),
+                        ),
                         currencyRateId: result.data.currencyRateId,
                         customerId: result.data.customerId,
                         description: result.data.description || null,
@@ -273,7 +273,7 @@ function PaymentsPage() {
                       amount: result.data.amount,
                       currencyRateAmount: +(
                         result.data.amount / currency.latestRate
-                      ).toFixed(2),
+                      ),
                       currencyRateId: result.data.currencyRateId,
                       customerId: result.data.customerId,
                       description: result.data.description || null,

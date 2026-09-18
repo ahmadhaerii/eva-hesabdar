@@ -74,8 +74,8 @@ customer_debts AS (
         SELECT 
             si.customer_id, 
              lr.rate as last_rate ,
-            SUM(si.total_price * lr.rate) AS total_invoices,
-            SUM(si.total_price ) AS total_invoices_currency_amount
+            SUM(si.amount_payable * lr.rate) AS total_invoices,
+            SUM(si.amount_payable ) AS total_invoices_currency_amount
         FROM sales_invoices si
         INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
         INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
@@ -122,8 +122,8 @@ SELECT
             SELECT 
                 si.customer_id, 
                 lr.rate as last_rate ,
-                SUM(si.total_price * lr.rate) AS total_invoices,
-                SUM(si.total_price ) AS total_invoices_currency_amount
+                SUM(si.amount_payable * lr.rate) AS total_invoices,
+                SUM(si.amount_payable ) AS total_invoices_currency_amount
 
             FROM sales_invoices si
             INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
@@ -177,12 +177,12 @@ SELECT
             LIMIT 1
         )
     ) AS bestSellingProduct,
-    (SELECT COALESCE(SUM(si.total_price  ), 0)
+    (SELECT COALESCE(SUM(si.amount_payable  ), 0)
      FROM sales_invoices si
      INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
      INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
     ) AS allTimeSales,
-    (SELECT COALESCE(SUM(si.total_price  ), 0)
+    (SELECT COALESCE(SUM(si.amount_payable  ), 0)
      FROM sales_invoices si
      INNER JOIN currency_rates cr_base ON si.currency_rate_id = cr_base.id
      INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
@@ -229,7 +229,7 @@ SELECT
 
     const sales = await this.executor
       .select({
-        totalPrice: salesInvoices.totalPrice,
+        totalPrice: salesInvoices.amountPayable,
         saleDate: salesInvoices.invoiceDate,
       })
       .from(salesInvoices)
@@ -338,16 +338,28 @@ SELECT
         COUNT(DISTINCT si.id) AS countTotal,
 
         SUM(CASE WHEN si.invoice_date >= ${monthStart} AND si.invoice_date <= ${today}
-                 THEN sii.line_total_currency_amount ELSE 0 END) AS salesLastMonth,
+                 THEN si.amount_payable ELSE 0 END) AS salesLastMonth,
+
+
         SUM(CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today}
-                 THEN sii.line_total_currency_amount ELSE 0 END) AS salesThisYear,
-        SUM(sii.line_total_currency_amount) AS salesTotal,
+                 THEN si.amount_payable ELSE 0 END) AS salesThisYear,
+
+
+        SUM(si.amount_payable) AS salesTotal,
 
         SUM(CASE WHEN si.invoice_date >= ${monthStart} AND si.invoice_date <= ${today}
-                 THEN (sii.line_total_currency_amount - COALESCE(ic.cost, 0)) ELSE 0 END) AS profitLastMonth,
+                 THEN (sii.line_total_currency_amount - COALESCE(ic.cost, 0)) ELSE 0 END)   -  
+        SUM(CASE WHEN si.invoice_date >= ${monthStart}  AND si.invoice_date <= ${today}
+                 THEN COALESCE(si.discount , 0 ) ELSE 0 END)  AS profitLastMonth,
+
         SUM(CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today}
-                 THEN (sii.line_total_currency_amount - COALESCE(ic.cost, 0)) ELSE 0 END) AS profitThisYear,
-        SUM(sii.line_total_currency_amount - COALESCE(ic.cost, 0)) AS profitTotal
+                 THEN (sii.line_total_currency_amount - COALESCE(ic.cost, 0)) ELSE 0 END)  - 
+        SUM(CASE WHEN si.invoice_date >= ${yearStart}  AND si.invoice_date <= ${today}
+                 THEN COALESCE(si.discount , 0 ) ELSE 0 END)  AS profitThisYear,
+
+       (SUM(sii.line_total_currency_amount - COALESCE(ic.cost, 0)) - SUM (COALESCE(si.discount , 0 )) )  AS profitTotal
+
+
       FROM sales_invoices si
       JOIN sales_invoice_items sii ON sii.sales_invoice_id = si.id
       LEFT JOIN item_cost ic ON ic.salesInvoiceItemId = sii.id

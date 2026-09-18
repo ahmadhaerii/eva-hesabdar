@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c861731c-c549-4bfe-b182-150939f65b13",
+  "id": "c10e42e7-2573-4dff-b95a-3d61ac75fe7d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -1600,6 +1600,20 @@
         },
         "total_price": {
           "name": "total_price",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "discount": {
+          "name": "discount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount_payable": {
+          "name": "amount_payable",
           "type": "real",
           "primaryKey": false,
           "notNull": true,

@@ -12,6 +12,8 @@ export async function createSaleInvoice(data: {
     customerId: number;
     currencyRateId: number;
     totalPrice: number;
+    discount: number;
+    amountPayable: number;
     invoiceDate: string;
     createdAt: string;
     id?: number | undefined;

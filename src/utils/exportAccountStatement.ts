@@ -36,7 +36,7 @@ export const exportAccountStatementToExcel = async (
     worksheet.addRow({
       title: row.title,
       date: row.date,
-      currencyAmount: `${row.currencyAmount.toFixed(2)} ` + row.currencyName,
+      currencyAmount: `${row.currencyAmount.toFixed(3)} ` + row.currencyName,
       amount: `${row.amount.toLocaleString()} تومان`,
       balance: `${row.balance.toLocaleString()} ` + row.currencyName,
       description: row.description,

@@ -114,7 +114,7 @@ export class CreateCustomerStatementExcel extends BaseRepository {
 
       description:
         payment.description ??
-        `واریز وجه ${payment.amount.toLocaleString()} تومان`,
+        `واریز وجه ${payment?.amount?.toLocaleString()} تومان`,
 
       debit: 0,
 
@@ -141,7 +141,7 @@ export class CreateCustomerStatementExcel extends BaseRepository {
 
       return {
         ...item,
-        balance: balance.toFixed(2),
+        balance: balance.toFixed(3),
       };
     });
     return rows;

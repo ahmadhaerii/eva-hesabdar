@@ -35,7 +35,7 @@ export class CustomerRepository extends BaseRepository {
     const invoicesSubquery = this.executor
       .select({
         customerId: salesInvoices.customerId,
-        totalInvoices: sql<number>`SUM(${salesInvoices.totalPrice} )`.as(
+        totalInvoices: sql<number>`SUM(${salesInvoices.amountPayable} )`.as(
           "total_invoices",
         ),
       })
@@ -77,7 +77,7 @@ export class CustomerRepository extends BaseRepository {
     const invoicesSubquery = this.executor
       .select({
         customerId: salesInvoices.customerId,
-        totalInvoices: sql<number>`SUM(${salesInvoices.totalPrice} )`.as(
+        totalInvoices: sql<number>`SUM(${salesInvoices.amountPayable} )`.as(
           "total_invoices",
         ),
       })

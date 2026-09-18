@@ -30,7 +30,12 @@ export class SalesRepository extends BaseRepository {
           },
         },
         customer: true,
-        saleInvoiceItems: true,
+        saleInvoiceItems: {
+          with: {
+            allocations: true,
+            product: true,
+          },
+        },
       },
 
       orderBy: [desc(salesInvoices.invoiceDate)],

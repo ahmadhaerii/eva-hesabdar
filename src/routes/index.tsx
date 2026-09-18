@@ -407,9 +407,9 @@ function HomePage() {
           <StatCard
             title={t("mostIndebted")}
             description={dashboardData?.mostIndebted?.displayName!}
-            value={dashboardData?.mostIndebted?.debtCurrencyAmount.toLocaleString()}
+            value={dashboardData?.mostIndebted?.debtCurrencyAmount?.toLocaleString()}
             secondValue={
-              dashboardData?.mostIndebted?.debt.toLocaleString() +
+              dashboardData?.mostIndebted?.debt?.toLocaleString() +
               " " +
               defaultCurrency?.name
             }
@@ -421,7 +421,7 @@ function HomePage() {
           <StatCard
             title={t("totalDebts")}
             description={t("totalDebtsDescription")}
-            value={dashboardData?.totalDebt.toLocaleString()}
+            value={dashboardData?.totalDebt?.toLocaleString()}
             iconColor="#ffb900"
             iconBackgroundColor="#ffb90025"
           />
@@ -430,7 +430,7 @@ function HomePage() {
             title={t("stockRial")}
             description={t("stockRialDescription")}
             value={
-              dashboardData?.totalInventoryValue.toLocaleString() +
+              dashboardData?.totalInventoryValue?.toLocaleString() +
               " " +
               defaultCurrency?.name
             }
@@ -442,7 +442,7 @@ function HomePage() {
           <StatCard
             title={t("stockValue")}
             description={t("stockValueDescription")}
-            value={dashboardData?.totalInventoryValueInCurrency.toLocaleString()}
+            value={dashboardData?.totalInventoryValueInCurrency?.toLocaleString()}
             icon={Receipt}
             iconColor="#c34e27"
             iconBackgroundColor="#c34e2725"
@@ -517,14 +517,14 @@ function HomePage() {
             <StatCard
               title={t("yearlySales")}
               description={t("yearlySalesDescription")}
-              value={dashboardData?.currentYearSales.toLocaleString()}
+              value={dashboardData?.currentYearSales?.toLocaleString()}
               iconColor="#00d492"
               iconBackgroundColor="#00bc7d20"
             />
             <StatCard
               title={t("totalSales")}
               description={t("totalSalesDescription")}
-              value={dashboardData?.allTimeSales.toLocaleString()}
+              value={dashboardData?.allTimeSales?.toLocaleString()}
               icon={BadgeDollarSign}
               iconColor="#00d492"
               iconBackgroundColor="#00bc7d20"
@@ -539,7 +539,7 @@ function HomePage() {
 
                 <p className="mt-1 text-sm text-zinc-500">
                   {t("monthlySalesDescription")} :{" "}
-                  {last12MonthsSales?.totalSales.toLocaleString()}
+                  {last12MonthsSales?.totalSales?.toLocaleString()}
                 </p>
               </div>
 
@@ -609,7 +609,9 @@ function HomePage() {
                 <span className="font-medium">{t("countLastMonth")}</span>
               </div>
 
-              <strong>{dashboardStats?.countLastMonth.toLocaleString()}</strong>
+              <strong>
+                {dashboardStats?.countLastMonth?.toLocaleString()}
+              </strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -620,7 +622,9 @@ function HomePage() {
                 <span className="font-medium">{t("salesLastMonth")}</span>
               </div>
 
-              <strong>{dashboardStats?.salesLastMonth.toLocaleString()}</strong>
+              <strong>
+                {dashboardStats?.salesLastMonth?.toLocaleString()}
+              </strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -632,7 +636,7 @@ function HomePage() {
               </div>
 
               <strong>
-                {dashboardStats?.paymentsLastMonth.toLocaleString()}
+                {dashboardStats?.paymentsLastMonth?.toLocaleString()}
               </strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
@@ -645,7 +649,7 @@ function HomePage() {
               </div>
 
               <strong>
-                {dashboardStats?.profitLastMonth.toLocaleString()}
+                {dashboardStats?.profitLastMonth?.toLocaleString()}
               </strong>
             </div>
           </div>
@@ -665,7 +669,7 @@ function HomePage() {
                 <span className="font-medium">{t("countThisYear")}</span>
               </div>
 
-              <strong>{dashboardStats?.countThisYear.toLocaleString()}</strong>
+              <strong>{dashboardStats?.countThisYear?.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -676,7 +680,7 @@ function HomePage() {
                 <span className="font-medium">{t("salesThisYear")}</span>
               </div>
 
-              <strong>{dashboardStats?.salesThisYear.toLocaleString()}</strong>
+              <strong>{dashboardStats?.salesThisYear?.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -688,7 +692,7 @@ function HomePage() {
               </div>
 
               <strong>
-                {dashboardStats?.paymentsThisYear.toLocaleString()}
+                {dashboardStats?.paymentsThisYear?.toLocaleString()}
               </strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
@@ -700,7 +704,9 @@ function HomePage() {
                 <span className="font-medium">{t("profitThisYear")}</span>
               </div>
 
-              <strong>{dashboardStats?.profitThisYear.toLocaleString()}</strong>
+              <strong>
+                {dashboardStats?.profitThisYear?.toLocaleString()}
+              </strong>
             </div>
           </div>
           <div className="border-b border-white/[0.08] p-7 last:border-b-0 md:border-b-0   ">
@@ -719,7 +725,7 @@ function HomePage() {
                 <span className="font-medium">{t("countTotal")}</span>
               </div>
 
-              <strong>{dashboardStats?.countTotal.toLocaleString()}</strong>
+              <strong>{dashboardStats?.countTotal?.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -730,7 +736,7 @@ function HomePage() {
                 <span className="font-medium">{t("salesTotal")}</span>
               </div>
 
-              <strong>{dashboardStats?.salesTotal.toLocaleString()}</strong>
+              <strong>{dashboardStats?.salesTotal?.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -741,7 +747,7 @@ function HomePage() {
                 <span className="font-medium">{t("paymentsTotal")}</span>
               </div>
 
-              <strong>{dashboardStats?.paymentsTotal.toLocaleString()}</strong>
+              <strong>{dashboardStats?.paymentsTotal?.toLocaleString()}</strong>
             </div>
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -752,7 +758,7 @@ function HomePage() {
                 <span className="font-medium">{t("profitTotal")}</span>
               </div>
 
-              <strong>{dashboardStats?.profitTotal.toLocaleString()}</strong>
+              <strong>{dashboardStats?.profitTotal?.toLocaleString()}</strong>
             </div>
           </div>
         </section>

@@ -337,7 +337,10 @@ i18n.use(initReactI18next).init({
         showSaleInvoice: "نمایش فاکتور فروش",
         lineTotalCurrencyAmount: "مجموع ارزی",
         totalSaleInvoicePriceDescription:
-          "قیمت فروش کل  :  {{total}}  {{ currencyName }}  ، معادل   {{ TotalCurrencyAmount }}  {{currencyAmountName}}  میباشد",
+          "قیمت فروش کل  :  {{total}}  {{ currencyName }}  ، معادل   {{ totalCurrencyAmount }}  {{currencyAmountName}}  میباشد",
+
+        discountSaleInvoicePriceDescription:
+          "تخفیف :  {{discount}}  {{ currencyName }}  ، معادل   {{ discountCurrencyAmount }}  {{currencyAmountName}}  میباشد",
 
         // payments
         filterCustomer: "فیلتر مشتری",

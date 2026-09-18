@@ -96,16 +96,16 @@ export function DebtCustomers() {
             >
               <div>{customer.displayName}</div>
               <div>{customer.mobile}</div>
-              <div>{customer.totalInvoices?.toLocaleString()}</div>
-              <div>{customer.totalPayments?.toLocaleString()}</div>
+              <div>{customer?.totalInvoices?.toLocaleString()}</div>
+              <div>{customer?.totalPayments?.toLocaleString()}</div>
               <div>
-                {customer.debt?.toLocaleString()} {currency?.name}
+                {customer?.debt?.toLocaleString()} {currency?.name}
               </div>
               <div>
                 {currency && currency.latestRate
                   ? Math.round(
                       customer.debt * currency.latestRate,
-                    ).toLocaleString()
+                    )?.toLocaleString()
                   : 0}{" "}
                 {defaultCurrency?.name}
               </div>

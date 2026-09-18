@@ -91,7 +91,7 @@ export function UnfaithfulCustomers() {
                 {currency && currency.latestRate
                   ? Math.round(
                       customer.debt * currency.latestRate,
-                    ).toLocaleString()
+                    )?.toLocaleString()
                   : 0}{" "}
                 {defaultCurrency?.name}
               </div>

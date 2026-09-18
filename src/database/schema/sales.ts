@@ -32,6 +32,8 @@ export const salesInvoices = sqliteTable(
 
     invoiceDate: text("invoice_date").notNull(),
     totalPrice: real("total_price").notNull(),
+    discount: real("discount").notNull(),
+    amountPayable: real("amount_payable").notNull(),
 
     description: text("description"),
     deletedAt: text("deleted_at"),

@@ -52,7 +52,7 @@ export class SalesService {
         amount: dto.payment.amount,
         paymentDate: invoice.invoiceDate,
         paymentMethod: "",
-        description: `پرداخت وجه به مبلغ ${dto.payment.amount.toLocaleString()} جهت فاکتور شماره ${invoice.id} ثبت شد`,
+        description: `پرداخت وجه به مبلغ ${dto?.payment?.amount?.toLocaleString()} جهت فاکتور شماره ${invoice.id} ثبت شد`,
         referenceNumber: dto.payment.referenceNumber,
       };
       await customerService.createCustomerPayment(data);

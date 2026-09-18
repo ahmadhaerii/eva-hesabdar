@@ -1,37 +1,15 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckIcon, Pencil, Plus, Trash2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { CheckIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-
-import z from "zod";
 import {
-  CustomerWithRelations,
   Product,
   PurchaseInvoiceWithRelations,
   SalesInvoiceWithRelations,
 } from "@/database/types/database";
-import {
-  deletePurchaseInvoiceItem,
-  getPurchaseInvoiceItemsForProduct,
-  updatePurchaseInvoiceItem,
-} from "@/actions/purchase";
-import { ProductCombobox } from "@/components/ProductCombobox";
-import { getCategoriesWithProducts } from "@/actions/category";
-import { getCustomers } from "@/actions/customer";
-import { listCurrenciesWithLastRate } from "@/actions/currency";
-import { cn } from "@/utils/tailwind";
 import { useCurrencyStore } from "@/stores/currencyStore";
-import { WordifyFa } from "@/utils/wordify";
-import { createSaleInvoice, getSaleInvoice } from "@/actions/sale";
+import { getSaleInvoice } from "@/actions/sale";
 interface purchaseInvoiceWithRelations {
   purchaseInvoice: PurchaseInvoiceWithRelations;
 }
@@ -262,11 +240,24 @@ export default function ShowSaleInvoice({
           </div>
         )}
 
+      <p className="bg-destructive-mix py-1 px-2.5 rounded-xl text-sm text-destructive">
+        {t("discountSaleInvoicePriceDescription", {
+          discountCurrencyAmount: salesInvoice?.discount?.toLocaleString(),
+          currencyName: defaultCurrency?.name,
+          discount: salesInvoice
+            ? (
+                salesInvoice?.discount * salesInvoice?.currencyRate.rate
+              ).toLocaleString()
+            : 0,
+          currencyAmountName: salesInvoice?.currencyRate.currency?.name,
+        })}
+      </p>
+
       <p className="bg-helper-mix py-1 px-2.5 rounded-xl text-sm text-helper">
         {t("totalSaleInvoicePriceDescription", {
           total: total?.toLocaleString(),
           currencyName: defaultCurrency?.name,
-          TotalCurrencyAmount: salesInvoice?.totalPrice,
+          totalCurrencyAmount: salesInvoice?.totalPrice.toFixed(3),
           currencyAmountName: salesInvoice?.currencyRate.currency?.name,
         })}
       </p>

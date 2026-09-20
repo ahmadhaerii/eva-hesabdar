@@ -19,6 +19,7 @@ import {
   createCustomerPayment,
   customerWithDebt,
   deleteCustomer,
+  deleteCustomerPayment,
   getCustomerPayments,
   getCustomers,
   getCustomerTypes,
@@ -171,7 +172,7 @@ function PaymentsPage() {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["customers"],
+        queryKey: ["customerPayments"],
       });
       resetForm();
     },
@@ -181,11 +182,11 @@ function PaymentsPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) => deleteCustomer(id),
+    mutationFn: ({ id }: { id: number }) => deleteCustomerPayment(id),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["customers"],
+        queryKey: ["customerPayments"],
       });
 
       resetForm();
@@ -548,10 +549,10 @@ function PaymentsPage() {
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{t("deleteCustomer")}</DialogTitle>
+              <DialogTitle>{t("deletePayment")}</DialogTitle>
             </DialogHeader>
             <div className="flex justify-start gap-2">
-              <p>{t("deleteCustomerDescription", { name: paymentDate })}</p>
+              <p>{t("deletePaymentDescription")}</p>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
 
@@ -575,7 +576,7 @@ function PaymentsPage() {
                   });
                 }}
               >
-                {createMutation.isPending ? t("loading") : t("deleteCustomer")}
+                {createMutation.isPending ? t("loading") : t("deletePayment")}
               </Button>
             </div>
           </DialogContent>
@@ -656,6 +657,7 @@ function PaymentsPage() {
                     setDescription(customerPayment.description ?? "");
                     setReferenceNumber(customerPayment.referenceNumber ?? "");
                     setPaymentDate(customerPayment.paymentDate);
+                    setAdjustmentAmount(customerPayment.adjustmentAmount);
                     setAmount(customerPayment.amount);
                     setCustomerId(customerPayment.customerId);
                     setOpen(true);
@@ -669,11 +671,6 @@ function PaymentsPage() {
                   variant="destructive"
                   onClick={() => {
                     setEditingId(customerPayment.id);
-                    setDescription(customerPayment.description ?? "");
-                    setReferenceNumber(customerPayment.referenceNumber ?? "");
-                    setPaymentDate(customerPayment.paymentDate);
-                    setAmount(customerPayment.amount);
-                    setCustomerId(customerPayment.customerId);
                     setDialogDeleteOpen(true);
                   }}
                 >

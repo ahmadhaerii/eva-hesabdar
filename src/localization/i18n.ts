@@ -350,6 +350,8 @@ i18n.use(initReactI18next).init({
         addPayment: "ثبت پرداخت",
         editPayment: "ویرایش پرداخت",
         referenceNumber: "شماره رسید",
+        deletePayment: "حذف پرداخت",
+        deletePaymentDescription: "از حذف رسید پرداخت اطمینان دارید ؟",
         amount: "مبلغ",
         adjustmentAmount: "تخفیف پرداخت",
         customerDebtDescription: "کل بدهی مشتری {{debt}} میباشد",

@@ -88,6 +88,7 @@ export class CreateCustomerStatementExcel extends BaseRepository {
       currencyAmount: purchase.lineTotalCurrencyAmount,
 
       currencyName: purchase.currencyName,
+      discount: 0,
 
       amount: purchase.lineTotal,
 
@@ -114,6 +115,7 @@ export class CreateCustomerStatementExcel extends BaseRepository {
       currencyName: payment.currencyName,
 
       amount: payment.amount,
+      discount: payment.adjustmentAmount,
 
       description:
         payment.description ??
@@ -121,7 +123,7 @@ export class CreateCustomerStatementExcel extends BaseRepository {
 
       debit: 0,
 
-      credit: payment.currencyAmount,
+      credit: payment.currencyAmount + payment.currencyRateAdjustmentAmount,
     }));
 
     // -----------------------------

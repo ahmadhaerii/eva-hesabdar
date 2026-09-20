@@ -186,7 +186,7 @@ function HomePage() {
     queryKey: ["createCustomerStatement"],
     queryFn: async () => {
       const data = await createCustomerStatement(customerId!);
-      await exportAccountStatementToExcel(data, "گردش-حساب-مرداد");
+      await exportAccountStatementToExcel(data, new Date().toDateString());
       setCanGetReport(false);
     },
     enabled: !!customerId && canGetReport,
@@ -659,7 +659,7 @@ function HomePage() {
                   <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
                 </div>
 
-                <span className="font-medium">{t("discountLastMonth")}</span>
+                <span className="font-medium">{t("discount")}</span>
               </div>
 
               <strong>
@@ -673,9 +673,7 @@ function HomePage() {
                   <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
                 </div>
 
-                <span className="font-medium">
-                  {t("adjustmentAmountLastMonth")}
-                </span>
+                <span className="font-medium">{t("adjustmentAmount")}</span>
               </div>
 
               <strong>
@@ -745,7 +743,7 @@ function HomePage() {
                   <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
                 </div>
 
-                <span className="font-medium">{t("discountThisYear")}</span>
+                <span className="font-medium">{t("discount")}</span>
               </div>
 
               <strong>
@@ -758,9 +756,7 @@ function HomePage() {
                   <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
                 </div>
 
-                <span className="font-medium">
-                  {t("adjustmentAmountThisYear")}
-                </span>
+                <span className="font-medium">{t("adjustmentAmount")}</span>
               </div>
 
               <strong>
@@ -828,7 +824,7 @@ function HomePage() {
                   <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
                 </div>
 
-                <span className="font-medium">{t("discountTotal")}</span>
+                <span className="font-medium">{t("discount")}</span>
               </div>
 
               <strong>{dashboardStats?.discountTotal?.toLocaleString()}</strong>
@@ -839,9 +835,7 @@ function HomePage() {
                   <BanknoteArrowUp className="h-5 w-5 text-violet-500" />
                 </div>
 
-                <span className="font-medium">
-                  {t("adjustmentAmountTotal")}
-                </span>
+                <span className="font-medium">{t("adjustmentAmount")}</span>
               </div>
 
               <strong>

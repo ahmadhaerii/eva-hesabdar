@@ -25,6 +25,7 @@ export const exportAccountStatementToExcel = async (
     { header: "تاریخ", key: "date", width: 15 },
     { header: "مبلغ ارزی", key: "currencyAmount", width: 20 },
     { header: "مبلغ", key: "amount", width: 20 },
+    { header: "تخفیف پرداخت", key: "discount", width: 20 },
     { header: "بدهی", key: "balance", width: 20 },
     { header: "توضیحات", key: "description", width: 60 },
   ];
@@ -38,6 +39,7 @@ export const exportAccountStatementToExcel = async (
       date: row.date,
       currencyAmount: `${row.currencyAmount.toFixed(3)} ` + row.currencyName,
       amount: `${row.amount.toLocaleString()} تومان`,
+      discount: `${row.discount.toLocaleString()} تومان`,
       balance: `${row.balance.toLocaleString()} ` + row.currencyName,
       description: row.description,
     });

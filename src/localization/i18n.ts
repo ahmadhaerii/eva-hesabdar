@@ -180,6 +180,7 @@ i18n.use(initReactI18next).init({
         // Common
         invoiceCount: "تعداد فاکتور",
         year: "سال",
+        discount: "تخفیف",
         percent: "درصد",
         add: "افزودن",
         edit: "ویرایش",

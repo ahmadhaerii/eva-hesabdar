@@ -25,6 +25,7 @@ import CustomerType from "@/features/customers/customerType";
 import { useCurrencyStore } from "@/stores/currencyStore";
 import { listCurrenciesWithLastRate } from "@/actions/currency";
 import { CurrencyWithRate } from "@/database/repositories/currency/currency.repository";
+import { exportDebtCustomers } from "@/utils/export/exportDebtCustomers";
 
 export function DebtCustomers() {
   const { t } = useTranslation();
@@ -38,7 +39,7 @@ export function DebtCustomers() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["customers"],
+    queryKey: ["debtCustomers"],
     queryFn: listCustomersWithDebt,
   });
 
@@ -58,12 +59,26 @@ export function DebtCustomers() {
     },
   });
 
+  const getExportToExcel = async () => {
+    await exportDebtCustomers(
+      customers,
+      currency!,
+      defaultCurrency!,
+      new Date().toDateString(),
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">{t("debtCustomersList")}</h1>
         </div>
+        <Button className="mt-6" onClick={() => getExportToExcel()}>
+          <Plus className="ml-2 h-4 w-4" />
+
+          {t("customerReport")}
+        </Button>
       </div>
 
       {isLoading && <div className="text-muted-foreground">{t("loading")}</div>}

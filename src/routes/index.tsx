@@ -113,7 +113,7 @@ function StatCard({
   iconBackgroundColor?: string;
 }) {
   return (
-    <Card className="border-white/[0.08] bg-[#171717] shadow-none">
+    <Card className="   shadow-none">
       <CardContent className="p-6">
         <div
           className="mb-7 flex h-11 w-11 items-center justify-center rounded-md "
@@ -124,11 +124,11 @@ function StatCard({
           <Icon className="h-5 w-5 " style={{ color: iconColor }} />
         </div>
 
-        <p className="text-base font-semibold text-white">{title}</p>
+        <p className="text-base font-semibold  ">{title}</p>
 
         <p className="mt-2 text-sm text-zinc-500">{description}</p>
 
-        <p className="mt-1 text-lg font-semibold text-white">{value}</p>
+        <p className="mt-1 text-lg font-semibold  ">{value}</p>
         {secondValue && (
           <p className="mt-1 text-lg font-semibold text-orange-400">
             {secondValue}
@@ -340,42 +340,36 @@ function HomePage() {
 
         {/* Profit cards */}
         <section className="mb-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Card className="border-white/[0.08] bg-[#171717] shadow-none">
+          <Card className="   shadow-none">
             <CardContent className="p-6">
-              <p className="text-lg font-semibold text-white">
-                {t("products")}
-              </p>
+              <p className="text-lg font-semibold  ">{t("products")}</p>
 
               <p className="mt-3 text-2xl font-bold">
                 {dashboardData?.productsCount}
               </p>
             </CardContent>
           </Card>
-          <Card className="border-white/[0.08] bg-[#171717] shadow-none">
+          <Card className="   shadow-none">
             <CardContent className="p-6">
-              <p className="text-lg font-semibold text-white">{t("sales")}</p>
+              <p className="text-lg font-semibold  ">{t("sales")}</p>
 
               <p className="mt-3 text-2xl font-bold">
                 {dashboardData?.salesInvoicesCount}
               </p>
             </CardContent>
           </Card>
-          <Card className="border-white/[0.08] bg-[#171717] shadow-none">
+          <Card className="   shadow-none">
             <CardContent className="p-6">
-              <p className="text-lg font-semibold text-white">
-                {t("purchases")}
-              </p>
+              <p className="text-lg font-semibold  ">{t("purchases")}</p>
 
               <p className="mt-3 text-2xl font-bold">
                 {dashboardData?.purchaseInvoicesCount}
               </p>
             </CardContent>
           </Card>
-          <Card className="border-white/[0.08] bg-[#171717] shadow-none">
+          <Card className="    shadow-none">
             <CardContent className="p-6">
-              <p className="text-lg font-semibold text-white">
-                {t("customers")}
-              </p>
+              <p className="text-lg font-semibold  ">{t("customers")}</p>
 
               <p className="mt-3 text-2xl font-bold">
                 {dashboardData?.customersCount}
@@ -452,7 +446,7 @@ function HomePage() {
         {/* Main content */}
         <section className="grid gap-6 xl:grid-cols-[250px_250px_minmax(0,1fr)]">
           {/* Products */}
-          <Card className="border-white/[0.08]  shadow-none">
+          <Card className="   shadow-none">
             <CardHeader>
               <CardTitle className="text-lg">{t("mostUsed")}</CardTitle>
             </CardHeader>
@@ -465,11 +459,11 @@ function HomePage() {
                   setDialogComponent("DebtCustomers");
                 }}
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-[#ff205625]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md  ">
                   <HeartCrack className="h-5 w-5 text-[#ff2056]" />
                 </div>
                 <div className="min-w-0 ">
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate text-sm font-medium  ">
                     {t("debtCustomersList")}
                   </p>
                 </div>
@@ -487,7 +481,7 @@ function HomePage() {
                 </div>
 
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate text-sm font-medium  ">
                     {t("unfaithfulCustomersList")}
                   </p>
                 </div>
@@ -504,7 +498,7 @@ function HomePage() {
                 </div>
 
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate text-sm font-medium  ">
                     لیست کالاهای رو به اتمام
                   </p>
                 </div>
@@ -532,7 +526,7 @@ function HomePage() {
           </div>
 
           {/* Chart */}
-          <Card className="border-white/[0.08] bg-[#171717] shadow-none">
+          <Card className="  shadow-none">
             <CardHeader className="flex flex-row items-start justify-between">
               <div>
                 <CardTitle className="text-lg">{t("monthlySales")}</CardTitle>
@@ -592,8 +586,8 @@ function HomePage() {
         </section>
 
         {/* Bottom reports */}
-        <section className="mt-6 grid gap-0 overflow-hidden rounded-xl border border-white/[0.08] bg-[#171717] md:grid-cols-3">
-          <div className="border-b border-white/[0.08] p-7 last:border-b-0 md:border-b-0  ">
+        <section className="mt-6 grid gap-0 overflow-hidden rounded-xl border md:grid-cols-3">
+          <div className="border-b  p-7 last:border-b-0 md:border-b-0  ">
             <h3 className="text-lg font-semibold">{t("reportMonth")}</h3>
 
             <p className="mt-1 text-sm text-zinc-500">
@@ -682,7 +676,7 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="border-b border-white/[0.08] p-7 md:border-b-0 md:border-r md:border-l ">
+          <div className="border-b  p-7 md:border-b-0 md:border-r md:border-l ">
             <h3 className="text-lg font-semibold">{t("reportYear")}</h3>
 
             <p className="mt-1 text-sm text-zinc-500">
@@ -764,7 +758,7 @@ function HomePage() {
               </strong>
             </div>
           </div>
-          <div className="border-b border-white/[0.08] p-7 last:border-b-0 md:border-b-0   ">
+          <div className="border-b   p-7 last:border-b-0 md:border-b-0   ">
             <h3 className="text-lg font-semibold">{t("reportTotal")}</h3>
 
             <p className="mt-1 text-sm text-zinc-500">

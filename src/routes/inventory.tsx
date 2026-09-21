@@ -11,6 +11,9 @@ import { listCurrenciesWithLastRate } from "@/actions/currency";
 import { CurrencyWithRate } from "@/database/repositories/currency/currency.repository";
 import { daysSinceLastOrder } from "@/utils/dateUtils";
 import { inventorySummary } from "@/actions/product";
+import { exportInventoryToExcel } from "@/utils/export/exportInventory";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 function inventoryComponent() {
   const { t } = useTranslation();
@@ -28,12 +31,20 @@ function inventoryComponent() {
     queryFn: inventorySummary,
   });
 
+  const getExportInventoryToExcel = async () => {
+    await exportInventoryToExcel(inventorySummaries, new Date().toDateString());
+  };
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">{t("inventory")}</h1>
         </div>
+        <Button onClick={() => getExportInventoryToExcel()}>
+          <Plus className="ml-2 h-4 w-4" />
+
+          {t("customerReport")}
+        </Button>
       </div>
 
       {isLoading && <div className="text-muted-foreground">{t("loading")}</div>}

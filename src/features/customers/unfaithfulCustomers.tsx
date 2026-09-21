@@ -21,7 +21,7 @@ export function UnfaithfulCustomers() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["customers"],
+    queryKey: ["unfaithfulCustomers"],
     queryFn: listCustomersWithLastOrderDate,
   });
 

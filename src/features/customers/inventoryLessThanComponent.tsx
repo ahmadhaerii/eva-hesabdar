@@ -24,7 +24,7 @@ export function InventoryLessThanComponent() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["inventorySummary"],
+    queryKey: ["inventoryLessThan"],
     queryFn: inventorySummaryLessThan,
   });
 

@@ -1,5 +1,9 @@
 import { purchaseService } from "@/database/services/purchase.service";
 import { salesService } from "@/database/services/sales.service";
+import {
+  SalesInvoiceItemWithRelations,
+  SalesInvoiceWithRelations,
+} from "@/database/types/database";
 import { os } from "@orpc/server";
 import { z } from "zod";
 
@@ -21,6 +25,22 @@ export const getSaleInvoice = os.input(idInput).handler(async ({ input }) => {
     console.error("error", error);
   }
 });
+
+export const deleteSaleInvoiceItem = os
+  .input(
+    z.object({
+      saleInvoice: z.custom<SalesInvoiceWithRelations>(),
+      invoiceItem: z.custom<SalesInvoiceItemWithRelations>(),
+    }),
+  )
+  .handler(async ({ input }) => {
+    try {
+      const list = await salesService.deleteSaleInvoiceItem(input);
+      return list;
+    } catch (error) {
+      console.error("error", error);
+    }
+  });
 
 const createSaleInvoiceInput = z.object({
   invoice: z.object({

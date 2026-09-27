@@ -1,15 +1,24 @@
 import { Button } from "@/components/ui/button";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckIcon } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CheckIcon, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import {
   Product,
   PurchaseInvoiceWithRelations,
+  SalesInvoiceItemWithRelations,
   SalesInvoiceWithRelations,
 } from "@/database/types/database";
 import { useCurrencyStore } from "@/stores/currencyStore";
-import { getSaleInvoice } from "@/actions/sale";
+import { deleteSaleInvoiceItem, getSaleInvoice } from "@/actions/sale";
 interface purchaseInvoiceWithRelations {
   purchaseInvoice: PurchaseInvoiceWithRelations;
 }
@@ -37,6 +46,8 @@ export default function ShowSaleInvoice({
 }: SaleInvoiceProps) {
   const [salesInvoice, setSalesInvoice] =
     useState<SalesInvoiceWithRelations | null>(null);
+  const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false);
+
   const queryClient = useQueryClient();
 
   const {
@@ -50,11 +61,31 @@ export default function ShowSaleInvoice({
       if (data) {
         setSalesInvoice(data);
       }
-
-      console.log(data);
       return data;
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: ({
+      saleInvoice,
+      saleInvoiceItem,
+    }: {
+      saleInvoice: SalesInvoiceWithRelations;
+      saleInvoiceItem: SalesInvoiceItemWithRelations;
+    }) => deleteSaleInvoiceItem(saleInvoice, saleInvoiceItem),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["saleInvoice"],
+      });
+      setDialogDeleteOpen(false);
+    },
+    onError: (error) => {
+      console.error(error);
+      setDialogDeleteOpen(false);
+    },
+  });
+
   const { t } = useTranslation();
 
   const defaultCurrency = useCurrencyStore((state) => state.defaultCurrency);
@@ -63,17 +94,8 @@ export default function ShowSaleInvoice({
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [total, setTotal] = useState<number | null>(null);
-
-  // useEffect(() => {
-  //   if (productId !== null && quantity !== null && saleUnitPrice !== null) {
-  //     const total = quantity * saleUnitPrice;
-  //     setHelperDescription(
-  //       `قیمت فروش کل  : ${total.toLocaleString("en-US")} ${defaultCurrency?.name}  ، معادل  ${WordifyFa(total)} ${defaultCurrency?.name}   میباشد`,
-  //     );
-  //   } else {
-  //     setHelperDescription("قیمت فروش محاسبه نشده است");
-  //   }
-  // }, [quantity, productId, saleUnitPrice]);
+  const [deleteSalesInvoiceItem, setDeleteSalesInvoiceItem] =
+    useState<SalesInvoiceItemWithRelations | null>(null);
 
   useEffect(() => {
     if (salesInvoice) {
@@ -84,62 +106,6 @@ export default function ShowSaleInvoice({
       setTotal(total);
     }
   }, [salesInvoice]);
-
-  // useEffect(() => {
-  //   if (productId !== null && quantity !== null) {
-  //     const selectedRows = [];
-  //     let remainingQuantity = quantity;
-
-  //     for (const item of purchaseInvoiceItemsForProduct) {
-  //       if (remainingQuantity <= 0) break;
-
-  //       selectedRows.push(item.id);
-
-  //       remainingQuantity -= item.remainingQuantity;
-  //     }
-  //     setSelectedRowOfPurchaseInvoiceItems(selectedRows);
-  //   } else {
-  //     setSelectedRowOfPurchaseInvoiceItems([]);
-  //   }
-  // }, [quantity, productId]);
-
-  // useEffect(() => {
-  //   const currency = currenciesWithLastRate.find(
-  //     (currencyWithLastRate) =>
-  //       currencyWithLastRate.latestRateId == currencyRateId,
-  //   );
-  //   const profitPercent = selectedCustomer?.customProfitPercent
-  //     ? selectedCustomer?.customProfitPercent
-  //     : selectedCustomer?.customerType?.profitPercent;
-  //   const totalPrice =
-  //     purchaseInvoiceItemsForProduct[purchaseInvoiceItemsForProduct.length - 1]
-  //       ?.totalPrice;
-
-  //   if (
-  //     selectedCustomer &&
-  //     currency &&
-  //     totalPrice &&
-  //     profitPercent &&
-  //     currency?.latestRate !== null &&
-  //     productId !== null
-  //   ) {
-  //     const suggestedUnitPrice =
-  //       totalPrice * (1 + profitPercent / 100) * currency.latestRate;
-  //     setSuggestedUnitPrice(suggestedUnitPrice);
-  //     setPriceHelperDescription(
-  //       `قیمت فروش هر واحد : ${suggestedUnitPrice.toLocaleString("en-US")} ${defaultCurrency?.name}   میباشد`,
-  //     );
-  //   } else {
-  //     setPriceHelperDescription("قیمت فروش محاسبه نشده است");
-  //   }
-
-  //   setTotalRemainingQuantity(
-  //     purchaseInvoiceItemsForProduct.reduce(
-  //       (sum, lot) => sum + lot.remainingQuantity,
-  //       0,
-  //     ),
-  //   );
-  // }, [purchaseInvoiceItemsForProduct]);
 
   return (
     <div className="space-y-6">
@@ -189,6 +155,52 @@ export default function ShowSaleInvoice({
           </div>
         </div>
       </div>
+      <Dialog
+        open={dialogDeleteOpen}
+        onOpenChange={(open: boolean) => setDialogDeleteOpen(open)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("deletePurchaseItem")}</DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-start gap-2">
+            <p>
+              {t("deletePurchaseItemsDescription", {
+                name: deleteSalesInvoiceItem?.product.name,
+              })}
+            </p>
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <div className="flex justify-start gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setDialogDeleteOpen(false);
+              }}
+              disabled={deleteMutation.isPending}
+            >
+              {t("cancel")}
+            </Button>
+
+            <Button
+              disabled={deleteMutation.isPending}
+              onClick={() => {
+                deleteMutation.mutate({
+                  saleInvoice: salesInvoice!,
+                  saleInvoiceItem: deleteSalesInvoiceItem!,
+                });
+              }}
+            >
+              {deleteMutation.isPending
+                ? t("loading")
+                : t("deletePurchaseItem")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="flex items-center justify-between">
         <div>
           <p className="text-muted-foreground">{t("saleInvoiceDescription")}</p>
@@ -207,18 +219,19 @@ export default function ShowSaleInvoice({
         salesInvoice?.saleInvoiceItems &&
         salesInvoice.saleInvoiceItems.length > 0 && (
           <div className="rounded-lg border">
-            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 font-medium">
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 font-medium">
               <div>{t("productName")}</div>
               <div>{t("quantity")}</div>
               <div>{t("unitPrice")}</div>
               <div>{t("total")}</div>
               <div>{t("lineTotalCurrencyAmount")}</div>
+              <div>{t("action")}</div>
             </div>
 
             {salesInvoice?.saleInvoiceItems.map((salesInvoiceItem) => (
               <div
                 key={salesInvoiceItem.id}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 last:border-b-0"
+                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b p-4 last:border-b-0"
               >
                 <div>{salesInvoiceItem.product.name}</div>
                 <div>{salesInvoiceItem.quantity.toLocaleString("en-US")}</div>
@@ -234,6 +247,18 @@ export default function ShowSaleInvoice({
                 <div>
                   {salesInvoiceItem.lineTotalCurrencyAmount.toLocaleString()}{" "}
                   {salesInvoice.currencyRate.currency?.name}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => {
+                      setDeleteSalesInvoiceItem(salesInvoiceItem);
+                      setDialogDeleteOpen(true);
+                    }}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}

@@ -1,6 +1,8 @@
 import {
   NewSalesInvoice,
   NewSalesInvoiceItem,
+  SalesInvoiceItemWithRelations,
+  SalesInvoiceWithRelations,
 } from "../../database/types/database";
 
 import { salesRepository } from "../repositories/sales/sales.repository";
@@ -103,154 +105,39 @@ export class SalesService {
     }
   }
 
-  // remove below
+  async deleteSaleInvoiceItem(data: {
+    saleInvoice: SalesInvoiceWithRelations;
+    invoiceItem: SalesInvoiceItemWithRelations;
+  }) {
+    const { saleInvoice, invoiceItem } = data;
+    let totalPrice =
+      saleInvoice.totalPrice - invoiceItem.lineTotalCurrencyAmount;
+    let amountPayable =
+      saleInvoice.amountPayable - invoiceItem.lineTotalCurrencyAmount;
+    if (saleInvoice.saleInvoiceItems.length === 1) {
+      totalPrice = 0;
+      amountPayable = 0;
+    }
+    for await (const allocation of invoiceItem.allocations) {
+      const purchaseInvoiceItem =
+        await purchaseRepository.getPurchaseInvoiceItemById(
+          allocation.purchaseInvoiceItemId,
+        );
 
-  //   async create(dto: CreateSalesInvoiceDto) {
-  //     const [invoice] = await salesRepository.createInvoice(dto.invoice);
+      await purchaseRepository.updateRemainingQuantity(
+        allocation.purchaseInvoiceItemId,
+        purchaseInvoiceItem?.remainingQuantity! + allocation.quantity,
+      );
+      await salesRepository.deleteAllocation(allocation.id);
+    }
 
-  //     for (const item of dto.items) {
-  //       await salesRepository.addItem({
-  //         ...item,
-  //         salesInvoiceId: invoice.id,
-  //       });
-  //     }
+    await salesRepository.deleteInvoiceItem(invoiceItem.id);
 
-  //     await this.allocateInventory(invoice.id);
-
-  //     await this.createInventoryTransactions(invoice.id, invoice.invoiceDate);
-
-  //     await salesRepository.changeStatus(invoice.id, "Confirmed");
-
-  //     return invoice;
-  //   }
-  //   /* ==========================================================
-  //    CREATE INVENTORY TRANSACTIONS
-  // ========================================================== */
-
-  //   private async createInventoryTransactions(
-  //     invoiceId: number,
-  //     transactionDate: string,
-  //   ) {
-  //     const items = await salesRepository.getItems(invoiceId);
-
-  //     if (items.length === 0) {
-  //       return;
-  //     }
-
-  //     for (const item of items) {
-  //       const allocations = await salesRepository.getAllocations(item.id);
-
-  //       for (const allocation of allocations) {
-  //         await inventoryRepository.createTransaction({
-  //           productId: item.productId,
-
-  //           inventoryLotId: allocation.inventoryLotId,
-
-  //           transactionType: "Sale",
-
-  //           quantity: -allocation.quantity,
-
-  //           referenceTable: "sales_invoices",
-
-  //           referenceId: invoiceId,
-
-  //           transactionDate,
-
-  //           description: `Sales Invoice #${invoiceId}`,
-
-  //           createdAt: new Date().toISOString(),
-  //         });
-  //       }
-  //     }
-  //   }
-  //   /* ==========================================================
-  //    ALLOCATE INVENTORY (FIFO)
-  // ========================================================== */
-
-  //   private async allocateInventory(invoiceId: number) {
-  //     const items = await salesRepository.getItems(invoiceId);
-
-  //     if (items.length === 0) {
-  //       return;
-  //     }
-
-  //     for (const item of items) {
-  //       let remainingQuantity = item.quantity;
-
-  //       const lots = await inventoryRepository.getAvailableLots(item.productId);
-
-  //       if (lots.length === 0) {
-  //         throw new Error(`No inventory available for product ${item.productId}`);
-  //       }
-
-  //       for (const lot of lots) {
-  //         if (remainingQuantity <= 0) {
-  //           break;
-  //         }
-
-  //         const usedQuantity = Math.min(remainingQuantity, lot.remainingQuantity);
-
-  //         await salesRepository.createAllocation({
-  //           salesInvoiceItemId: item.id,
-
-  //           inventoryLotId: lot.id,
-
-  //           quantity: usedQuantity,
-
-  //           fifoUnitCost: lot.finalUnitCost,
-
-  //           fifoTotalCost: usedQuantity * lot.finalUnitCost,
-
-  //           createdAt: new Date().toISOString(),
-  //         });
-
-  //         await inventoryRepository.updateRemainingQuantity(
-  //           lot.id,
-  //           lot.remainingQuantity - usedQuantity,
-  //         );
-
-  //         remainingQuantity -= usedQuantity;
-  //       }
-
-  //       if (remainingQuantity > 0) {
-  //         throw new Error(`Insufficient inventory for product ${item.productId}`);
-  //       }
-  //     }
-  //   }
-  //   /* ==========================================================
-  //    GET INVOICE
-  // ========================================================== */
-
-  //   async getById(id: number) {
-  //     return salesRepository.getById(id);
-  //   }
-  //   /* ==========================================================
-  //    LIST
-  // ========================================================== */
-
-  //   async list() {
-  //     return salesRepository.list();
-  //   }
-  //   /* ==========================================================
-  //    CONFIRM
-  // ========================================================== */
-
-  //   async confirm(invoiceId: number) {
-  //     return salesRepository.changeStatus(invoiceId, "Confirmed");
-  //   }
-  //   /* ==========================================================
-  //    CANCEL
-  // ========================================================== */
-
-  //   async cancel(invoiceId: number) {
-  //     return salesRepository.changeStatus(invoiceId, "Cancelled");
-  //   }
-  //   /* ==========================================================
-  //    DELETE
-  // ========================================================== */
-
-  //   async delete(invoiceId: number) {
-  //     return salesRepository.delete(invoiceId);
-  //   }
+    await salesRepository.updateSaleInvoicePrice(
+      saleInvoice.id,
+      totalPrice,
+      amountPayable,
+    );
+  }
 }
 export const salesService = new SalesService();

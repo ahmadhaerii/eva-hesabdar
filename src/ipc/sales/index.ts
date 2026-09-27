@@ -1,5 +1,6 @@
 import {
   listSaleInvoices,
+  deleteSaleInvoiceItem,
   getSaleInvoice,
   createSaleInvoice,
 } from "./handlers";
@@ -7,5 +8,6 @@ import {
 export const sale = {
   listSaleInvoices,
   getSaleInvoice,
+  deleteSaleInvoiceItem,
   createSaleInvoice,
 };

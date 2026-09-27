@@ -10,18 +10,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { number, z } from "zod";
-import {
-  createPurchaseInvoice,
-  deletePurchaseInvoice,
-  getPurchaseInvoices,
-  updatePurchaseInvoice,
-} from "@/actions/purchase";
-import { getCurrencies, getRatesByCurrency } from "@/actions/currency";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { PurchaseInvoiceWithRelations } from "@/database/types/database";
-import PurchaseItems from "@/features/purchases/purchaseItems";
-import { useCurrencyStore } from "@/stores/currencyStore";
 import SaleInvoice from "@/features/sales/saleInvoice";
 import { getSaleInvoices } from "@/actions/sale";
 import ShowSaleInvoice from "@/features/sales/showSaleInvoice";
@@ -29,22 +20,9 @@ import ShowSaleInvoice from "@/features/sales/showSaleInvoice";
 function SalesPage() {
   const { t } = useTranslation();
 
-  const [currencyRateId, setCurrencyRateId] = useState<number | null>(null);
-  const [currencyId, setCurrencyId] = useState<number | null>(null);
-
   const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
-  const [selectedPurchaseInvoice, setSelectedPurchaseInvoice] =
-    useState<PurchaseInvoiceWithRelations | null>(null);
-  const [dialogDeleteOpen, setDialogDeleteOpen] = useState(false);
+  useState<PurchaseInvoiceWithRelations | null>(null);
   const [dialogSaleInvoiceOpen, setDialogSaleInvoiceOpen] = useState(false);
-
-  const [invoiceNumber, setInvoiceNumber] = useState("");
-  const [invoiceDate, setInvoiceDate] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("Confirmed");
-
-  const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const {
@@ -56,111 +34,12 @@ function SalesPage() {
     queryFn: getSaleInvoices,
   });
 
-  const {
-    data: currencies = [],
-    isLoading: isLoadingCurrencies,
-    isError: isErrorCurrencies,
-  } = useQuery({
-    queryKey: ["currencies"],
-    queryFn: getCurrencies,
-  });
-
-  const {
-    data: currencyRates = [],
-    isLoading: isLoadingCurrencyRates,
-    isError: isErrorCurrencyRates,
-  } = useQuery({
-    queryKey: ["currencyRates", currencyId],
-    queryFn: () => getRatesByCurrency({ id: currencyId! }),
-    enabled: !!currencyId,
-  });
-
-  const createMutation = useMutation({
-    mutationFn: createPurchaseInvoice,
-
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["purchaseInvoices"],
-      });
-      resetForm();
-    },
-
-    onError: () => {
-      setError("ایجاد مشتری با خطا مواجه شد.");
-    },
-  });
-  const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: {
-        invoiceNumber: string;
-        invoiceDate: string;
-        currencyId: number;
-        currencyRateId: number;
-        description?: string | null | undefined;
-        status?: "Draft" | "Confirmed" | "Cancelled" | undefined;
-      };
-    }) => updatePurchaseInvoice(id, data),
-
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["purchaseInvoices"],
-      });
-      resetForm();
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) => deletePurchaseInvoice(id),
-
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["purchaseInvoices"],
-      });
-
-      resetForm();
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
-
   const resetForm = async () => {
     setEditingId(null);
-    setInvoiceNumber("");
-    setInvoiceDate("");
-    setCurrencyId(null);
-    setCurrencyRateId(null);
-    setDescription("");
-    setStatus("");
-
-    setError("");
     setDialogSaleInvoiceOpen(false);
-    setDialogDeleteOpen(false);
-    setOpen(false);
     await queryClient.invalidateQueries({
       queryKey: ["purchaseInvoices"],
     });
-  };
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, ""); // فقط عدد
-    if (value.length > 8) value = value.slice(0, 8);
-
-    // اضافه کردن خط تیره خودکار
-    if (value.length >= 5) {
-      value = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
-    } else if (value.length >= 4) {
-      value = `${value.slice(0, 4)}-${value.slice(4)}`;
-    }
-
-    setInvoiceDate(value);
   };
 
   return (
@@ -215,51 +94,6 @@ function SalesPage() {
             </DialogContent>
           </Dialog>
         </div>
-
-        <Dialog
-          open={dialogDeleteOpen}
-          onOpenChange={(open: boolean) =>
-            open ? setDialogDeleteOpen(open) : resetForm()
-          }
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t("deletePurchaseInvoice")}</DialogTitle>
-            </DialogHeader>
-            <div className="flex justify-start gap-2">
-              <p>
-                {t("deletePurchaseInvoiceDescription", { name: invoiceNumber })}
-              </p>
-            </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-
-            <div className="flex justify-start gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  resetForm();
-                }}
-                disabled={deleteMutation.isPending}
-              >
-                {t("cancel")}
-              </Button>
-
-              <Button
-                disabled={deleteMutation.isPending}
-                onClick={() => {
-                  deleteMutation.mutate({
-                    id: editingId!,
-                  });
-                }}
-              >
-                {createMutation.isPending
-                  ? t("loading")
-                  : t("deletePurchaseInvoice")}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
 
       {isLoading && <div className="text-muted-foreground">{t("loading")}</div>}

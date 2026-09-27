@@ -1,3 +1,7 @@
+import {
+  SalesInvoiceItemWithRelations,
+  SalesInvoiceWithRelations,
+} from "@/database/types/database";
 import { ipc } from "@/ipc/manager";
 
 export async function getSaleInvoices(): Promise<
@@ -53,4 +57,11 @@ export async function getSaleInvoice(
   id: number,
 ): Promise<Awaited<ReturnType<typeof ipc.client.sale.getSaleInvoice>>> {
   return ipc.client.sale.getSaleInvoice(id);
+}
+
+export async function deleteSaleInvoiceItem(
+  saleInvoice: SalesInvoiceWithRelations,
+  invoiceItem: SalesInvoiceItemWithRelations,
+): Promise<Awaited<ReturnType<typeof ipc.client.sale.deleteSaleInvoiceItem>>> {
+  return ipc.client.sale.deleteSaleInvoiceItem({ saleInvoice, invoiceItem });
 }

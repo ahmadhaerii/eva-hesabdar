@@ -7,7 +7,7 @@ import {
   salesInvoices,
 } from "@/database/schema";
 import { BaseRepository } from "../base.repository";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, gt, isNull } from "drizzle-orm";
 
 export class CreateCustomerStatementExcel extends BaseRepository {
   async createCustomerStatement(customerId: number): Promise<any[]> {
@@ -42,6 +42,32 @@ export class CreateCustomerStatementExcel extends BaseRepository {
         ),
       );
 
+    const invoices = await this.executor
+      .select({
+        id: salesInvoices.id,
+        invoiceNumber: salesInvoices.invoiceNumber,
+        customerId: salesInvoices.customerId,
+        currencyRateId: salesInvoices.currencyRateId,
+        invoiceDate: salesInvoices.invoiceDate,
+        totalPrice: salesInvoices.totalPrice,
+        discount: salesInvoices.discount,
+        amountPayable: salesInvoices.amountPayable,
+        currencyRate: currencyRates.rate,
+        currencyName: currencies.name,
+      })
+      .from(salesInvoices)
+      .innerJoin(
+        currencyRates,
+        eq(salesInvoices.currencyRateId, currencyRates.id),
+      )
+      .innerJoin(currencies, eq(currencyRates.currencyId, currencies.id))
+      .where(
+        and(
+          eq(salesInvoices.customerId, customerId),
+          gt(salesInvoices.totalPrice, 0),
+          isNull(salesInvoices.deletedAt),
+        ),
+      );
     // -----------------------------
     // 2. Get payments
     // -----------------------------
@@ -101,6 +127,25 @@ export class CreateCustomerStatementExcel extends BaseRepository {
       credit: 0,
     }));
 
+    const invoicesRows = invoices.map((invoice) => ({
+      title: "فاکتور خرید" as const,
+
+      date: invoice.invoiceDate,
+
+      currencyAmount: 0,
+
+      currencyName: invoice.currencyName,
+      discount: invoice.discount * invoice.currencyRate,
+
+      amount: 0,
+
+      description: `تخفیف در فاکتور شماره ${invoice.id}`,
+
+      debit: 0,
+
+      credit: invoice.discount,
+    }));
+
     // -----------------------------
     // 4. Create payment rows
     // -----------------------------
@@ -130,8 +175,8 @@ export class CreateCustomerStatementExcel extends BaseRepository {
     // 5. Combine
     // -----------------------------
 
-    const statement = [...purchaseRows, ...paymentRows].sort((a, b) =>
-      a.date.localeCompare(b.date),
+    const statement = [...purchaseRows, ...paymentRows, ...invoicesRows].sort(
+      (a, b) => a.date.localeCompare(b.date),
     );
 
     // -----------------------------
@@ -143,7 +188,6 @@ export class CreateCustomerStatementExcel extends BaseRepository {
     const rows = statement.map((item) => {
       balance += item.debit;
       balance -= item.credit;
-
       return {
         ...item,
         balance: balance.toFixed(3),

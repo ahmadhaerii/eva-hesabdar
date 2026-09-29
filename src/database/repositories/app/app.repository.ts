@@ -98,7 +98,8 @@ customer_debts AS (
         FROM customer_payments cp
         INNER JOIN currency_rates cr_base ON cp.currency_rate_id = cr_base.id
         INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
-        GROUP BY cp.customer_id
+         WHERE cp.deleted_at IS NULL
+        GROUP BY cp.customer_id 
     ) pay ON pay.customer_id = c.id
 )
 SELECT 
@@ -146,10 +147,11 @@ SELECT
                              SUM(cp.currency_rate_adjustment_amount ) AS total_currency_rate_adjustment_amount,
 
                   SUM(cp.amount ) AS total_payments 
-            FROM customer_payments cp
+            FROM customer_payments cp 
             INNER JOIN currency_rates cr_base ON cp.currency_rate_id = cr_base.id
             INNER JOIN latest_rates lr ON lr.currency_id = cr_base.currency_id
-            GROUP BY cp.customer_id
+            WHERE cp.deleted_at IS NULL
+            GROUP BY cp.customer_id 
         ) pay ON pay.customer_id = c.id
         ORDER BY debt DESC
         LIMIT 1

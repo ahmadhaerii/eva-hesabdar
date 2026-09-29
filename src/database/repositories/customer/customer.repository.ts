@@ -56,7 +56,12 @@ export class CustomerRepository extends BaseRepository {
           ),
       })
       .from(customerPayments)
-      .where(eq(customerPayments.customerId, customerId))
+      .where(
+        and(
+          eq(customerPayments.customerId, customerId),
+          isNull(customerPayments.deletedAt),
+        ),
+      )
       .as("pay");
 
     const debtExpr = sql<number>`COALESCE(${invoicesSubquery.totalInvoices}, 0) - (COALESCE(${paymentsSubquery.totalPayments}, 0) + COALESCE(${paymentsSubquery.totalAdjustmentAmount}, 0))`;
@@ -103,6 +108,7 @@ export class CustomerRepository extends BaseRepository {
           ),
       })
       .from(customerPayments)
+      .where(isNull(customerPayments.deletedAt))
       .groupBy(customerPayments.customerId)
       .as("pay");
 
@@ -150,6 +156,7 @@ export class CustomerRepository extends BaseRepository {
           ),
       })
       .from(customerPayments)
+      .where(isNull(customerPayments.deletedAt))
       .groupBy(customerPayments.customerId)
       .as("pay");
 

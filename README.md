@@ -2,9 +2,9 @@
 
  EVA it's here to fix your calculation in shop 
 
-![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/tree/main/images/demo.png)
-![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/tree/main/images/demo1.png)
-![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/tree/main/images/demo2.png)
+![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo.png)
+![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo1.png)
+![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo2.png)
 
 ## Libs and tools
 

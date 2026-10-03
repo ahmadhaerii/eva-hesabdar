@@ -1,14 +1,32 @@
 # EVA
 
- EVA it's here to fix your calculation in shop 
+**EVA** یک نرم‌افزار حسابداری چندارزی است که برای کسب‌وکارهایی طراحی شده که خرید و واردات خود را به **دلار یا درهم** انجام می‌دهند، اما فروش آن‌ها به **ریال یا تومان** انجام می‌شود.
 
-![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo.png)
-![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo1.png)
-![Demo GIF](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo2.png)
+## EVA چه مشکلی را حل می‌کند؟
 
-## Libs and tools
+در کسب‌وکارهای وارداتی، محاسبه قیمت تمام‌شده، نرخ فروش و سود و زیان به دلیل تفاوت ارز خرید و ارز فروش می‌تواند پیچیده و زمان‌بر باشد.
 
-To develop a Electron app, I use ... 
+**نرم‌افزار حسابداری EVA** با مدیریت هم‌زمان چند ارز، این محاسبات را ساده و دقیق می‌کند و به شما کمک می‌کند:
+
+- قیمت تمام‌شده کالا را به‌درستی محاسبه کنید.
+- نرخ‌گذاری کالا را با توجه به نرخ ارز انجام دهید.
+- سود و زیان واقعی معاملات را محاسبه کنید.
+- خریدهای دلاری و درهمی را در کنار فروش ریالی و تومانی مدیریت کنید.
+- محاسبات مربوط به تغییرات نرخ ارز را ساده‌تر و دقیق‌تر انجام دهید.
+
+EVA برای افرادی ساخته شده است که با **واردات، خرید ارزی و فروش ریالی یا تومانی** سروکار دارند و می‌خواهند بخش پیچیده محاسبات حسابداری و نرخ‌گذاری را به شکل ساده‌تری مدیریت کنند.
+
+## Demo
+
+![EVA Demo](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo.png)
+
+![EVA Demo](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo1.png)
+
+![EVA Demo](https://github.com/ahmadhaerii/eva-hesabdar/blob/main/images/demo2.png)
+
+## Libs and Tools
+
+EVA is built with modern web and desktop technologies.
 
 ### Core 🏍️
 
@@ -22,45 +40,41 @@ To develop a Electron app, I use ...
 - [Prettier](https://prettier.io)
 - [Ultracite with Biome](https://www.ultracite.ai/providers/biome)
 - [Zod 4](https://zod.dev)
-- [React Query (TanStack)](https://react-query.tanstack.com)
+- [React Query (TanStack)](https://tanstack.com/query)
 
 ### UI 🎨
 
-- [React 19.2](https://reactjs.org)
-- [Tailwind 4.3](https://tailwindcss.com)
+- [React 19.2](https://react.dev)
+- [Tailwind CSS 4.3](https://tailwindcss.com)
 - [Shadcn UI](https://ui.shadcn.com)
-- [Geist](https://vercel.com/font) as default font
+- [Geist](https://vercel.com/font) as the default font
 - [i18next](https://www.i18next.com)
-- [TanStack Router](https://tanstack.com/router) (with file based routing)
+- [TanStack Router](https://tanstack.com/router) with file-based routing
 - [Lucide](https://lucide.dev)
 
-### Test 🧪
+### Testing 🧪
 
 - [Vitest](https://vitest.dev)
 - [Playwright](https://playwright.dev)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
 
-### Packing and distribution 📦
+### Packaging and Distribution 📦
 
 - [Electron Forge](https://www.electronforge.io)
 
 ### CI/CD 🚀
 
-- Pre-configured [GitHub Actions workflow](https://github.com/LuanRoger/electron-shadcn/blob/main/.github/workflows/playwright.yml), for test with Playwright
+- Pre-configured [GitHub Actions workflow](https://github.com/LuanRoger/electron-shadcn/blob/main/.github/workflows/playwright.yml) for Playwright tests.
 
-### Project preferences 🎯
+### Project Preferences 🎯
 
-- Use Context isolation
+- Context isolation is enabled.
 - [React Compiler](https://react.dev/learn/react-compiler) is enabled by default.
-- `titleBarStyle`: hidden (Using custom title bar)
-- Geist as default font
-- Some default styles was applied, check the [`styles`](https://github.com/LuanRoger/electron-shadcn/tree/main/src/styles) directory
-- React DevTools are installed by default
- 
+- `titleBarStyle`: hidden, using a custom title bar.
+- Geist is used as the default font.
+- React DevTools are installed by default.
+
+## Development
+
+```bash
 npm run start -- --inspect-electron
-
-
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/LuanRoger/electron-shadcn/blob/main/LICENSE) file for details.
